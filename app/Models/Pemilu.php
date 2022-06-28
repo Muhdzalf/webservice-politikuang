@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Pemilu extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'nama',
+        'tanggal',
+        'waktu',
+        'alamat_id',
+        'jenis',
+    ];
 }

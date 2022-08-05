@@ -13,4 +13,14 @@ class Provinsi extends Model
         'nama',
         'deskripsi'
     ];
+
+    public function kabupaten()
+    {
+        return $this->hasMany(Kabupaten::class, 'provinsi_id', 'id');
+    }
+
+    public function alamat()
+    {
+        return $this->hasMany(Alamat::class, 'provinsi_id', 'id');
+    }
 }

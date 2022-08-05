@@ -48,4 +48,24 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function alamat()
+    {
+        return $this->belongsTo(Alamat::class, 'alamat_id', 'id');
+    }
+
+    public function progressLaporan()
+    {
+        return $this->hasMany(ProgressLaporan::class, 'user_id', 'id');
+    }
+
+    public function laporan()
+    {
+        return $this->hasMany(Laporan::class, 'user_id', 'id');
+    }
+
+    public function edukasi()
+    {
+        return $this->hasMany(Edukasi::class, 'user_id', 'id');
+    }
 }

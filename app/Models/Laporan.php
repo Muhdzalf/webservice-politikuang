@@ -22,4 +22,20 @@ class Laporan extends Model
         'pengirim_laporan',
         'pemilu_id',
     ];
+
+    //Relasi
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'pengirim_laporan', 'id');
+    }
+    public function pemilu()
+    {
+        return $this->belongsTo(Pemilu::class, 'pemilu_id', 'id');
+    }
+
+    public function progressLaporan()
+    {
+        return $this->hasMany(ProgressLaporan::class, 'laporan_id', 'id');
+    }
 }

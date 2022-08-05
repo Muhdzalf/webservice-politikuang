@@ -16,4 +16,14 @@ class Pemilu extends Model
         'alamat_id',
         'jenis',
     ];
+
+    public function alamat()
+    {
+        return $this->belongsTo(Alamat::class, 'alamat_id', 'id');
+    }
+
+    public function laporan()
+    {
+        return $this->hasMany(Laporan::class, 'pemilu_id', 'id');
+    }
 }

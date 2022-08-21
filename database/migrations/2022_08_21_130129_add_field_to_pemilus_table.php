@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('pemilus', function (Blueprint $table) {
+        Schema::table('pemilu', function (Blueprint $table) {
             // jenis pemilu fk
             $table->bigInteger('jenis_id')->unsigned()->after('waktu_pelaksanaan')->default(0);
-            $table->foreign('jenis_id')->references('id')->on('pemilu')->onUpdate('cascade');
+            $table->foreign('jenis_id')->references('id')->on('jenis_pemilu')->onUpdate('cascade');
         });
     }
 
@@ -27,8 +27,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('pemilus', function (Blueprint $table) {
-            $table->dropForeign('pemilus_jenis_id_foreign');
+        Schema::table('pemilu', function (Blueprint $table) {
+            $table->dropForeign('pemilu_jenis_id_foreign');
             $table->dropColumn('jenis_id');
         });
     }

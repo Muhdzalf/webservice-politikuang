@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('alamats', function (Blueprint $table) {
+        Schema::create('alamat', function (Blueprint $table) {
             $table->id();
-            $table->text('keterangan')->nullable();
+            $table->text('detail')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('alamats');
+        Schema::dropIfExists('alamat');
     }
 };

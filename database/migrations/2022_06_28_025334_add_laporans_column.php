@@ -13,14 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('laporans', function (Blueprint $table) {
+        Schema::table('laporan', function (Blueprint $table) {
             // relasi dengan tabel user
             $table->bigInteger('pengirim_laporan')->unsigned()->after('kronologi_kejadian');
             $table->foreign('pengirim_laporan')->references('id')->on('users');
 
             //relasi dengan tabel pemilu
             $table->bigInteger('pemilu_id')->unsigned()->after('judul');
-            $table->foreign('pemilu_id')->references('id')->on('pemilus');
+            $table->foreign('pemilu_id')->references('id')->on('pemilu');
         });
     }
 
@@ -31,10 +31,10 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('laporans', function (Blueprint $table) {
+        Schema::table('laporan', function (Blueprint $table) {
             //drop foreign
-            $table->dropForeign('laporans_pengirim_laporan_foreign');
-            $table->dropForeign('laporans_pemilu_id_foreign');
+            $table->dropForeign('laporan_pengirim_laporan_foreign');
+            $table->dropForeign('laporan_pemilu_id_foreign');
             $table->dropColumn(['pengirim_laporan', 'pemilu_id']);
         });
     }

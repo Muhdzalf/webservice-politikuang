@@ -9,9 +9,10 @@ class Provinsi extends Model
 {
     use HasFactory;
 
+    protected $table = 'provinsi';
+
     protected $fillable = [
         'nama',
-        'deskripsi'
     ];
 
     public function kabupaten()

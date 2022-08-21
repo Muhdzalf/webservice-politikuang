@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('kabupatens', function (Blueprint $table) {
+        Schema::table('kabupaten', function (Blueprint $table) {
             //relasi dengan tabel provinsi
             $table->char('provinsi_id', 2)->after('nama');
-            $table->foreign('provinsi_id')->references('id')->on('provinsis')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('provinsi_id')->references('id')->on('provinsi')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -27,8 +27,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('kabupatens', function (Blueprint $table) {
-            $table->dropForeign('kabupatens_provinsi_id_foreign');
+        Schema::table('kabupaten', function (Blueprint $table) {
+            $table->dropForeign('kabupaten_provinsi_id_foreign');
             $table->dropColumn('provinsi_id');
         });
     }

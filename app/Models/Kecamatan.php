@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Kecamatan extends Model
 {
     use HasFactory;
+    protected $table = 'kecamatan';
+
 
     protected $fillable = [
         'nama',
@@ -17,7 +19,7 @@ class Kecamatan extends Model
 
     public function kabupaten()
     {
-        return $this->belongsTo(Kabupaten::class, 'kabupaten_id');
+        return $this->belongsTo(Kabupaten::class, 'kabupaten_id', 'id');
     }
 
     public function alamat()

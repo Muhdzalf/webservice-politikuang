@@ -9,6 +9,9 @@ class ProgressLaporan extends Model
 {
     use HasFactory;
 
+    protected $table = 'progress_laporan';
+
+
     protected $fillable = [
         'laporan_id',
         'user_id',

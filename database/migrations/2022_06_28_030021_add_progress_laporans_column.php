@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('progress_laporans', function (Blueprint $table) {
+        Schema::table('progress_laporan', function (Blueprint $table) {
             // relasi dengan tabel laporan
             $table->bigInteger('laporan_id')->unsigned()->after('id');
-            $table->foreign('laporan_id')->references('id')->on('laporans');
+            $table->foreign('laporan_id')->references('id')->on('laporan');
 
             // relasi dengan tabel user
             $table->bigInteger('user_id')->unsigned()->after('id');
@@ -31,9 +31,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('progress_laporans', function (Blueprint $table) {
-            $table->dropForeign('progress_laporans_laporan_id_foreign');
-            $table->dropForeign('progress_laporans_user_id_foreign');
+        Schema::table('progress_laporan', function (Blueprint $table) {
+            $table->dropForeign('progress_laporan_laporan_id_foreign');
+            $table->dropForeign('progress_laporan_user_id_foreign');
             $table->dropColumn(['laporan_id', 'user_id']);
         });
     }

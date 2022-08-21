@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('progress_laporans', function (Blueprint $table) {
+        Schema::create('progress_laporan', function (Blueprint $table) {
             $table->id();
             $table->string('status');
             $table->index('status');

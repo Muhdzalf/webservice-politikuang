@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('pemilus', function (Blueprint $table) {
+        Schema::table('pemilu', function (Blueprint $table) {
             //relasi dengan tabel alamat
-            $table->bigInteger('alamat_id')->unsigned()->after('jenis');
-            $table->foreign('alamat_id')->references('id')->on('alamats')->onDelete('cascade')->onUpdate('cascade');
+            $table->bigInteger('alamat_id')->unsigned()->after('waktu_pelaksanaan');
+            $table->foreign('alamat_id')->references('id')->on('alamat')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -27,8 +27,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('pemilus', function (Blueprint $table) {
-            $table->dropForeign('pemilus_alamat_id_foreign');
+        Schema::table('pemilu', function (Blueprint $table) {
+            $table->dropForeign('pemilu_alamat_id_foreign');
             $table->dropColumn('alamat_id');
         });
     }

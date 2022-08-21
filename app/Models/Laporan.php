@@ -9,6 +9,8 @@ class Laporan extends Model
 {
     use HasFactory;
 
+    protected $table = 'laporan';
+
     protected $filleable = [
         'nomor_laporan',
         'judul',
@@ -19,6 +21,7 @@ class Laporan extends Model
         'nominal',
         'lokasi_kejadian',
         'kronologi_kejadian',
+        'bukti',
         'pengirim_laporan',
         'pemilu_id',
     ];

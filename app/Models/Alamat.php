@@ -10,18 +10,14 @@ class Alamat extends Model
 {
     use HasFactory;
 
+    protected $table = 'alamat';
+
     protected $fillable = [
         'kecamatan_id',
         'kabupaten_id',
         'provinsi_id',
         'keterangan'
     ];
-
-    public function user()
-    {
-        return $this->hasOne(User::class, 'alamat_id', 'id');
-    }
-
     public function pemilu()
     {
         return $this->hasOne(User::class, 'alamat_id', 'id');

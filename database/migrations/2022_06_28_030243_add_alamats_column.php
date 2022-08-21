@@ -13,18 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('alamats', function (Blueprint $table) {
+        Schema::table('alamat', function (Blueprint $table) {
             // relasi dengan tabel kecamatan
             $table->char('kecamatan_id', 7)->after('id');
-            $table->foreign('kecamatan_id')->references('id')->on('kecamatans');
+            $table->foreign('kecamatan_id')->references('id')->on('kecamatan');
 
             // relasi dengan tabel kabupaten
             $table->char('kabupaten_id', 4)->after('kecamatan_id');
-            $table->foreign('kabupaten_id')->references('id')->on('kabupatens');
+            $table->foreign('kabupaten_id')->references('id')->on('kabupaten');
 
             // relasi dengan tabel kecamatan
             $table->char('provinsi_id', 2)->after('kabupaten_id');
-            $table->foreign('provinsi_id')->references('id')->on('provinsis');
+            $table->foreign('provinsi_id')->references('id')->on('provinsi');
         });
     }
 
@@ -35,10 +35,10 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('alamats', function (Blueprint $table) {
-            $table->dropForeign('alamats_kecamatan_id_foreign');
-            $table->dropForeign('alamats_kabupaten_id_foreign');
-            $table->dropForeign('alamats_provinsi_id_foreign');
+        Schema::table('alamat', function (Blueprint $table) {
+            $table->dropForeign('alamat_kecamatan_id_foreign');
+            $table->dropForeign('alamat_kabupaten_id_foreign');
+            $table->dropForeign('alamat_provinsi_id_foreign');
             $table->dropColumn(['kecamatan_id', 'kabupaten_id', 'provinsi_id']);
         });
     }

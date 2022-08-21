@@ -9,12 +9,14 @@ class Pemilu extends Model
 {
     use HasFactory;
 
+    protected $table = 'pemilu';
+
     protected $fillable = [
         'nama',
         'tanggal_pelaksanaan',
         'waktu_pelaksanaan',
         'alamat_id',
-        'jenis',
+        'jenis_id',
     ];
 
     public function alamat()
@@ -25,5 +27,10 @@ class Pemilu extends Model
     public function laporan()
     {
         return $this->hasMany(Laporan::class, 'pemilu_id', 'id');
+    }
+
+    public function jenis()
+    {
+        return $this->belongsTo(JenisPemilu::class, 'jenis_id', 'id');
     }
 }

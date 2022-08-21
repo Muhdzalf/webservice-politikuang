@@ -9,6 +9,9 @@ class Edukasi extends Model
 {
     use HasFactory;
 
+    protected $table = 'edukasi';
+
+
     protected $fillable = [
         'judul',
         'penulis',
@@ -19,6 +22,6 @@ class Edukasi extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

@@ -13,15 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('laporans', function (Blueprint $table) {
+        Schema::create('laporan', function (Blueprint $table) {
             $table->id();
-            $table->uuid('nomor_laporan', 8)->unique();
-            $table->string('judul', 30);
-            $table->time('waktu_kejadian');
+            $table->string('nomor_laporan', 15);
+            $table->string('judul', 50);
+            $table->year('waktu_kejadian');
             $table->date('tanggal_keajadian');
             $table->string('pemberi', 50);
             $table->string('penerima', 50);
-            $table->integer('nominal', 15);
+            $table->bigInteger('nominal');
             $table->string('lokasi_kejadian', 50);
             $table->longText('kronologi_kejadian');
             $table->string('bukti', 200);
@@ -36,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('laporans');
+        Schema::dropIfExists('laporan');
     }
 };

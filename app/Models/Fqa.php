@@ -9,6 +9,8 @@ class Fqa extends Model
 {
     use HasFactory;
 
+    protected $table = 'fqa';
+
     protected $fillable = [
         'pertanyaan',
         'jawaban',

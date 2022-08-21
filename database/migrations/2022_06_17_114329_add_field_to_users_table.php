@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->char('nik', 16)->after('id');
+            $table->string('alamat', 150)->after('nik');
             $table->string('nomor_tlp', 13)->after('email');
             $table->date('tanggal_lahir')->after('nomor_tlp');
             $table->char('jenis_kelamin', 1)->after('tanggal_lahir');
@@ -32,7 +33,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['nik', 'tanggal_lahir', 'jenis_kelamin', 'nomor_tlp', 'pekerjaan', 'role', 'kewarganegaraan']);
+            $table->dropColumn(['nik', 'alamat', 'tanggal_lahir', 'jenis_kelamin', 'nomor_tlp', 'pekerjaan', 'role', 'kewarganegaraan']);
         });
     }
 };

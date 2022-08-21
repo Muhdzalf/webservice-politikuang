@@ -30,78 +30,78 @@ class AddressController extends Controller
         }
     }
 
-    public function createProvinsi(Request $request)
-    {
-        if (!Gate::allows('only-petugas')) {
-            return response()->json([
-                'message' => 'Fitur ini hanya dapat ditambahkan oleh petugas'
-            ]);
-        }
-        $request->validate([
-            'nama' => 'required|string',
-        ]);
+    // public function createProvinsi(Request $request)
+    // {
+    //     if (!Gate::allows('only-petugas')) {
+    //         return response()->json([
+    //             'message' => 'Fitur ini hanya dapat ditambahkan oleh petugas'
+    //         ]);
+    //     }
+    //     $request->validate([
+    //         'nama' => 'required|string',
+    //     ]);
 
-        $provinsi = Provinsi::create([
-            'nama' => 'Provinsi ' . $request->nama
-        ]);
+    //     $provinsi = Provinsi::create([
+    //         'nama' => 'Provinsi ' . $request->nama
+    //     ]);
 
-        return response()->json([
-            'message' => 'Data Provinsi berhasil dibuat',
-            'data' => $provinsi
-        ]);
-    }
+    //     return response()->json([
+    //         'message' => 'Data Provinsi berhasil dibuat',
+    //         'data' => $provinsi
+    //     ]);
+    // }
 
-    public function updateProvinsi(Request $request, $id)
-    {
-        try {
-            if (!Gate::allows('only-petugas')) {
-                return response()->json([
-                    'message' => 'Data ini hanya bisa diperbaharui oleh petugas'
-                ]);
-            }
-            $provinsi = Provinsi::find($id);
+    // public function updateProvinsi(Request $request, $id)
+    // {
+    //     try {
+    //         if (!Gate::allows('only-petugas')) {
+    //             return response()->json([
+    //                 'message' => 'Data ini hanya bisa diperbaharui oleh petugas'
+    //             ]);
+    //         }
+    //         $provinsi = Provinsi::find($id);
 
-            $request->validate([
-                'nama' => 'required|string',
-            ]);
+    //         $request->validate([
+    //             'nama' => 'required|string',
+    //         ]);
 
-            $provinsi->nama = 'Provinsi ' . $request->nama;
-            $provinsi->save();
+    //         $provinsi->nama = 'Provinsi ' . $request->nama;
+    //         $provinsi->save();
 
-            return response()->json([
-                'message' => 'Data Provinsi berhasil diperbaharui',
-                'data' => $provinsi
-            ]);
-        } catch (Exception $error) {
-            return response()->json([
-                'message' => 'Gagal Memperbaharui Data',
-                'error' => $error
-            ]);
-        }
-    }
+    //         return response()->json([
+    //             'message' => 'Data Provinsi berhasil diperbaharui',
+    //             'data' => $provinsi
+    //         ]);
+    //     } catch (Exception $error) {
+    //         return response()->json([
+    //             'message' => 'Gagal Memperbaharui Data',
+    //             'error' => $error
+    //         ]);
+    //     }
+    // }
 
-    public function deleteProvinsi($id)
-    {
-        try {
-            if (!Gate::allows('only-petugas')) {
-                return response()->json([
-                    'message' => 'Data ini hanya bisa dihapus oleh petugas'
-                ]);
-            }
+    // public function deleteProvinsi($id)
+    // {
+    //     try {
+    //         if (!Gate::allows('only-petugas')) {
+    //             return response()->json([
+    //                 'message' => 'Data ini hanya bisa dihapus oleh petugas'
+    //             ]);
+    //         }
 
-            $provinsi = Provinsi::find($id);
-            $provinsi->delete();
+    //         $provinsi = Provinsi::find($id);
+    //         $provinsi->delete();
 
-            return response()->json([
-                'message' => 'Data Provinsi berhasil dihapus'
-            ]);
-        } catch (Exception $error) {
-            return response()->json([
-                'message' => 'Gagal Menghapus Data',
-                'error' => $error
-            ]);
-        }
-    }
+    //         return response()->json([
+    //             'message' => 'Data Provinsi berhasil dihapus'
+    //         ]);
+    //     } catch (Exception $error) {
+    //         return response()->json([
+    //             'message' => 'Gagal Menghapus Data',
+    //             'error' => $error
+    //         ]);
+    //     }
+    // }
 
     // Kabupaten
     public function getAllKabupaten()
@@ -120,81 +120,81 @@ class AddressController extends Controller
         }
     }
 
-    public function createKabupaten(Request $request)
-    {
-        if (!Gate::allows('only-petugas')) {
-            return response()->json([
-                'message' => 'Fitur ini hanya dapat ditambahkan oleh petugas'
-            ]);
-        }
-        $request->validate([
-            'nama' => 'required|string',
-            'provinsi_id' => 'required|string'
-        ]);
+    // public function createKabupaten(Request $request)
+    // {
+    //     if (!Gate::allows('only-petugas')) {
+    //         return response()->json([
+    //             'message' => 'Fitur ini hanya dapat ditambahkan oleh petugas'
+    //         ]);
+    //     }
+    //     $request->validate([
+    //         'nama' => 'required|string',
+    //         'provinsi_id' => 'required|string'
+    //     ]);
 
-        $kabupaten = Kabupaten::create([
-            'nama' => $request->nama,
-            'provinsi_id' => $request->provinsi_id
-        ]);
+    //     $kabupaten = Kabupaten::create([
+    //         'nama' => $request->nama,
+    //         'provinsi_id' => $request->provinsi_id
+    //     ]);
 
-        return response()->json([
-            'message' => 'Data Kabupaten berhasil dibuat',
-            'data' => $kabupaten
-        ]);
-    }
+    //     return response()->json([
+    //         'message' => 'Data Kabupaten berhasil dibuat',
+    //         'data' => $kabupaten
+    //     ]);
+    // }
 
 
-    public function updateKabupaten(Request $request, $id)
-    {
-        try {
-            if (!Gate::allows('only-petugas')) {
-                return response()->json([
-                    'message' => 'Data ini hanya bisa diperbaharui oleh petugas'
-                ]);
-            }
-            $kabupaten = Kabupaten::find($id);
+    // public function updateKabupaten(Request $request, $id)
+    // {
+    //     try {
+    //         if (!Gate::allows('only-petugas')) {
+    //             return response()->json([
+    //                 'message' => 'Data ini hanya bisa diperbaharui oleh petugas'
+    //             ]);
+    //         }
+    //         $kabupaten = Kabupaten::find($id);
 
-            $request->validate([
-                'nama' => 'required|string',
-            ]);
+    //         $request->validate([
+    //             'nama' => 'required|string',
+    //         ]);
 
-            $kabupaten->nama = $request->nama;
-            $kabupaten->save();
+    //         $kabupaten->nama = $request->nama;
+    //         $kabupaten->save();
 
-            return response()->json([
-                'message' => 'Data Kabupaten berhasil diperbaharui',
-                'data' => $kabupaten
-            ]);
-        } catch (Exception $error) {
-            return response()->json([
-                'message' => 'Gagal Memperbaharui Data',
-                'error' => $error
-            ]);
-        }
-    }
+    //         return response()->json([
+    //             'message' => 'Data Kabupaten berhasil diperbaharui',
+    //             'data' => $kabupaten
+    //         ]);
+    //     } catch (Exception $error) {
+    //         return response()->json([
+    //             'message' => 'Gagal Memperbaharui Data',
+    //             'error' => $error
+    //         ]);
+    //     }
+    // }
 
-    public function deleteKabupaten($id)
-    {
-        try {
-            if (!Gate::allows('only-petugas')) {
-                return response()->json([
-                    'message' => 'Data ini hanya bisa dihapus oleh petugas'
-                ]);
-            }
+    // public function deleteKabupaten($id)
+    // {
+    //     try {
+    //         if (!Gate::allows('only-petugas')) {
+    //             return response()->json([
+    //                 'message' => 'Data ini hanya bisa dihapus oleh petugas'
+    //             ]);
+    //         }
 
-            $kabupaten = Kabupaten::find($id);
-            $kabupaten->delete();
+    //         $kabupaten = Kabupaten::find($id);
+    //         $kabupaten->delete();
 
-            return response()->json([
-                'message' => 'Data Kabupaten berhasil dihapus'
-            ]);
-        } catch (Exception $error) {
-            return response()->json([
-                'message' => 'Gagal Menghapus Data',
-                'error' => $error
-            ]);
-        }
-    }
+    //         return response()->json([
+    //             'message' => 'Data Kabupaten berhasil dihapus'
+    //         ]);
+    //     } catch (Exception $error) {
+    //         return response()->json([
+    //             'message' => 'Gagal Menghapus Data',
+    //             'error' => $error
+    //         ]);
+    //     }
+    // }
 
 
 
@@ -216,80 +216,80 @@ class AddressController extends Controller
         }
     }
 
-    public function createKecamatan(Request $request)
-    {
-        if (!Gate::allows('only-petugas')) {
-            return response()->json([
-                'message' => 'Fitur ini hanya dapat ditambahkan oleh petugas'
-            ]);
-        }
-        $request->validate([
-            'nama' => 'required|string',
-            'kabupaten_id' => 'required|string'
-        ]);
+    // public function createKecamatan(Request $request)
+    // {
+    //     if (!Gate::allows('only-petugas')) {
+    //         return response()->json([
+    //             'message' => 'Fitur ini hanya dapat ditambahkan oleh petugas'
+    //         ]);
+    //     }
+    //     $request->validate([
+    //         'nama' => 'required|string',
+    //         'kabupaten_id' => 'required|string'
+    //     ]);
 
-        $kecamatan = Kecamatan::create([
-            'nama' => $request->nama,
-            'kabupaten_id' => $request->kabupaten_id,
-        ]);
+    //     $kecamatan = Kecamatan::create([
+    //         'nama' => $request->nama,
+    //         'kabupaten_id' => $request->kabupaten_id,
+    //     ]);
 
-        return response()->json([
-            'message' => 'Data Kecamatan berhasil dibuat',
-            'data' => $kecamatan
-        ]);
-    }
+    //     return response()->json([
+    //         'message' => 'Data Kecamatan berhasil dibuat',
+    //         'data' => $kecamatan
+    //     ]);
+    // }
 
-    public function updateKecamatan(Request $request, $id)
-    {
-        try {
-            if (!Gate::allows('only-petugas')) {
-                return response()->json([
-                    'message' => 'Data ini hanya bisa diperbaharui oleh petugas'
-                ]);
-            }
-            $kecamatan = Kecamatan::find($id);
+    // public function updateKecamatan(Request $request, $id)
+    // {
+    //     try {
+    //         if (!Gate::allows('only-petugas')) {
+    //             return response()->json([
+    //                 'message' => 'Data ini hanya bisa diperbaharui oleh petugas'
+    //             ]);
+    //         }
+    //         $kecamatan = Kecamatan::find($id);
 
-            $request->validate([
-                'nama' => 'required|string',
-                'kabupaten_id' => 'required'
-            ]);
+    //         $request->validate([
+    //             'nama' => 'required|string',
+    //             'kabupaten_id' => 'required'
+    //         ]);
 
-            $kecamatan->nama = $request->nama;
-            $kecamatan->kabupaten_id = $request->kabupaten_id;
-            $kecamatan->save();
+    //         $kecamatan->nama = $request->nama;
+    //         $kecamatan->kabupaten_id = $request->kabupaten_id;
+    //         $kecamatan->save();
 
-            return response()->json([
-                'message' => 'Data Kecamatan berhasil diperbaharui',
-                'data' => $kecamatan
-            ]);
-        } catch (Exception $error) {
-            return response()->json([
-                'message' => 'Gagal Memperbaharui Data',
-                'error' => $error
-            ]);
-        }
-    }
+    //         return response()->json([
+    //             'message' => 'Data Kecamatan berhasil diperbaharui',
+    //             'data' => $kecamatan
+    //         ]);
+    //     } catch (Exception $error) {
+    //         return response()->json([
+    //             'message' => 'Gagal Memperbaharui Data',
+    //             'error' => $error
+    //         ]);
+    //     }
+    // }
 
-    public function deleteKecamatan($id)
-    {
-        try {
-            if (!Gate::allows('only-petugas')) {
-                return response()->json([
-                    'message' => 'Data ini hanya bisa dihapus oleh petugas'
-                ]);
-            }
+    // public function deleteKecamatan($id)
+    // {
+    //     try {
+    //         if (!Gate::allows('only-petugas')) {
+    //             return response()->json([
+    //                 'message' => 'Data ini hanya bisa dihapus oleh petugas'
+    //             ]);
+    //         }
 
-            $kecamatan = Kecamatan::find($id);
-            $kecamatan->delete();
+    //         $kecamatan = Kecamatan::find($id);
+    //         $kecamatan->delete();
 
-            return response()->json([
-                'message' => 'Data Kecamatan berhasil dihapus'
-            ]);
-        } catch (Exception $error) {
-            return response()->json([
-                'message' => 'Gagal Menghapus Data',
-                'error' => $error
-            ]);
-        }
-    }
+    //         return response()->json([
+    //             'message' => 'Data Kecamatan berhasil dihapus'
+    //         ]);
+    //     } catch (Exception $error) {
+    //         return response()->json([
+    //             'message' => 'Gagal Menghapus Data',
+    //             'error' => $error
+    //         ]);
+    //     }
+    // }
 }

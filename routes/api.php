@@ -27,19 +27,19 @@ Route::middleware('auth:sanctum')->group(
     function () {
 
         //Provinsi Route
-        Route::post('/provinsi/create', [AddressController::class, 'createProvinsi']);
-        Route::post('/provinsi/update/{id}', [AddressController::class, 'updateProvinsi']);
-        Route::post('/provinsi/delete/{id}', [AddressController::class, 'deleteProvinsi']);
+        // Route::post('/provinsi/create', [AddressController::class, 'createProvinsi']);
+        // Route::post('/provinsi/update/{id}', [AddressController::class, 'updateProvinsi']);
+        // Route::post('/provinsi/delete/{id}', [AddressController::class, 'deleteProvinsi']);
 
         // Kabupaten Route
-        Route::post('/kabupaten/create', [AddressController::class, 'createKabupaten']);
-        Route::post('/kabupaten/update/{id}', [AddressController::class, 'updateKabupaten']);
-        Route::post('/kabupaten/delete/{id}', [AddressController::class, 'deleteKabupaten']);
+        // Route::post('/kabupaten/create', [AddressController::class, 'createKabupaten']);
+        // Route::post('/kabupaten/update/{id}', [AddressController::class, 'updateKabupaten']);
+        // Route::post('/kabupaten/delete/{id}', [AddressController::class, 'deleteKabupaten']);
 
         // Kecamatan Route
-        Route::post('/kecamatan/create', [AddressController::class, 'createKecamatan']);
-        Route::post('/kecamatan/update/{id}', [AddressController::class, 'updateKecamatan']);
-        Route::post('/kecamatan/delete/{id}', [AddressController::class, 'deleteKecamatan']);
+        // Route::post('/kecamatan/create', [AddressController::class, 'createKecamatan']);
+        // Route::post('/kecamatan/update/{id}', [AddressController::class, 'updateKecamatan']);
+        // Route::post('/kecamatan/delete/{id}', [AddressController::class, 'deleteKecamatan']);
 
         // FQA Route
         Route::post('/fqa/create', [FQAController::class, 'create']);

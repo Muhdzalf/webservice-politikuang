@@ -15,15 +15,15 @@ return new class extends Migration
     {
         Schema::table('alamats', function (Blueprint $table) {
             // relasi dengan tabel kecamatan
-            $table->bigInteger('kecamatan_id')->unsigned()->after('id');
+            $table->char('kecamatan_id', 7)->after('id');
             $table->foreign('kecamatan_id')->references('id')->on('kecamatans');
 
             // relasi dengan tabel kabupaten
-            $table->bigInteger('kabupaten_id')->unsigned();
+            $table->char('kabupaten_id', 4)->after('kecamatan_id');
             $table->foreign('kabupaten_id')->references('id')->on('kabupatens');
 
             // relasi dengan tabel kecamatan
-            $table->bigInteger('provinsi_id')->unsigned();
+            $table->char('provinsi_id', 2)->after('kabupaten_id');
             $table->foreign('provinsi_id')->references('id')->on('provinsis');
         });
     }

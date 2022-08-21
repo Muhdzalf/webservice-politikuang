@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -26,5 +27,11 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         //
+        // create gate only petugas
+        Gate::define('only-petugas', function (User $user) {
+            if ($user->role == 'petugas') {
+                return true;
+            }
+        });
     }
 }

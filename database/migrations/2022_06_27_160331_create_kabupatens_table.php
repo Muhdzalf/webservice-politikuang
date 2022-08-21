@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('kabupatens', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama', 20);
+            $table->char('id', 4);
+            $table->string('nama', 50);
             $table->timestamps();
         });
     }

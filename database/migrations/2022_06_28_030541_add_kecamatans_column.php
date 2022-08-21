@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('kecamatans', function (Blueprint $table) {
             //relasi dengan tabel kabupaten
-            $table->bigInteger('kabupaten_id')->unsigned()->after('nama');
+            $table->char('kabupaten_id', 4)->after('nama');
             $table->foreign('kabupaten_id')->references('id')->on('kabupatens')->onDelete('cascade')->onUpdate('cascade');
         });
     }

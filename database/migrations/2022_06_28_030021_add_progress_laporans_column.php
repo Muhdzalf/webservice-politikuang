@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreign('laporan_id')->references('id')->on('laporans');
 
             // relasi dengan tabel user
-            $table->bigInteger('user_id')->unsigned();
+            $table->bigInteger('user_id')->unsigned()->after('id');
             $table->foreign('user_id')->references('id')->on('users');
         });
     }

@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('nama', 50);
             $table->date('tanggal_pelaksanaan');
             $table->time('waktu_pelaksanaan');
-            $table->String('jenis', 20);
             $table->timestamps();
         });
     }

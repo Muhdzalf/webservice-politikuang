@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreign('pengirim_laporan')->references('id')->on('users');
 
             //relasi dengan tabel pemilu
-            $table->bigInteger('pemilu_id')->unsigned();
+            $table->bigInteger('pemilu_id')->unsigned()->after('judul');
             $table->foreign('pemilu_id')->references('id')->on('pemilus');
         });
     }

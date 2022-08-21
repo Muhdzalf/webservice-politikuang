@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('kabupatens', function (Blueprint $table) {
             //relasi dengan tabel provinsi
-            $table->bigInteger('provinsi_id')->unsigned()->after('nama');
+            $table->char('provinsi_id', 2)->after('nama');
             $table->foreign('provinsi_id')->references('id')->on('provinsis')->onDelete('cascade')->onUpdate('cascade');
         });
     }

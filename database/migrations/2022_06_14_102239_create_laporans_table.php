@@ -21,9 +21,10 @@ return new class extends Migration
             $table->date('tanggal_keajadian');
             $table->string('pemberi', 50);
             $table->string('penerima', 50);
-            $table->biginteger('nominal')->unsigned();
+            $table->integer('nominal', 15);
             $table->string('lokasi_kejadian', 50);
             $table->longText('kronologi_kejadian');
+            $table->string('bukti', 200);
             $table->timestamps();
         });
     }

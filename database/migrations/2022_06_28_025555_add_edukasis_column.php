@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('edukasis', function (Blueprint $table) {
             // relasi dengan tabel user
-            $table->bigInteger('user_id')->unsigned();
+            $table->bigInteger('user_id')->unsigned()->after('isi');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
     }

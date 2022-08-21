@@ -11,8 +11,8 @@ class Pemilu extends Model
 
     protected $fillable = [
         'nama',
-        'tanggal',
-        'waktu',
+        'tanggal_pelaksanaan',
+        'waktu_pelaksanaan',
         'alamat_id',
         'jenis',
     ];

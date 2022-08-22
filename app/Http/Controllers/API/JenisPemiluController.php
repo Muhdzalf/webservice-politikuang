@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\JenisPemilu;
 use App\Models\Pemilu;
 use Illuminate\Http\Request;
-
-use function PHPUnit\Framework\returnSelf;
+use Illuminate\Support\Facades\Gate;
 
 class JenisPemiluController extends Controller
 {
@@ -23,6 +22,11 @@ class JenisPemiluController extends Controller
 
     public function create(Request $request)
     {
+        if (!Gate::allows('only-petugas')) {
+            return response()->json([
+                'message' => 'Hanya petugas yang mememiliki akses untuk fitur ini'
+            ], 403);
+        }
         $request->validate([
             'nama' => 'required|string'
         ]);
@@ -39,6 +43,11 @@ class JenisPemiluController extends Controller
 
     public function update(Request $request, $id)
     {
+        if (!Gate::allows('only-petugas')) {
+            return response()->json([
+                'message' => 'Hanya petugas yang mememiliki akses untuk fitur ini'
+            ], 403);
+        }
         $request->validate([
             'nama' => 'required|string'
         ]);
@@ -54,6 +63,11 @@ class JenisPemiluController extends Controller
 
     public function delete($id)
     {
+        if (!Gate::allows('only-petugas')) {
+            return response()->json([
+                'message' => 'Hanya petugas yang mememiliki akses untuk fitur ini'
+            ], 403);
+        }
         $data = JenisPemilu::find($id);
         $data->delete();
 

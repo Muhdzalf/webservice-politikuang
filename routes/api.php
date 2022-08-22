@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AddressController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\EdukasiController;
 use App\Http\Controllers\API\FQAController;
+use App\Http\Controllers\API\LaporanController;
 use App\Http\Controllers\API\PemiluController;
 use Illuminate\Support\Facades\Route;
 
@@ -57,6 +58,10 @@ Route::middleware('auth:sanctum')->group(
         Route::post('/edukasi/delete/{id}', [EdukasiController::class, 'delete']);
 
         // Laporan Route
+        Route::post('/laporan/create', [LaporanController::class, 'createLaporan']);
+        Route::post('/laporan/update/{id}', [LaporanController::class, 'updateByUser']);
+        Route::post('/laporan/status/add/{id}', [LaporanController::class, 'changeStatus']);
+        Route::post('/laporan/delete/{id}', [LaporanController::class, 'delete']);
 
         // Logout Route
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -78,3 +83,6 @@ Route::get('/fqa', [FQAController::class, 'getAll']);
 // AUTH ROUTE
 Route::Post('/login', [AuthController::class, 'login']);
 Route::Post('/register', [AuthController::class, 'register']);
+
+// ALL LAPORAN
+Route::get('/laporan', [LaporanController::class, 'getAll']);

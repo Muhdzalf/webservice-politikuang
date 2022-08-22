@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Edukasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class EdukasiController extends Controller
 {
@@ -20,6 +21,11 @@ class EdukasiController extends Controller
 
     public function create(Request $request)
     {
+        if (!Gate::allows('only-petugas')) {
+            return response()->json([
+                'message' => 'Hanya petugas yang mememiliki akses untuk fitur ini'
+            ], 403);
+        }
         $request->validate([
             'judul' => 'required|string',
             'penulis' => 'required|string',

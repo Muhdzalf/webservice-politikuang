@@ -14,7 +14,7 @@ class Laporan extends Model
     protected $filleable = [
         'nomor_laporan',
         'judul',
-        'waktu_kejadian',
+        'tahun_kejadian',
         'tanggal_kejadian',
         'pemberi',
         'penerima',

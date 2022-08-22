@@ -5,51 +5,56 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Alamat;
 use App\Models\Pemilu;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class PemiluController extends Controller
 {
-    //
-    public function createPemilu(Request $request)
+    public function create(Request $request)
     {
-        if (!Gate::allows('only-petugas')) {
+        try {
+            if (!Gate::allows('only-petugas')) {
+                return response()->json([
+                    'message' => 'Hanya petugas yang mememiliki akses untuk fitur ini'
+                ], 403);
+            }
+
+            $request->validate([
+                'nama' => 'required|string',
+                'tanggal_pelaksanaan' => 'required|date_format:Y-m-d',
+                'waktu_pelaksanaan' => 'required|date_format:h:i',
+                'jenis_id' => 'required|numeric',
+                'kecamatan_id' => 'required|numeric',
+                'kabupaten_id' => 'required|numeric',
+                'provinsi_id' => 'required|numeric',
+                'detail' => 'required|string',
+            ]);
+
+            $alamat = Alamat::create([
+                'kecamatan_id' => $request->kecamatan_id,
+                'kabupaten_id' => $request->kabupaten_id,
+                'provinsi_id' => $request->provinsi_id,
+                'detail' => $request->detail,
+            ]);
+
+            $alamatId = $alamat->id;
+
+            $pemilu = Pemilu::create([
+                'nama' => $request->nama,
+                'tanggal_pelaksanaan' => $request->tanggal_pelaksanaan,
+                'waktu_pelaksanaan' => $request->waktu_pelaksanaan,
+                'jenis_id' => $request->jenis_id,
+                'alamat_id' => $alamatId,
+            ]);
+
             return response()->json([
-                'message' => 'Hanya petugas yang mememiliki akses untuk fitur ini'
-            ], 403);
+                'message' => 'data pemilu berhasil ditambahkan',
+                'data' => $pemilu
+            ]);
+        } catch (Exception $error) {
+            return $error;
         }
-        $request->validate([
-            'nama' => 'required|string',
-            'tanggal_pelaksanaan' => 'required|date_format:d/m/y',
-            'waktu_pelaksanaan' => 'required',
-            'kecamatan_id' => 'required|numeric',
-            'kabupaten_id' => 'required|numeric',
-            'provinsi_id' => 'required|numeric',
-            'keterangan' => 'required|string',
-            'jenis' => 'required|string|in:pilpres,pilgub,pilkada,pildes', // Jenis
-        ]);
-
-        $alamat = Alamat::create([
-            'keterangan' => $request->keterangan,
-            'kecamatan_id' => $request->kecamatan_id,
-            'kabupaten_id' => $request->kabupaten_id,
-            'provinsi_id' => $request->provinsi_id,
-        ]);
-
-        $alamatId = $alamat->id;
-
-        $pemilu = Pemilu::create([
-            'nama' => $request->nama,
-            'tanggal_pelaksanaan' => $request->tanggal,
-            'waktu_pelaksanaan' => $request->waktu,
-            'alamat_id' => $alamatId,
-            'jenis' => $request->jenis
-        ]);
-
-        return response()->json([
-            'message' => 'data pemilu berhasil ditambahkan',
-            'data' => $pemilu,
-        ]);
     }
 
     public function getAll()
@@ -74,14 +79,14 @@ class PemiluController extends Controller
         $pemilu->nama = $request->nama;
         $pemilu->tanggal_pelaksanaan = $request->tanggal_pelaksanaan;
         $pemilu->waktu_pelaksanaan = $request->waktu_pelaksanaan;
-        $pemilu->jenis = $request->jenis;
+        $pemilu->jenis_id = $request->jenis_id;
 
         $alamat = Alamat::find($pemilu->alamat_id);
 
         $alamat->provinsi_id = $request->provinsi_id;
         $alamat->kabupaten_id = $request->kabupaten_id;
         $alamat->kecamatan_id = $request->kecamatan_id;
-        $alamat->keterangan = $request->keterangan;
+        $alamat->detail = $request->detail;
 
         $alamat->save();
         $pemilu->save();

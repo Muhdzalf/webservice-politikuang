@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('provinsi', function (Blueprint $table) {
             $table->char('id', 2)->primary();
             $table->string('nama', 50);
-            $table->timestamps();
         });
     }
 

@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('kecamatan', function (Blueprint $table) {
             $table->char('id', 7)->primary();
             $table->string('nama', 50);
-            $table->timestamps();
         });
     }
 

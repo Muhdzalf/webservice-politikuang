@@ -17,16 +17,20 @@ class KabupatenSeeder extends Seeder
     public function run()
     {
         //seeder kabupaten
-        $jabar = ['Kabupaten Garut', 'Kabupaten Bandung', 'Kabupaten Tasikmalaya', 'Kota Tasikmalaya', 'Kota Bandung', 'Kabupaten Bandung Barat', 'Kota Bekasi', 'Kota Bogor', 'Kota Depok'];
+        // $jabar = ['Kabupaten Garut', 'Kabupaten Bandung', 'Kabupaten Tasikmalaya', 'Kota Tasikmalaya', 'Kota Bandung', 'Kabupaten Bandung Barat', 'Kota Bekasi', 'Kota Bogor', 'Kota Depok'];
 
-        foreach ($jabar as $item) {
+        // foreach ($jabar as $item) {
 
-            DB::table('kabupatens')->insert([
-                'nama' => $item,
-                'provinsi_id' => 1,
-                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
-            ]);
-        }
+        //     DB::table('kabupatens')->insert([
+        //         'nama' => $item,
+        //         'provinsi_id' => 1,
+        //         'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        //         'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+        //     ]);
+        // }
+
+        $sql = file_get_contents(database_path() . '\data\kabupaten.sql');
+
+        DB::statement($sql);
     }
 }

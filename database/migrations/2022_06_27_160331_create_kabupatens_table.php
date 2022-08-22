@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('kabupaten', function (Blueprint $table) {
             $table->char('id', 4)->primary();
             $table->string('nama', 50);
-            $table->timestamps();
         });
     }
 

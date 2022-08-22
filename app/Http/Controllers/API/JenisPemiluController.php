@@ -31,7 +31,7 @@ class JenisPemiluController extends Controller
             'nama' => 'required|string'
         ]);
 
-        $jenisPemilu = Pemilu::create([
+        $jenisPemilu = JenisPemilu::create([
             'nama' => $request->nama
         ]);
 

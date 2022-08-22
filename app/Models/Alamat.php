@@ -16,7 +16,7 @@ class Alamat extends Model
         'kecamatan_id',
         'kabupaten_id',
         'provinsi_id',
-        'keterangan'
+        'detail'
     ];
     public function pemilu()
     {

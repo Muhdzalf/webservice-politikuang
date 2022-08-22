@@ -15,9 +15,8 @@ return new class extends Migration
     {
         Schema::create('progress_laporan', function (Blueprint $table) {
             $table->id();
-            $table->string('status');
-            $table->index('status');
-            $table->string('keterangan');
+            $table->string('status', 20);
+            $table->string('keterangan', 150);
             $table->timestamps();
         });
     }

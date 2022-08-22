@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('judul', 100);
             $table->string('penulis', 50);
             $table->boolean('published')->default('0');
+            $table->date('tanggal_terbit')->nullable();
             $table->longText('isi');
             $table->timestamps();
         });

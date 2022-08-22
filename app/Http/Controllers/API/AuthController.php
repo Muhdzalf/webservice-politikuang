@@ -21,30 +21,17 @@ class AuthController extends Controller
 
         $request->validate([
             'nama' => 'required|string|max:50',
-            'nik' => 'required|numeric',
+            'nik' => 'required|numeric|min:16|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8',
-            'tanggal_lahir' => 'required|date',
-            'jenis_kelamin' => 'required|string|min:1',
-            'nomor_tlp' => 'required|numeric',
-            'kecamatan_id' => 'required',
-            'kabupaten_id' => 'required',
-            'provinsi_id' => 'required',
-            'keterangan' => 'required|string',
+            'tanggal_lahir' => 'required|date_format:Y-m-d',
+            'jenis_kelamin' => 'required|string|max:1',
+            'nomor_tlp' => 'required|regex:/(0)[0-9]{11}/',
+            'alamat' => 'required|string',
             'pekerjaan' => 'required|string',
             'kewarganegaraan' => 'required|string',
-            'role' => 'required'
+            'role' => 'required|in:petugas,masyarakat'
         ]);
-
-        $alamat = Alamat::create([
-            'keterangan' => $request->keterangan,
-            'kecamatan_id' => $request->kecamatan_id,
-            'kabupaten_id' => $request->kabupaten_id,
-            'provinsi_id' => $request->provinsi_id,
-
-        ]);
-
-        $alamatId = $alamat->id;
 
         $user = User::create([
             'nama' => $request->nama,
@@ -55,7 +42,7 @@ class AuthController extends Controller
             'tanggal_lahir' => $request->tanggal_lahir,
             'jenis_kelamin' => $request->jenis_kelamin,
             'nomor_tlp' => $request->nomor_tlp,
-            'alamat_id' => $alamatId,
+            'alamat' => $request->alamat,
             'pekerjaan' => $request->pekerjaan,
             'kewarganegaraan' => $request->kewarganegaraan,
             'role' => $request->role,

@@ -16,6 +16,7 @@ class Edukasi extends Model
         'judul',
         'penulis',
         'published',
+        'tanggal_terbit',
         'isi',
         'user_id',
     ];

@@ -17,12 +17,12 @@ return new class extends Migration
             $table->id();
             $table->string('nomor_laporan', 15);
             $table->string('judul', 50);
-            $table->year('waktu_kejadian');
+            $table->year('tahun_kejadian');
             $table->date('tanggal_keajadian');
             $table->string('pemberi', 50);
             $table->string('penerima', 50);
             $table->bigInteger('nominal');
-            $table->string('lokasi_kejadian', 50);
+            $table->string('lokasi_kejadian', 100);
             $table->longText('kronologi_kejadian');
             $table->string('bukti', 200);
             $table->timestamps();

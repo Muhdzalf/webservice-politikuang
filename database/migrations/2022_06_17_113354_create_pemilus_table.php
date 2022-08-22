@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('pemilu', function (Blueprint $table) {
             $table->id();
-            $table->string('nama', 50);
+            $table->string('nama', 75);
             $table->date('tanggal_pelaksanaan');
             $table->time('waktu_pelaksanaan');
             $table->timestamps();

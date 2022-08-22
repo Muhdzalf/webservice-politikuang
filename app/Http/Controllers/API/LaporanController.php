@@ -29,8 +29,8 @@ class LaporanController extends Controller
         $request->validate([
             'nomor_laporan' => 'required',
             'judul' => 'required|string',
-            'waktu_kejadian' => 'required',
-            'tanggal_kejadian' => 'required|date',
+            'tahun_kejadian' => 'required|date_format:Y',
+            'tanggal_kejadian' => 'required|date_format:Y-m-d',
             'pemberi' => 'required|string',
             'penerima' => 'required|string',
             'nominal' => 'required|numeric',
@@ -46,7 +46,7 @@ class LaporanController extends Controller
 
         $laporan = Laporan::create([
             'judul' => $request->judul,
-            'waktu_kejadian' => $request->waktu_kejadian,
+            'tahun_kejadian' => $request->tahun_kejadian,
             'tanggal_kejadian' => $request->tanggal_kejadian,
             'pemberi' => $request->pemberi,
             'penerima' => $request->penerima,
@@ -88,7 +88,7 @@ class LaporanController extends Controller
     {
         $laporan = Laporan::find($id);
         $laporan->judul = $request->judul;
-        $laporan->waktu_kejadian = $request->waktu_kejadian;
+        $laporan->tahun_kejadian = $request->tahun_kejadian;
         $laporan->tanggal_kejadian = $request->tanggal_kejadian;
         $laporan->pemberi = $request->pemberi;
         $laporan->penerima = $request->penerima;

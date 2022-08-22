@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AddressController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\EdukasiController;
 use App\Http\Controllers\API\FQAController;
+use App\Http\Controllers\API\JenisPemiluController;
 use App\Http\Controllers\API\LaporanController;
 use App\Http\Controllers\API\PemiluController;
 use Illuminate\Support\Facades\Route;
@@ -48,7 +49,7 @@ Route::middleware('auth:sanctum')->group(
         Route::post('/fqa/delete/{id}', [FQAController::class, 'delete']);
 
         // Pemilu Route
-        Route::post('/pemilu/create', [PemiluController::class, 'createPemilu']);
+        Route::post('/pemilu/create', [PemiluController::class, 'create']);
         Route::post('/pemilu/update/{id}', [PemiluController::class, 'updatePemilu']);
         Route::post('/pemilu/delete/{id}', [PemiluController::class, 'deletePemilu']);
 
@@ -62,6 +63,11 @@ Route::middleware('auth:sanctum')->group(
         Route::post('/laporan/update/{id}', [LaporanController::class, 'updateByUser']);
         Route::post('/laporan/status/add/{id}', [LaporanController::class, 'changeStatus']);
         Route::post('/laporan/delete/{id}', [LaporanController::class, 'delete']);
+
+        // Jenis Pemilu
+        Route::post('/jenis-pemilu/create', [JenisPemiluController::class, 'create']);
+        Route::post('/jenis-pemilu/update/{id}', [JenisPemiluController::class, 'update']);
+        Route::post('/jenis-pemilu/delete/{id}', [JenisPemiluController::class, 'delete']);
 
         // Logout Route
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -86,3 +92,6 @@ Route::Post('/register', [AuthController::class, 'register']);
 
 // ALL LAPORAN
 Route::get('/laporan', [LaporanController::class, 'getAll']);
+
+// Alamat
+// Route::get('/alamat', [AddressController::class, '']);

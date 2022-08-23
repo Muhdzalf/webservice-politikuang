@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('nomor_laporan', 15);
             $table->string('judul', 50);
             $table->year('tahun_kejadian');
-            $table->date('tanggal_keajadian');
+            $table->date('tanggal_kejadian');
             $table->string('pemberi', 50);
             $table->string('penerima', 50);
             $table->bigInteger('nominal');

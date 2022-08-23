@@ -7,6 +7,7 @@ use App\Models\Fqa;
 use App\Models\Laporan;
 use App\Models\Pemilu;
 use App\Models\ProgressLaporan;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -20,67 +21,74 @@ class LaporanController extends Controller
         $laporan = Laporan::all();
 
         return response()->json([
-            'message' => 'Data Laporan Berhasil Diambil',
+            'message' => 'Semua Data Laporan Berhasil Diambil',
             'data' => $laporan,
         ]);
     }
     public function createLaporan(Request $request)
     {
-        $request->validate([
-            'nomor_laporan' => 'required',
-            'judul' => 'required|string',
-            'tahun_kejadian' => 'required|date_format:Y',
-            'tanggal_kejadian' => 'required|date_format:Y-m-d',
-            'pemberi' => 'required|string',
-            'penerima' => 'required|string',
-            'nominal' => 'required|numeric',
-            'lokasi_kejadian' => 'required|string',
-            'kronologi_kejadian' => 'required|string',
-            'bukti' => 'required|url',
-            'pengirim_laporan' => 'required|string',
-            'pemilu_id' => 'required|numeric'
-        ]);
+        try {
+            $request->validate([
+                'nomor_laporan' => 'unique:laporan',
+                'judul' => 'required|string',
+                'tahun_kejadian' => 'required|date_format:Y',
+                'tanggal_kejadian' => 'required|date_format:Y-m-d',
+                'pemberi' => 'required|string',
+                'penerima' => 'required|string',
+                'nominal' => 'required|numeric',
+                'lokasi_kejadian' => 'required|string',
+                'kronologi_kejadian' => 'required|string',
+                'bukti' => 'required|url',
+                // 'pengirim_laporan' => 'required|string',
+                'pemilu_id' => 'required|numeric'
+            ]);
 
-        // mendapatkan id user yang sedang login
-        $pengirimId = Auth::user()->id;
-
-        $laporan = Laporan::create([
-            'judul' => $request->judul,
-            'tahun_kejadian' => $request->tahun_kejadian,
-            'tanggal_kejadian' => $request->tanggal_kejadian,
-            'pemberi' => $request->pemberi,
-            'penerima' => $request->penerima,
-            'nominal' => $request->nominal,
-            'lokasi_kejadian' => $request->lokasi_kejadian,
-            'kronologi_kejadian' => $request->kronologi_kejadian,
-            'bukti' => $request->bukti,
-            'pengirim_laporan' => $pengirimId,
-            'pemilu_id' => $request->pemilu_id
-        ]);
-
-        $pemilu = Pemilu::find($request->pemilu_id);
-        $laporan = Laporan::find($request->id);
-
-        // generate nomor laporan dengan format tahun
-        $nomor = $pemilu->tanggal_pelaksanaan . '-' . $pemilu->jenis_id; //jumlah terakhir laporan pada pemilu tersebut + 1;
-
-        $laporan->nomor_laporan = $nomor;
-        $laporan->save();
+            // mendapatkan id user yang sedang login
+            $pengirimId = Auth::user()->id;
+            $pemilu = Pemilu::find($request->pemilu_id);
+            $laporan = Laporan::where('pemilu_id', $request->pemilu_id)->count();
 
 
-        // pada saat pembuatan laporan maka otomatis akan langsung tercatat pada progress laporan
-        ProgressLaporan::create([
-            'laporan_id' => $laporan->id,
-            'user_id' => Auth::user()->id,
-            'status' => 'Dibuat',
-            'keterangan' => 'Laporan telah dibuat oleh ' . Auth::user()->nama
-        ]);
+
+            $tahunPemilu = date('Y', strtotime($pemilu->tanggal_pelaksanaan));
+            $jenisPemiluID = '0' . $pemilu->jenis_id;
+            $pemiluID = '0' . $pemilu->id;
+            $jumlahLaporan = '0' . $laporan + 1;
+
+            // generate nomor laporan dengan format: Tahun Pemilu-JenisPemiluID-PemiluID-jumlahLaporanPadaPemiluTersebut
+            $nomor = $tahunPemilu . '-' . $jenisPemiluID . '-' . $pemiluID . '-' . $jumlahLaporan;
+
+            $laporan = Laporan::create([
+                'nomor_laporan' => $nomor,
+                'judul' => $request->judul,
+                'tahun_kejadian' => $request->tahun_kejadian,
+                'tanggal_kejadian' => $request->tanggal_kejadian,
+                'pemberi' => $request->pemberi,
+                'penerima' => $request->penerima,
+                'nominal' => $request->nominal,
+                'lokasi_kejadian' => $request->lokasi_kejadian,
+                'kronologi_kejadian' => $request->kronologi_kejadian,
+                'bukti' => $request->bukti,
+                'pengirim_laporan' => $pengirimId,
+                'pemilu_id' => $request->pemilu_id
+            ]);
+
+            // pada saat pembuatan laporan maka otomatis akan langsung tercatat pada progress laporan
+            ProgressLaporan::create([
+                'laporan_id' => $laporan->id,
+                'user_id' => Auth::user()->id,
+                'status' => 'Dibuat',
+                'keterangan' => 'Laporan telah dibuat oleh ' . Auth::user()->nama
+            ]);
 
 
-        return response()->json([
-            'message' => 'Laporan Berhasil dibuat',
-            'data' => $laporan
-        ]);
+            return response()->json([
+                'message' => 'Laporan Berhasil dibuat',
+                'data' => $laporan
+            ]);
+        } catch (Exception $error) {
+            return $error;
+        }
     }
 
     // update isinya sama user
@@ -100,14 +108,14 @@ class LaporanController extends Controller
         ProgressLaporan::create([
             'laporan_id' => $laporan->id,
             'user_id' => Auth::user()->id,
-            'status' => 'Di perbaharui',
+            'status' => 'Diubah',
             'keterangan' => 'Laporan telah diperbaharui oleh ' . Auth::user()->nama
         ]);
 
         $laporan->save();
 
         return response()->json([
-            'message' => 'Laporan Telah Diperbaharui',
+            'message' => 'Laporan ' . $laporan->namaTelah . 'berhasil diperbaharui',
             'data' => $laporan
         ]);
     }
@@ -118,7 +126,7 @@ class LaporanController extends Controller
         // $progress = ProgressLaporan::where('laporan_id', $id);
         if (!Gate::allows('only-petugas')) {
             return response()->json([
-                'message' => 'Hanya petugas yang mememiliki akses untuk fitur ini'
+                'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $progress = ProgressLaporan::create([
@@ -137,5 +145,9 @@ class LaporanController extends Controller
     {
         $laporan = Laporan::find($id);
         $laporan->delete();
+
+        return response()->json([
+            'message' => 'Data Laporan ' . $laporan->judul . ' berhasil dihapus'
+        ]);
     }
 }

@@ -95,3 +95,6 @@ Route::get('/laporan', [LaporanController::class, 'getAll']);
 
 // Alamat
 // Route::get('/alamat', [AddressController::class, '']);
+
+// Jenis Pemilu
+Route::get('/jenis-pemilu', [JenisPemiluController::class, 'getAll']);

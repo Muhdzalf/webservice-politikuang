@@ -14,11 +14,6 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        // try {
-        // $provinsi = AddressController::getAllProvinsi();
-        // $kabupaten = AddressController::getAllKabupaten();
-        // $kecamatan = AddressController::getAllKecamatan();
-
         $request->validate([
             'nama' => 'required|string|max:50',
             'nik' => 'required|numeric|min:16|unique:users',
@@ -61,19 +56,11 @@ class AuthController extends Controller
             'access_token' => $token,
             'type' => 'Bearer'
         ]);
-        // } catch (Exception $error) {
-        //     return response()->json(
-        //         [
-        //             'message' => 'Registrasi Gagal',
-        //             'error' => $error,
-        //         ]
-        //     );
-        // }
     }
 
     public function login(Request $request)
     {
-        // try {
+
         // validasi email sama password
         $request->validate([
             'email' => 'required|email',
@@ -107,12 +94,6 @@ class AuthController extends Controller
             'akses token' => $token,
             'token type' => 'bearer',
         ]);
-        // } catch (Exception $error) {
-        //     return response()->json([
-        //         'message' => 'login gagal',
-        //         'error' => $error,
-        //     ]);
-        // }
     }
 
     public function fetchUser(Request $request)
@@ -130,19 +111,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // try {
         //menghapus token yang sudah aktif
         $token = $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'message' => 'Logout Berhasil',
-            'akses token' => $token
         ]);
-        // } catch (Exception $error) {
-        //     return response()->json([
-        //         'message' => 'Logout Gagal',
-        //         'error' => $error
-        //     ]);
-        // }
     }
 }

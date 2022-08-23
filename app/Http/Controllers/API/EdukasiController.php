@@ -23,7 +23,7 @@ class EdukasiController extends Controller
     {
         if (!Gate::allows('only-petugas')) {
             return response()->json([
-                'message' => 'Hanya petugas yang mememiliki akses untuk fitur ini'
+                'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $request->validate([

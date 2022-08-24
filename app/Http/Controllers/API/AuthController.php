@@ -16,7 +16,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:50',
-            'nik' => 'required|numeric|min:16|unique:users',
+            'nik' => 'required|numeric|digits:16|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8',
             'tanggal_lahir' => 'required|date_format:Y-m-d',

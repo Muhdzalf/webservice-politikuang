@@ -51,7 +51,6 @@ class AuthController extends Controller
         // JSON response user
         return response()->json([
             'message' => 'Proses Registrasi Berhasil!',
-            'status code' => 200,
             'data' => $user,
             'access_token' => $token,
             'type' => 'Bearer'

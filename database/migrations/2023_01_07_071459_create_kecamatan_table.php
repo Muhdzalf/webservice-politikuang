@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('kecamatan', function (Blueprint $table) {
-            $table->id('id_kecamatan');
+            $table->char('id_kecamatan', 7)->primary()->unsigned();
             $table->string('nama', 35);
-            $table->unsignedBigInteger('kabupaten_kota_id');
+            $table->char('kabupaten_kota_id', 4)->unsigned();
             $table->foreign('kabupaten_kota_id')->references('id_kabupaten_kota')->on('kabupaten_kota')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });

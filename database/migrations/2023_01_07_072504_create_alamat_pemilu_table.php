@@ -15,12 +15,17 @@ return new class extends Migration
     {
         Schema::create('alamat_pemilu', function (Blueprint $table) {
             $table->id('id_alamat');
-            $table->unsignedBigInteger('provinsi_id')->nullable();
+
+            $table->char('provinsi_id', 2)->unsigned()->nullable();
             $table->foreign('provinsi_id')->references('id_provinsi')->on('provinsi')->onUpdate('cascade')->nullOnDelete();
-            $table->unsignedBigInteger('kabupaten_kota_id')->nullable();
+
+            $table->char('kabupaten_kota_id', 4)->nullable()->unsigned();
             $table->foreign('kabupaten_kota_id')->references('id_kabupaten_kota')->on('kabupaten_kota')->onUpdate('cascade')->nullOnDelete();
-            $table->unsignedBigInteger('kecamatan_id')->nullable();
-            $table->foreign('kecamatan_id')->references('id_kecamatan')->on('kecamatan')->onUpdate('cascade')->nullOnDelete();;
+
+            $table->char('kecamatan_id', 7)->nullable()->unsigned();
+            $table->foreign('kecamatan_id')->references('id_kecamatan')->on('kecamatan')->onUpdate('cascade')->nullOnDelete();
+
+            $table->string('desa', 35);
             $table->timestamps();
         });
     }

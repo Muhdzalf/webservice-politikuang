@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(
         // Pemilu Route
         Route::post('/pemilu/create', [PemiluController::class, 'create']);
         Route::post('/pemilu/update/{id}', [PemiluController::class, 'updatePemilu']);
+        Route::get('/pemilu/detail/{id}', [PemiluController::class, 'details']);
         Route::post('/pemilu/delete/{id}', [PemiluController::class, 'deletePemilu']);
 
         // Konten Edukasi Route
@@ -59,9 +60,13 @@ Route::middleware('auth:sanctum')->group(
         Route::post('/edukasi/delete/{id}', [EdukasiController::class, 'delete']);
 
         // Laporan Route
+        Route::get('/laporan', [LaporanController::class, 'allLaporan']);
+        Route::get('/laporan/my-laporan', [LaporanController::class, 'getUserLaporan']);
+        Route::get('/laporan/progress/{id}', [LaporanController::class, 'getProgressLaporan']);
         Route::post('/laporan/create', [LaporanController::class, 'createLaporan']);
         Route::post('/laporan/update/{id}', [LaporanController::class, 'updateByUser']);
-        Route::post('/laporan/status/add/{id}', [LaporanController::class, 'changeStatus']);
+        Route::get('/laporan/details/{id}', [LaporanController::class, 'details']);
+        Route::post('/laporan/status/{id}', [LaporanController::class, 'changeStatus']);
         Route::post('/laporan/delete/{id}', [LaporanController::class, 'delete']);
 
         // Jenis Pemilu
@@ -71,7 +76,10 @@ Route::middleware('auth:sanctum')->group(
 
         // Logout Route
         Route::post('/logout', [AuthController::class, 'logout']);
+
+        // User
         Route::get('/user', [AuthController::class, 'fetchUser']);
+        Route::post('user/update', [AuthController::class, 'updateProfile']);
     }
 );
 
@@ -90,8 +98,7 @@ Route::get('/fqa', [FQAController::class, 'getAll']);
 Route::Post('/login', [AuthController::class, 'login']);
 Route::Post('/register', [AuthController::class, 'register']);
 
-// ALL LAPORAN
-Route::get('/laporan', [LaporanController::class, 'getAll']);
+
 
 // Alamat
 // Route::get('/alamat', [AddressController::class, '']);

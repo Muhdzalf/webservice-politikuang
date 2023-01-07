@@ -13,7 +13,13 @@ class FQAController extends Controller
     //
     public function getAll()
     {
-        $fqa = Fqa::all();
+        $fqa = Fqa::query()->filter(request(['cari']))->get();
+        if (count($fqa) < 1) {
+            return response()->json([
+                'message' => 'Data FQA Tidak ditemukan',
+                'data' => null
+            ], 404);
+        }
 
         return response()->json([
             'message' => 'Data FQA berhasil diambil',
@@ -50,6 +56,11 @@ class FQAController extends Controller
             ], 403);
         }
         $fqa = Fqa::find($id);
+
+        $request->validate([
+            'pertanyaan' => 'required|string',
+            'jawaban' => 'required|string'
+        ]);
 
         $fqa->pertanyaan = $request->pertanyaan;
         $fqa->jawaban = $request->jawaban;

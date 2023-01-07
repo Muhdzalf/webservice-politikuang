@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::table('laporan', function (Blueprint $table) {
             // relasi dengan tabel user
             $table->bigInteger('pengirim_laporan')->unsigned()->after('kronologi_kejadian');
-            $table->foreign('pengirim_laporan')->references('id')->on('users');
+            $table->foreign('pengirim_laporan')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
 
             //relasi dengan tabel pemilu
             $table->bigInteger('pemilu_id')->unsigned()->after('judul');
-            $table->foreign('pemilu_id')->references('id')->on('pemilu');
+            $table->foreign('pemilu_id')->references('id')->on('pemilu')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

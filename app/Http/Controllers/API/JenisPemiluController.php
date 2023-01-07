@@ -53,7 +53,7 @@ class JenisPemiluController extends Controller
         ]);
 
         $data = JenisPemilu::find($id);
-        $data->$request->nama;
+        $data->nama = $request->nama;
         $data->save();
 
         return response()->json([

@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::table('progress_laporan', function (Blueprint $table) {
             // relasi dengan tabel laporan
             $table->bigInteger('laporan_id')->unsigned()->after('id');
-            $table->foreign('laporan_id')->references('id')->on('laporan');
+            $table->foreign('laporan_id')->references('id')->on('laporan')->onDelete('cascade')->onUpdate('cascade');
 
             // relasi dengan tabel user
             $table->bigInteger('user_id')->unsigned()->after('id');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

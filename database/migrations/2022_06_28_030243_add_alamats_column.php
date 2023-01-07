@@ -16,15 +16,15 @@ return new class extends Migration
         Schema::table('alamat', function (Blueprint $table) {
             // relasi dengan tabel kecamatan
             $table->char('kecamatan_id', 7)->after('id');
-            $table->foreign('kecamatan_id')->references('id')->on('kecamatan');
+            $table->foreign('kecamatan_id')->references('id')->on('kecamatan')->onDelete('cascade')->onUpdate('cascade');
 
             // relasi dengan tabel kabupaten
             $table->char('kabupaten_id', 4)->after('kecamatan_id');
-            $table->foreign('kabupaten_id')->references('id')->on('kabupaten');
+            $table->foreign('kabupaten_id')->references('id')->on('kabupaten')->onDelete('cascade')->onUpdate('cascade');
 
             // relasi dengan tabel kecamatan
             $table->char('provinsi_id', 2)->after('kabupaten_id');
-            $table->foreign('provinsi_id')->references('id')->on('provinsi');
+            $table->foreign('provinsi_id')->references('id')->on('provinsi')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

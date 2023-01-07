@@ -15,4 +15,11 @@ class Fqa extends Model
         'pertanyaan',
         'jawaban',
     ];
+
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['cari'] ?? false, function ($query, $cari) {
+            $query->where('pertanyaan', 'like', '%' . $cari . '%')->orWhere('jawaban', 'like', '%' . $cari . '%');
+        });
+    }
 }

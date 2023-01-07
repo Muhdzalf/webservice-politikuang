@@ -19,12 +19,25 @@ class Pemilu extends Model
         'jenis_id',
     ];
 
+    public function scopeSearch($query, array $filters)
+    {
+        //Pencarian berdasarkan nama
+        $query->when($filters['nama'] ?? false, function ($query, $nama) {
+            return $query->where('nama', 'like', '%' . $nama . '%');
+        });
+
+        //Pencarian berdasarkan id
+        $query->when($filters['id'] ?? false, function ($query, $id) {
+            return $query->where('id', 'like', '%' . $id . '%');
+        });
+    }
+
     public function alamat()
     {
         return $this->belongsTo(Alamat::class, 'alamat_id', 'id');
     }
 
-    public function laporan()
+    public function laporans()
     {
         return $this->hasMany(Laporan::class, 'pemilu_id', 'id');
     }

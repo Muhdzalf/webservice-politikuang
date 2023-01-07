@@ -105,6 +105,24 @@ class AuthController extends Controller
 
     public function updateProfile(Request $request, User $user)
     {
+        $user = Auth::user();
+
+        $user->nama = $request->nama;
+        $user->nik = $request->nik;
+        $user->email = $request->email;
+        $user->tanggal_lahir = $request->tanggal_lahir;
+        $user->jenis_kelamin = $request->jenis_kelamin;
+        $user->nomor_tlp = $request->nomor_tlp;
+        $user->alamat = $request->alamat;
+        $user->pekerjaan = $request->pekerjaan;
+        $user->kewarganegaraan = $request->kewarganegaraan;
+
+        $user->save();
+
+        return response()->json([
+            'message' => "data berhasil diperbaharui",
+            'data' => $user
+        ]);
     }
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use GuzzleHttp\Psr7\Query;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,6 +27,14 @@ class Laporan extends Model
         'pemilu_id',
     ];
 
+    public function scopeFilter($query, array $filters)
+    {
+
+        $query->when($filters['cari'] ?? false, function ($query, $cari) {
+            $query->where('nomor_laporan', 'like', '%' . $cari . '%')->orWhere('judul', 'like', '%' . $cari . '%');
+        });
+    }
+
     //Relasi
 
     public function user()
@@ -37,7 +46,7 @@ class Laporan extends Model
         return $this->belongsTo(Pemilu::class, 'pemilu_id', 'id');
     }
 
-    public function progressLaporan()
+    public function progressLaporans()
     {
         return $this->hasMany(ProgressLaporan::class, 'laporan_id', 'id');
     }

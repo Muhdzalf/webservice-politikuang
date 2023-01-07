@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('nomor_tlp', 13)->after('email');
             $table->date('tanggal_lahir')->after('nomor_tlp');
             $table->char('jenis_kelamin', 1)->after('tanggal_lahir');
-            $table->string('pekerjaan', 20)->after('jenis_kelamin');
+            $table->string('pekerjaan', 30)->after('jenis_kelamin');
             $table->string('kewarganegaraan', 30)->after('pekerjaan');
             $table->string('role', 15)->default('masyarakat')->after('kewarganegaraan');
         });

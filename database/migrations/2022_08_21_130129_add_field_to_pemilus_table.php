@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::table('pemilu', function (Blueprint $table) {
             // jenis pemilu fk
             $table->bigInteger('jenis_id')->unsigned()->after('waktu_pelaksanaan')->default(0);
-            $table->foreign('jenis_id')->references('id')->on('jenis_pemilu')->onUpdate('cascade');
+            $table->foreign('jenis_id')->references('id')->on('jenis_pemilu')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

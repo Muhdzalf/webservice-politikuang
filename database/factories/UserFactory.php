@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -18,11 +19,19 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name(),
+            'nama' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'password' => Hash::make('12345678'), // password
             'remember_token' => Str::random(10),
+            'nik' => $this->faker->numerify('320506##########'),
+            'tanggal_lahir' => '2000-12-12', // Valid Format Y-m-d
+            'jenis_kelamin' => $this->faker->randomElement(['L', 'P']),
+            'nomor_tlp' => '082320136961',
+            'alamat' => $this->faker->address(),
+            'pekerjaan' => $this->faker->jobTitle(),
+            'kewarganegaraan' => 'Indonesia',
+            'role' => 'masyarakat',
         ];
     }
 
@@ -36,6 +45,15 @@ class UserFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'email_verified_at' => null,
+            ];
+        });
+    }
+
+    public function petugas()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'role' => 'petugas',
             ];
         });
     }

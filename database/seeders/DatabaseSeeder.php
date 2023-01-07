@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -25,6 +26,10 @@ class DatabaseSeeder extends Seeder
             ProvinsiSeeder::class,
             KabupatenSeeder::class,
             KecamatanSeeder::class,
+            JenisPemiluSeeder::class,
+            PemiluSeeder::class,
+            UserSeeder::class,
+            FqaSeeder::class,
         ]);
     }
 }

@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('alamat', function (Blueprint $table) {
             $table->id();
-            $table->string('detail', 50)->nullable();
+            $table->string('detail_alamat', 50)->nullable();
             $table->timestamps();
         });
     }

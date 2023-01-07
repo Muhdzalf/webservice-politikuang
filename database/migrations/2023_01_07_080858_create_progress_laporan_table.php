@@ -19,10 +19,11 @@ return new class extends Migration
             $table->text('keterangan')->nullable();
 
             $table->string('nomor_laporan', 20);
-            $table->foreign('nomor_laporan')->references('nomor_laporan')->on('laporan')->onUpdate('cascade')->onDelete('cascasde');
+            $table->foreign('nomor_laporan')->references('nomor_laporan')->on('laporan')->onUpdate('cascade')->onDelete('cascade');
 
             $table->char('nik', 16);
             $table->foreign('nik')->references('nik')->on('users')->onDelete('cascade')->onUpdate('cascade');
+
             $table->timestamps();
         });
     }

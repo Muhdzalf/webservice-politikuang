@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('provinsi', function (Blueprint $table) {
-            $table->char('id_provinsi', 2)->primary()->unsigned();
+            $table->char('id_provinsi', 2)->primary();
             $table->string('nama', 35);
             $table->timestamps();
         });

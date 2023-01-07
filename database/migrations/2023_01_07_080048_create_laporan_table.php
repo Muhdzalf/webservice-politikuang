@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('laporan', function (Blueprint $table) {
-            $table->string('nomor_laporan')->unsigned()->primary();
+            $table->string('nomor_laporan')->primary();
             $table->string('judul', 50);
-            $table->integer('nominal', 15);
+            $table->integer('nominal');
             $table->string('pemberi', 50);
             $table->string('penerima', 50);
             $table->date('tanggal_kejadian');
@@ -25,9 +25,9 @@ return new class extends Migration
             $table->string('bukti', 200);
 
             $table->unsignedBigInteger('pemilu_id')->nullable();
-            $table->foreign('pemilu_id')->references('id_pemilu')->on('pemilu')->onUpdate('cascade')->nullOnDelete();
+            $table->foreign('pemilu_id')->references('id_pemilu')->on('pemilu')->nullOnDelete()->onUpdate('cascade');
 
-            $table->unsignedBigInteger('pelapor');
+            $table->char('pelapor', 16);
             $table->foreign('pelapor')->references('nik')->on('users')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamps();

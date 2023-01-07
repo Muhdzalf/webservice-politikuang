@@ -15,16 +15,15 @@ class Laporan extends Model
     protected $fillable = [
         'nomor_laporan',
         'judul',
-        'tahun_kejadian',
-        'tanggal_kejadian',
+        'nominal',
         'pemberi',
         'penerima',
-        'nominal',
-        'lokasi_kejadian',
+        'tanggal_kejadian',
+        'alamat_kejadian',
         'kronologi_kejadian',
         'bukti',
-        'pengirim_laporan',
         'pemilu_id',
+        'pelapor',
     ];
 
     public function scopeFilter($query, array $filters)
@@ -39,15 +38,15 @@ class Laporan extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'pengirim_laporan', 'id');
+        return $this->belongsTo(User::class, 'pelapor', 'nik');
     }
     public function pemilu()
     {
-        return $this->belongsTo(Pemilu::class, 'pemilu_id', 'id');
+        return $this->belongsTo(Pemilu::class, 'pemilu_id', 'id_pemilu');
     }
 
     public function progressLaporans()
     {
-        return $this->hasMany(ProgressLaporan::class, 'laporan_id', 'id');
+        return $this->hasMany(ProgressLaporan::class, 'nomor_laporan', 'nomor_laporan');
     }
 }

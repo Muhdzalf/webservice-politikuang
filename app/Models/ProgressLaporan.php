@@ -13,19 +13,19 @@ class ProgressLaporan extends Model
 
 
     protected $fillable = [
-        'laporan_id',
-        'user_id',
+        'nomor_laporan',
+        'nik',
         'status',
         'keterangan'
     ];
 
     public function laporan()
     {
-        return $this->belongsTo(Laporan::class, 'laporan_id', 'id');
+        return $this->belongsTo(Laporan::class, 'nomor_laporan', 'nomor_laporan');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'nik', 'nik');
     }
 }

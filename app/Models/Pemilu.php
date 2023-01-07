@@ -14,7 +14,6 @@ class Pemilu extends Model
     protected $fillable = [
         'nama',
         'tanggal_pelaksanaan',
-        'waktu_pelaksanaan',
         'alamat_id',
         'jenis_id',
     ];
@@ -34,16 +33,16 @@ class Pemilu extends Model
 
     public function alamat()
     {
-        return $this->belongsTo(Alamat::class, 'alamat_id', 'id');
+        return $this->belongsTo(Alamat::class, 'alamat_id', 'id_alamat');
     }
 
     public function laporans()
     {
-        return $this->hasMany(Laporan::class, 'pemilu_id', 'id');
+        return $this->hasMany(Laporan::class, 'pemilu_id', 'id_pemilu');
     }
 
     public function jenis()
     {
-        return $this->belongsTo(JenisPemilu::class, 'jenis_id', 'id');
+        return $this->belongsTo(JenisPemilu::class, 'jenis_id', 'id_jenis');
     }
 }

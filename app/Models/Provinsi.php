@@ -17,11 +17,11 @@ class Provinsi extends Model
 
     public function kabupaten()
     {
-        return $this->hasMany(Kabupaten::class, 'provinsi_id', 'id');
+        return $this->hasMany(Kabupaten::class, 'provinsi_id', 'id_provinsi');
     }
 
     public function alamat()
     {
-        return $this->hasMany(Alamat::class, 'provinsi_id', 'id');
+        return $this->hasMany(Alamat::class, 'provinsi_id', 'id_provinsi');
     }
 }

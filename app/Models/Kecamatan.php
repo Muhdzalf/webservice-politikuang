@@ -14,16 +14,16 @@ class Kecamatan extends Model
 
     protected $fillable = [
         'nama',
-        'kabupaten_id'
+        'kabupaten_kota_id'
     ];
 
     public function kabupaten()
     {
-        return $this->belongsTo(Kabupaten::class, 'kabupaten_id', 'id');
+        return $this->belongsTo(Kabupaten::class, 'kabupaten_id', 'id_kabupaten_kota');
     }
 
     public function alamat()
     {
-        return $this->hasMany(Alamat::class, 'kecamatan_id', 'id');
+        return $this->hasMany(Alamat::class, 'kecamatan_id', 'id_kecamatan');
     }
 }

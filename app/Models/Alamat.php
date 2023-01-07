@@ -14,25 +14,25 @@ class Alamat extends Model
 
     protected $fillable = [
         'kecamatan_id',
-        'kabupaten_id',
+        'kabupaten_kota_id',
         'provinsi_id',
-        'detail_alamat'
+        'desa'
     ];
     public function pemilu()
     {
-        return $this->hasOne(User::class, 'alamat_id', 'id');
+        return $this->hasOne(User::class, 'alamat_id', 'id_alamat');
     }
 
     public function provinsi()
     {
-        return $this->belongsTo(Provinsi::class, 'provinsi_id', 'id');
+        return $this->belongsTo(Provinsi::class, 'provinsi_id', 'id_provinsi');
     }
     public function kabupaten()
     {
-        return $this->belongsTo(Kabupaten::class, 'kabupaten_id', 'id');
+        return $this->belongsTo(Kabupaten::class, 'kabupaten_kota_id', 'id_kabupaten)kota');
     }
     public function kecamatan()
     {
-        return $this->belongsTo(kecamatan::class, 'kecamatan_id', 'id');
+        return $this->belongsTo(kecamatan::class, 'kecamatan_id', 'id_kecamatan');
     }
 }

@@ -18,17 +18,17 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'nama',
         'nik',
+        'nama',
         'email',
-        'password',
         'tanggal_lahir',
         'jenis_kelamin',
-        'nomor_tlp',
+        'no_hp',
         'alamat',
         'pekerjaan',
         'kewarganegaraan',
         'role',
+        'password',
     ];
 
     /**
@@ -52,16 +52,11 @@ class User extends Authenticatable
 
     public function progressLaporan()
     {
-        return $this->hasMany(ProgressLaporan::class, 'user_id', 'id');
+        return $this->hasMany(ProgressLaporan::class, 'nik', 'nik');
     }
 
     public function laporan()
     {
-        return $this->hasMany(Laporan::class, 'user_id', 'id');
-    }
-
-    public function edukasi()
-    {
-        return $this->hasMany(Edukasi::class, 'user_id', 'id');
+        return $this->hasMany(Laporan::class, 'pelapor', 'nik');
     }
 }

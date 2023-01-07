@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Kabupaten extends Model
+class KabupatenKota extends Model
 {
     use HasFactory;
 
-    protected $table = 'kabupaten';
+    protected $table = 'kabupaten_kota';
 
     protected $fillable = [
         'nama',
@@ -18,16 +18,16 @@ class Kabupaten extends Model
 
     public function provinsi()
     {
-        return $this->belongsTo(Provinsi::class, 'provinsi_id', 'id');
+        return $this->belongsTo(Provinsi::class, 'provinsi_id', 'id_provinsi');
     }
 
     public function kecamatan()
     {
-        return $this->hasMany(Kecamatan::class, 'kabupaten_id', 'id');
+        return $this->hasMany(Kecamatan::class, 'kabupaten_kota_id', 'id_kabupaten_kota');
     }
 
     public function alamat()
     {
-        return $this->hasMany(Alamat::class, 'kabupaten_id', 'id');
+        return $this->hasMany(Alamat::class, 'kabupaten_kota_id', 'id_kabupaten_kota');
     }
 }

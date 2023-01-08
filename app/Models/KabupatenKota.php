@@ -16,6 +16,9 @@ class KabupatenKota extends Model
         'provinsi_id'
     ];
 
+    protected $primaryKey = 'id_kabupaten_kota';
+
+
     public function provinsi()
     {
         return $this->belongsTo(Provinsi::class, 'provinsi_id', 'id_provinsi');

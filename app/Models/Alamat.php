@@ -18,6 +18,9 @@ class Alamat extends Model
         'provinsi_id',
         'desa'
     ];
+
+    protected $primaryKey = 'id_alamat';
+
     public function pemilu()
     {
         return $this->hasOne(User::class, 'alamat_id', 'id_alamat');

@@ -26,6 +26,9 @@ class Laporan extends Model
         'pelapor',
     ];
 
+    protected $primaryKey = 'nomor_laporan';
+
+
     public function scopeFilter($query, array $filters)
     {
 

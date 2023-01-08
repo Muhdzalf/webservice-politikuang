@@ -17,6 +17,9 @@ class Kecamatan extends Model
         'kabupaten_kota_id'
     ];
 
+    protected $primaryKey = 'id_kecamatan';
+
+
     public function kabupaten()
     {
         return $this->belongsTo(Kabupaten::class, 'kabupaten_id', 'id_kabupaten_kota');

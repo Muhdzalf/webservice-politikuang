@@ -16,6 +16,8 @@ class Fqa extends Model
         'jawaban',
     ];
 
+    protected $primaryKey = 'id_fqa';
+
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['cari'] ?? false, function ($query, $cari) {

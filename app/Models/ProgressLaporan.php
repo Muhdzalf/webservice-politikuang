@@ -19,6 +19,8 @@ class ProgressLaporan extends Model
         'keterangan'
     ];
 
+    protected $primaryKey = 'id_progress';
+
     public function laporan()
     {
         return $this->belongsTo(Laporan::class, 'nomor_laporan', 'nomor_laporan');

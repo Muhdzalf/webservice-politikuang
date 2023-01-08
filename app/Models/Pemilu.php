@@ -18,6 +18,9 @@ class Pemilu extends Model
         'jenis_id',
     ];
 
+    protected $primaryKey = 'id_pemilu';
+
+
     public function scopeSearch($query, array $filters)
     {
         //Pencarian berdasarkan nama

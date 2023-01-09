@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\JenisPemilu;
-use App\Models\Pemilu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -14,17 +13,30 @@ class JenisPemiluController extends Controller
     {
         $jenis = JenisPemilu::all();
 
+        if (count($jenis) < 1) {
+            return response()->json([
+                'kode' => 404,
+                'status' => 'Not Found',
+                'message' => 'Data Jenis Pemilu Tidak Ditemukan',
+                'data' => $jenis,
+            ], 404);
+        }
+
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Data Jenis Pemilu Berhasil Diambil',
             'data' => $jenis,
-        ]);
+        ], 200);
     }
 
     public function create(Request $request)
     {
         if (!Gate::allows('only-petugas')) {
             return response()->json([
-                'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
+                'kode' => 403,
+                'status' => 'Forbidden',
+                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya petugas yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $request->validate([
@@ -36,6 +48,8 @@ class JenisPemiluController extends Controller
         ]);
 
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Data Jenis Pemilu berhasil dibuat',
             'data' => $jenisPemilu
         ]);
@@ -45,6 +59,8 @@ class JenisPemiluController extends Controller
     {
         if (!Gate::allows('only-petugas')) {
             return response()->json([
+                'kode' => 403,
+                'status' => 'Forbidden',
                 'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
             ], 403);
         }
@@ -57,14 +73,19 @@ class JenisPemiluController extends Controller
         $data->save();
 
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Data Jenis Pemilu Berhasil Diperbaharui',
-        ]);
+            'data' => $data
+        ], 200);
     }
 
     public function delete($id)
     {
         if (!Gate::allows('only-petugas')) {
             return response()->json([
+                'kode' => 403,
+                'status' => 'Forbidden',
                 'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
             ], 403);
         }
@@ -72,6 +93,8 @@ class JenisPemiluController extends Controller
         $data->delete();
 
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Data Jenis Pemilu Berhasil Dihapus'
         ]);
     }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\JenisPemilu;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
@@ -16,7 +17,22 @@ class JenisPemiluTest extends TestCase
      *
      * @return void
      */
-    public function test_only_petugas_can_create_jenis_pemilu()
+    public function test_required_field_jenis_pemilu()
+    {
+        $petugas = User::factory()->petugas()->create();
+        Sanctum::actingAs($petugas);
+
+        $response = $this->postJson('api/jenis-pemilu/create', [], ['Accept' => 'application/json']);
+
+        $response->assertUnprocessable()->assertJson([
+            "message" => "The nama field is required.",
+            "errors" => [
+                "nama" => ["The nama field is required."],
+            ]
+        ]); //422
+    }
+
+    public function test_petugas_success_create_jenis_pemilu()
     {
         $petugas = User::factory()->petugas()->create();
 
@@ -24,9 +40,20 @@ class JenisPemiluTest extends TestCase
 
         $response = $this->postJson('api/jenis-pemilu/create', [
             'nama' => 'Pemilihan Presiden dan Wakil Presiden'
-        ]);
+        ], ['Accept' => 'application/json']);
 
-        $response->assertOk();
+        $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
+            'message',
+            'data' => [
+                'id_jenis',
+                'nama',
+                'created_at',
+                'updated_at'
+            ]
+
+        ]); // 200
     }
 
 
@@ -40,72 +67,97 @@ class JenisPemiluTest extends TestCase
             'nama' => 'Pemilihan Presiden dan Wakil Presiden'
         ]);
 
-        $response->assertForbidden();
+        $response->assertForbidden()->assertJson(
+            [
+                'kode' => 403,
+                'status' => 'Forbidden',
+                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya petugas yang memiliki akses untuk fitur ini'
+            ]
+        ); //403
     }
 
-    public function test_petugas_get_a_validation_error_when_try_to_create_jenis_pemilu_with_nama_value_null()
+    public function test_petugas_success_update_jenis_pemilu()
     {
-        $petugas = User::factory()->petugas()->create();
-
-        Sanctum::actingAs($petugas, ['create']);
-
-        $response = $this->postJson('api/jenis-pemilu/create', [
-            'nama' => '',
-        ]);
-
-        $response->assertUnprocessable();
-    }
-
-    public function test_petugas_can_update_jenis_pemilu()
-    {
-        $faker = Faker::create('id_ID');
+        $jenisPemilu = JenisPemilu::factory()->create();
 
         $petugas = User::factory()->petugas()->create();
-
-        $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id');
 
         Sanctum::actingAs($petugas, ['update']);
 
-        $response = $this->postJson('api/jenis-pemilu/update/' . $faker->randomElement($jenisPemiluID), [
-            'nama' => 'Pemilihan Presiden (PILPRES)'
+        $response = $this->putJson('api/jenis-pemilu/update/' . $jenisPemilu->id_jenis, [
+            'nama' => 'Pemilihan Presiden dan Wakil Presiden (hasil edit)'
         ]);
 
-        $response->assertOk()->dump();
+        $response->assertOk()->assertJsonStructure(
+            [
+                'kode',
+                'status',
+                'message',
+                'data' =>
+                [
+                    'id_jenis',
+                    'nama',
+                    'created_at',
+                    'updated_at'
+                ]
+            ]
+        );
     }
+
     public function test_masyarakat_get_a_forbidden_error_when_try_to_update_jenis_pemilu()
     {
-        $faker = Faker::create('id_ID');
-        $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id');
+        $jenisPemilu = JenisPemilu::factory()->create();
 
         $masyarakat = User::factory()->create();
 
         Sanctum::actingAs($masyarakat, ['update']);
 
-        $response = $this->postJson('api/jenis-pemilu/update/' . $faker->randomElement($jenisPemiluID), [
+        $response = $this->putJson('api/jenis-pemilu/update/' . $jenisPemilu->id_jenis, [
             'nama' => 'Pemilihan Presiden (PILPRES)'
-        ]);
+        ], ['Accept' => 'application/json']);
 
-        $response->assertForbidden();
+        $response->assertForbidden()->assertJson(
+            [
+                'kode' => 403,
+                'status' => 'Forbidden',
+                'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
+            ]
+        );
     }
 
     public function test_petugas_can_delete_Jenis_pemilu()
     {
-        $faker = Faker::create('id_ID');
-        $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id');
+        $jenisPemilu = JenisPemilu::factory()->create();
 
         $petugas = User::factory()->petugas()->create();
 
         Sanctum::actingAs($petugas, ['delete']);
 
-        $response = $this->postJson('api/jenis-pemilu/delete/' . $faker->randomElement($jenisPemiluID),);
+        $response = $this->deleteJson('api/jenis-pemilu/delete/' . $jenisPemilu->id_jenis, [], ['Accept' => 'application/json']);
 
-        $response->assertOk();
+        $response->assertOk()->assertJson([
+            'kode' => 200,
+            'status' => 'OK',
+            'message' => 'Data Jenis Pemilu Berhasil Dihapus'
+        ]);
     }
 
     public function test_user_can_get_all_data_jenis_pemilu()
     {
         $response = $this->getJson('api/jenis-pemilu');
 
-        $response->assertOk();
+        $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
+            'message',
+            'data' => [
+                '*' => [
+                    'id_jenis',
+                    'nama',
+                    'created_at',
+                    'updated_at'
+                ]
+            ]
+        ]);
     }
 }

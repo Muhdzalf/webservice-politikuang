@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Alamat;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,20 +11,21 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    // Registrasi
     public function register(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:50',
             'nik' => 'required|numeric|digits:16|unique:users',
+            'nama' => 'required|string|max:50',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8',
             'tanggal_lahir' => 'required|date_format:Y-m-d',
-            'jenis_kelamin' => 'required|string|max:1',
-            'nomor_tlp' => 'required|regex:/(0)[0-9]{11}/',
+            'jenis_kelamin' => 'required|string|max:1|in:L,P',
+            'no_hp' => 'required|regex:/(0)[0-9]{11}/',
             'alamat' => 'required|string',
             'pekerjaan' => 'required|string',
             'kewarganegaraan' => 'required|string',
-            'role' => 'required|in:petugas,masyarakat'
+            'role' => 'required|in:petugas,masyarakat,administrator'
         ]);
 
         $user = User::create([
@@ -36,7 +36,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'tanggal_lahir' => $request->tanggal_lahir,
             'jenis_kelamin' => $request->jenis_kelamin,
-            'nomor_tlp' => $request->nomor_tlp,
+            'no_hp' => $request->no_hp,
             'alamat' => $request->alamat,
             'pekerjaan' => $request->pekerjaan,
             'kewarganegaraan' => $request->kewarganegaraan,
@@ -50,11 +50,13 @@ class AuthController extends Controller
 
         // JSON response user
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Proses Registrasi Berhasil!',
-            'data' => $user,
             'access_token' => $token,
-            'type' => 'Bearer'
-        ]);
+            'type' => 'Bearer',
+            'data' => $user,
+        ], 200);
     }
 
     public function login(Request $request)
@@ -70,7 +72,9 @@ class AuthController extends Controller
         if (!Auth::attempt($credential)) {
             return response()->json(
                 [
-                    'message' => 'Unauthorized'
+                    'kode' => 401,
+                    'status' => 'Unauthorized',
+                    'message' => 'Proses login gagal, siahkan cek kembali email dan password Anda'
                 ],
                 401
             );
@@ -88,51 +92,25 @@ class AuthController extends Controller
 
         // return berhasil
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Login Berhasil',
-            'data' => $user,
             'akses token' => $token,
             'token type' => 'bearer',
-        ]);
-    }
-
-    public function fetchUser(Request $request)
-    {
-        return response()->json([
-            'message' => 'data user berhasil diambil',
-            'data' => $request->user()
-        ]);
-    }
-
-    public function updateProfile(Request $request, User $user)
-    {
-        $user = Auth::user();
-
-        $user->nama = $request->nama;
-        $user->nik = $request->nik;
-        $user->email = $request->email;
-        $user->tanggal_lahir = $request->tanggal_lahir;
-        $user->jenis_kelamin = $request->jenis_kelamin;
-        $user->nomor_tlp = $request->nomor_tlp;
-        $user->alamat = $request->alamat;
-        $user->pekerjaan = $request->pekerjaan;
-        $user->kewarganegaraan = $request->kewarganegaraan;
-
-        $user->save();
-
-        return response()->json([
-            'message' => "data berhasil diperbaharui",
-            'data' => $user
-        ]);
+            'data' => $user,
+        ], 200);
     }
 
 
     public function logout(Request $request)
     {
         //menghapus token yang sudah aktif
-        $token = $request->user()->currentAccessToken()->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Logout Berhasil',
-        ]);
+        ], 200);
     }
 }

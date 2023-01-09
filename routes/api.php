@@ -2,11 +2,12 @@
 
 use App\Http\Controllers\API\AddressController;
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\EdukasiController;
 use App\Http\Controllers\API\FQAController;
 use App\Http\Controllers\API\JenisPemiluController;
 use App\Http\Controllers\API\LaporanController;
 use App\Http\Controllers\API\PemiluController;
+use App\Http\Controllers\API\ProgressController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,62 +29,49 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(
     function () {
 
-        //Provinsi Route
-        // Route::post('/provinsi/create', [AddressController::class, 'createProvinsi']);
-        // Route::post('/provinsi/update/{id}', [AddressController::class, 'updateProvinsi']);
-        // Route::post('/provinsi/delete/{id}', [AddressController::class, 'deleteProvinsi']);
-
-        // Kabupaten Route
-        // Route::post('/kabupaten/create', [AddressController::class, 'createKabupaten']);
-        // Route::post('/kabupaten/update/{id}', [AddressController::class, 'updateKabupaten']);
-        // Route::post('/kabupaten/delete/{id}', [AddressController::class, 'deleteKabupaten']);
-
-        // Kecamatan Route
-        // Route::post('/kecamatan/create', [AddressController::class, 'createKecamatan']);
-        // Route::post('/kecamatan/update/{id}', [AddressController::class, 'updateKecamatan']);
-        // Route::post('/kecamatan/delete/{id}', [AddressController::class, 'deleteKecamatan']);
-
-        // FQA Route
-        Route::post('/fqa/create', [FQAController::class, 'create']);
-        Route::post('/fqa/update/{id}', [FQAController::class, 'update']);
-        Route::post('/fqa/delete/{id}', [FQAController::class, 'delete']);
-
-        // Pemilu Route
-        Route::post('/pemilu/create', [PemiluController::class, 'create']);
-        Route::post('/pemilu/update/{id}', [PemiluController::class, 'updatePemilu']);
-        Route::get('/pemilu/detail/{id}', [PemiluController::class, 'details']);
-        Route::post('/pemilu/delete/{id}', [PemiluController::class, 'deletePemilu']);
-
-        // Konten Edukasi Route
-        Route::post('/edukasi/create', [EdukasiController::class, 'create']);
-        Route::post('/edukasi/update/{id}', [EdukasiController::class, 'update']);
-        Route::post('/edukasi/delete/{id}', [EdukasiController::class, 'delete']);
-
-        // Laporan Route
-        Route::get('/laporan', [LaporanController::class, 'allLaporan']);
-        Route::get('/laporan/my-laporan', [LaporanController::class, 'getUserLaporan']);
-        Route::get('/laporan/progress/{id}', [LaporanController::class, 'getProgressLaporan']);
+        //MASYARAKAT
         Route::post('/laporan/create', [LaporanController::class, 'createLaporan']);
-        Route::post('/laporan/update/{id}', [LaporanController::class, 'updateByUser']);
-        Route::get('/laporan/details/{id}', [LaporanController::class, 'details']);
-        Route::post('/laporan/status/{id}', [LaporanController::class, 'changeStatus']);
-        Route::post('/laporan/delete/{id}', [LaporanController::class, 'delete']);
+        Route::delete('/laporan/delete/{nomor_laporan}', [LaporanController::class, 'delete']);
+        Route::put('/laporan/update/{nomor_laporan}', [LaporanController::class, 'update']);
+        Route::get('user/laporan/', [LaporanController::class, 'getUserLaporan']);
+
+
+        //PETUGAS
+        // Pemilu
+        Route::post('/pemilu/create', [PemiluController::class, 'create']);
+        Route::put('/pemilu/update/{id}', [PemiluController::class, 'update']);
+        Route::get('/pemilu/detail/{id}', [PemiluController::class, 'details']);
+        Route::delete('/pemilu/delete/{id}', [PemiluController::class, 'deletePemilu']);
+
+        // FQA
+        Route::post('/fqa/create', [FQAController::class, 'create']);
+        Route::put('/fqa/update/{id}', [FQAController::class, 'update']);
+        Route::delete('/fqa/delete/{id}', [FQAController::class, 'delete']);
+
+
+        // Laporan
+        Route::get('/laporan', [LaporanController::class, 'allLaporan']);
+        Route::get('/laporan/details/{nomor_laporan}', [LaporanController::class, 'details']);
+
+        // Progress Laporan
+        Route::post('/laporan/respon/{id}', [ProgressController::class, 'responLaporan']);
+        Route::get('/laporan/{nomor_laporan}/progress/', [ProgressController::class, 'getProgressLaporan']);
 
         // Jenis Pemilu
         Route::post('/jenis-pemilu/create', [JenisPemiluController::class, 'create']);
-        Route::post('/jenis-pemilu/update/{id}', [JenisPemiluController::class, 'update']);
-        Route::post('/jenis-pemilu/delete/{id}', [JenisPemiluController::class, 'delete']);
-
-        // Logout Route
-        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::put('/jenis-pemilu/update/{id}', [JenisPemiluController::class, 'update']);
+        Route::delete('/jenis-pemilu/delete/{id}', [JenisPemiluController::class, 'delete']);
 
         // User
-        Route::get('/user', [AuthController::class, 'fetchUser']);
-        Route::post('user/update', [AuthController::class, 'updateProfile']);
+        Route::get('/user', [UserController::class, 'fetchUser']);
+        Route::put('user/update', [UserController::class, 'updateProfile']);
+
+        // Auth Route
+        Route::post('/logout', [AuthController::class, 'logout']);
     }
 );
 
-// ALAMAT API ROUTE
+// ALAMAT
 Route::get('/provinsi', [AddressController::class, 'getAllProvinsi']);
 Route::get('/kabupaten', [AddressController::class, 'getAllKabupaten']);
 Route::get('/kecamatan', [AddressController::class, 'getAllKecamatan']);
@@ -97,11 +85,6 @@ Route::get('/fqa', [FQAController::class, 'getAll']);
 // AUTH ROUTE
 Route::Post('/login', [AuthController::class, 'login']);
 Route::Post('/register', [AuthController::class, 'register']);
-
-
-
-// Alamat
-// Route::get('/alamat', [AddressController::class, '']);
 
 // Jenis Pemilu
 Route::get('/jenis-pemilu', [JenisPemiluController::class, 'getAll']);

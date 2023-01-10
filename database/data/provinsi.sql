@@ -1,4 +1,4 @@
-INSERT INTO `provinsi` (`id`, `nama`) VALUES
+INSERT INTO `provinsi` (`id_provinsi`, `nama`) VALUES
 ('11', 'ACEH'),
 ('12', 'SUMATERA UTARA'),
 ('13', 'SUMATERA BARAT'),

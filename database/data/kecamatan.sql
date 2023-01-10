@@ -1,4 +1,4 @@
-INSERT INTO `kecamatan` (`id`, `kabupaten_id`, `nama`) VALUES
+INSERT INTO `kecamatan` (`id_kecamatan`, `kabupaten_kota_id`, `nama`) VALUES
 ('1101010', '1101', 'TEUPAH SELATAN'),
 ('1101020', '1101', 'SIMEULUE TIMUR'),
 ('1101021', '1101', 'TEUPAH BARAT'),

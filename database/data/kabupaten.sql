@@ -1,4 +1,4 @@
-INSERT INTO `kabupaten` (`id`, `provinsi_id`, `nama`) VALUES
+INSERT INTO `kabupaten_kota` (`id_kabupaten_kota`, `provinsi_id`, `nama`) VALUES
 ('1101', '11', 'KABUPATEN SIMEULUE'),
 ('1102', '11', 'KABUPATEN ACEH SINGKIL'),
 ('1103', '11', 'KABUPATEN ACEH SELATAN'),

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\User;
 use Tests\TestCase;
 use Faker\Factory as Faker;
-use Laravel\Sanctum\Sanctum;
 
 
 class AuthTest extends TestCase

@@ -47,9 +47,9 @@ class UserTest extends TestCase
     public function test_user_can_update_profile_data()
     {
         $dataAwal = [
-            'nik' => 3205061198212009,
+            'nik' => 3205061198212078, // unique, harus selalu diganti ketika melakukan test
             'nama' => 'Muhammad Dzalfiqri Sabani',
-            'email' => 'mdz@example.com',
+            'email' => 'mdz@example.com', // unique, harus selalu diganti ketika melakukan test
             'password' => Hash::make('12345678'),
             'tanggal_lahir' => '1999-12-12',
             'jenis_kelamin' => 'L',
@@ -92,6 +92,6 @@ class UserTest extends TestCase
                 'kewarganegaraan',
                 'role',
             ]
-        ])->dump();
+        ]);
     }
 }

@@ -26,7 +26,6 @@ class UserController extends Controller
         $user = Auth::user();
 
         $user->nama = $request->nama;
-        $user->nik = $request->nik;
         $user->email = $request->email;
         $user->tanggal_lahir = $request->tanggal_lahir;
         $user->jenis_kelamin = $request->jenis_kelamin;

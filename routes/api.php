@@ -74,7 +74,9 @@ Route::middleware('auth:sanctum')->group(
 
 // ALAMAT
 Route::get('/provinsi', [AddressController::class, 'getAllProvinsi']);
-Route::get('/kabupaten', [AddressController::class, 'getAllKabupaten']);
+Route::get('/provinsi/{id}/kabupaten-kota', [AddressController::class, 'getAllKabupatenByProvinsiId']);
+Route::get('/kabupaten-kota', [AddressController::class, 'getAllKabupaten']);
+Route::get('/kabupaten-kota/{id}/kecamatan', [AddressController::class, 'getAllKecamatanByKabupatenKotaId']);
 Route::get('/kecamatan', [AddressController::class, 'getAllKecamatan']);
 
 // Pemilu Route

@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Kabupaten;
 use App\Models\Kecamatan;
 use App\Models\Provinsi;
-use App\Models\Alamat;
+use App\Models\KabupatenKota;
 use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class AddressController extends Controller
 {
@@ -19,6 +16,8 @@ class AddressController extends Controller
         try {
             $provinsi = Provinsi::all();
             return response()->json([
+                'kode' => 200,
+                'status' => 'OK',
                 'message' => 'Data provinsi berhasil diambil',
                 'data' => $provinsi
             ]);
@@ -34,9 +33,29 @@ class AddressController extends Controller
     public function getAllKabupaten()
     {
         try {
-            $kabupaten = Kabupaten::all();
+            $kabupaten = KabupatenKota::all();
             return response()->json([
+                'kode' => 200,
+                'status' => 'OK',
                 'message' => 'Data kabupaten berhasil diambil',
+                'data' => $kabupaten
+            ]);
+        } catch (Exception $error) {
+            return response()->json([
+                'message' => 'Data kabupaten gagal diambil',
+                'error' => $error
+            ]);
+        }
+    }
+
+    public function getAllKabupatenByProvinsiId($id)
+    {
+        try {
+            $kabupaten = KabupatenKota::query()->where('provinsi_id', $id)->get();
+            return response()->json([
+                'kode' => 200,
+                'status' => 'OK',
+                'message' => 'List kabupaten berhasil diambil',
                 'data' => $kabupaten
             ]);
         } catch (Exception $error) {
@@ -53,7 +72,27 @@ class AddressController extends Controller
         try {
             $kecamatan = Kecamatan::all();
             return response()->json([
+                'kode' => 200,
+                'status' => 'OK',
                 'message' => 'Data kecamatan berhasil diambil',
+                'data' => $kecamatan
+            ]);
+        } catch (Exception $error) {
+            return response()->json([
+                'message' => 'Data kecamatan gagal diambil',
+                'error' => $error
+            ]);
+        }
+    }
+
+    public function getAllKecamatanByKabupatenKotaId($id)
+    {
+        try {
+            $kecamatan = kecamatan::query()->where('kabupaten_kota_id', $id)->get();
+            return response()->json([
+                'kode' => 200,
+                'status' => 'OK',
+                'message' => 'List kecamatan berhasil diambil',
                 'data' => $kecamatan
             ]);
         } catch (Exception $error) {

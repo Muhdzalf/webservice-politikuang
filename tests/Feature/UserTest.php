@@ -46,10 +46,16 @@ class UserTest extends TestCase
 
     public function test_user_can_update_profile_data()
     {
+        $faker = Faker::create('id_ID');
+
+        //Data tetap dan unique
+        $nik = 32050611920034;
+        $email = $faker->safeEmail();
+
         $dataAwal = [
-            'nik' => 3205061198212078, // unique, harus selalu diganti ketika melakukan test
+            'nik' => $nik, // unique, harus selalu diganti ketika melakukan test
             'nama' => 'Muhammad Dzalfiqri Sabani',
-            'email' => 'mdz@example.com', // unique, harus selalu diganti ketika melakukan test
+            'email' => $email, // unique, harus selalu diganti ketika melakukan test
             'password' => Hash::make('12345678'),
             'tanggal_lahir' => '1999-12-12',
             'jenis_kelamin' => 'L',
@@ -66,23 +72,26 @@ class UserTest extends TestCase
 
         // Terdapat Perubahaan pada nama dan alamat
         $dataBaru = [
-            'nama' => 'Sabani Muhammad Z',
-            'email' => 'mdz@example.com',
+            'nama' => 'Muhammad Sabani',
+            'email' => $email,
             'tanggal_lahir' => '1999-12-12',
             'jenis_kelamin' => 'L',
             'no_hp' => '083218439312',
             'alamat' => 'Bandung, Jawa Barat',
             'pekerjaan' => 'Mahasiswa',
-            'kewarganegaraan' => 'Indonesia',
         ];
 
-        $response = $this->putJson('api/user/update', $dataBaru, ['Accept' => 'application/json']);
+        $response = $this->postJson(
+            'api/user/update',
+            $dataBaru,
+            ['Accept' => 'application/json']
+        );
 
         $response->assertOk()->assertJsonStructure([
             'message',
             'data' => [
-                'nama',
                 'nik',
+                'nama',
                 'email',
                 'tanggal_lahir',
                 'jenis_kelamin',
@@ -92,6 +101,6 @@ class UserTest extends TestCase
                 'kewarganegaraan',
                 'role',
             ]
-        ]);
+        ])->dump();
     }
 }

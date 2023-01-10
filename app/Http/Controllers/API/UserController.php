@@ -23,8 +23,19 @@ class UserController extends Controller
 
     public function updateProfile(Request $request, User $user)
     {
-        $user = Auth::user();
+        $request->validate([
+            'nama' => 'required|string|max:50',
+            'email' => 'required|email',
+            'tanggal_lahir' => 'required|date_format:Y-m-d',
+            'jenis_kelamin' => 'required|string|max:1|in:L,P',
+            'no_hp' => 'required|regex:/(0)[0-9]{11}/',
+            'alamat' => 'required|string',
+            'pekerjaan' => 'required|string',
+        ]);
 
+        $user = $request->user();
+
+        $user->nik = $user->nik;
         $user->nama = $request->nama;
         $user->email = $request->email;
         $user->tanggal_lahir = $request->tanggal_lahir;
@@ -32,9 +43,8 @@ class UserController extends Controller
         $user->no_hp = $request->no_hp;
         $user->alamat = $request->alamat;
         $user->pekerjaan = $request->pekerjaan;
-        $user->kewarganegaraan = $request->kewarganegaraan;
 
-        // $user->save();
+        $user->save();
 
         return response()->json([
             'kode' => 200,

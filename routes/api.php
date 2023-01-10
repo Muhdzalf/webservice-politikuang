@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(
     function () {
 
+
         //MASYARAKAT
         Route::post('/laporan/create', [LaporanController::class, 'createLaporan']);
         Route::delete('/laporan/delete/{nomor_laporan}', [LaporanController::class, 'delete']);
@@ -64,7 +65,7 @@ Route::middleware('auth:sanctum')->group(
 
         // User
         Route::get('/user', [UserController::class, 'fetchUser']);
-        Route::put('user/update', [UserController::class, 'updateProfile']);
+        Route::post('user/update', [UserController::class, 'updateProfile']);
 
         // Auth Route
         Route::post('/logout', [AuthController::class, 'logout']);

@@ -27,7 +27,7 @@ class UserFactory extends Factory
             'nik' => $this->faker->numerify('320506##########'),
             'tanggal_lahir' => '2000-12-12', // Valid Format Y-m-d
             'jenis_kelamin' => $this->faker->randomElement(['L', 'P']),
-            'nomor_tlp' => '082320136961',
+            'no_hp' => $this->faker->numerify('08232013####'),
             'alamat' => $this->faker->address(),
             'pekerjaan' => $this->faker->jobTitle(),
             'kewarganegaraan' => 'Indonesia',

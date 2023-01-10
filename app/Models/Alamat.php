@@ -10,7 +10,7 @@ class Alamat extends Model
 {
     use HasFactory;
 
-    protected $table = 'alamat';
+    protected $table = 'alamat_pemilu';
 
     protected $fillable = [
         'kecamatan_id',

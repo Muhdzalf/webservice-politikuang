@@ -2,10 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Alamat;
+use App\Models\JenisPemilu;
+use App\Models\Pemilu;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use Faker\Factory as Faker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
 class PemiluTest extends TestCase
@@ -15,135 +19,240 @@ class PemiluTest extends TestCase
      *
      * @return void
      */
-    public function test_only_petugas_can_create_pemilu()
+    public function test_petugas_success_create_pemilu()
     {
         $faker = Faker::create('id_ID');
         $petugas = User::factory()->petugas()->create();
 
-        //Jenis Pemilu ID
-        $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id');
+        // membuat jenis pemilu untuk diambil id jenisnya
+        $jenisPemilu = JenisPemilu::factory()->create(['nama' => 'Pemilihan Kepala Desa']);
+
+        $pemiluData = [
+            'nama' => 'Pemilihan Kepala Desa Sukaratu',
+            'tanggal_pelaksanaan' => $faker->date(),
+            'jenis_id' => $jenisPemilu->id_jenis, // Pemilihan Kepala Desa
+            'kecamatan_id' => 3205230, // Banyuresmi
+            'kabupaten_kota_id' => 3205, // Kabupaten Garut
+            'provinsi_id' => 32, // Jawa Barat // Banyuresmi
+            'desa' => 'Desa ' . $faker->numberBetween(0, 20),
+        ];
+
 
         Sanctum::actingAs($petugas, ['create']);
-        $this->withoutExceptionHandling();
-        $response = $this->postJson('api/pemilu/create', [
-            'nama' => 'Pemilihan Kepala Desa ' . $faker->randomDigit(),
-            'tanggal_pelaksanaan' => $faker->date(),
-            'waktu_pelaksanaan' => $faker->time('H:i'),
-            'jenis_id' => $faker->randomElement($jenisPemiluID), // Pemilihan Kepala Desa
-            'kecamatan_id' => 3205230, // Banyuresmi
-            'kabupaten_id' => 3205, // Kabupaten Garut
-            'provinsi_id' => 32, // Jawa Barat // Banyuresmi
-            'detail_alamat' => 'Desa ' . $faker->numberBetween(0, 20),
-        ]);
 
-        $response->assertOk();
+        $response = $this->postJson('api/pemilu/create', $pemiluData, ['Accept' => 'Application/Json']);
+
+        $response->assertOk()->assertJsonStructure(
+            [
+                'kode',
+                'status',
+                'message',
+                'data' => [
+                    'id_pemilu',
+                    'nama',
+                    'tanggal_pelaksanaan',
+                    'jenis_id',
+                    'alamat_id',
+                ]
+            ]
+        );
     }
+
     public function test_masyarakat_get_forbidden_error_when_try_to_create_pemilu()
     {
         $faker = Faker::create('id_ID');
         $masyarakat = User::factory()->create();
 
         //Jenis Pemilu ID
-        $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id');
+        $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id_jenis');
 
         $dataPemilu = [
             'nama' => 'Pemilihan Kepala Desa',
             'tanggal_pelaksanaan' => $faker->date(),
-            'waktu_pelaksanaan' => $faker->time('H:i'),
-            'jenis_id' => $faker->randomElement($jenisPemiluID), // Pemilihan Kepala Desa
+            'jenis_id' => $faker->randomElement($jenisPemiluID), // Pemilihan Jenis Pemilu
             'kecamatan_id' => 3205230, // Banyuresmi
-            'kabupaten_id' => 3205, // Kabupaten Garut
+            'kabupaten_kota_id' => 3205, // Kabupaten Garut
             'provinsi_id' => 32, // Jawa Barat
-            'detail_alamat' => 'Desa ' . $faker->numberBetween(0, 20),
+            'desa' => 'Desa ' . $faker->numberBetween(0, 20),
         ];
 
         Sanctum::actingAs($masyarakat, ['create']);
 
         $response = $this->postJson('api/pemilu/create', $dataPemilu);
 
-        $response->assertForbidden();
+        $response->assertForbidden()->assertJson(
+            [
+                'kode' => 403,
+                'status' => 'Forbidden',
+                'message' => 'Anda tidak memiliki akses untuk fitur ini'
+            ]
+        );
     }
 
-    public function test_petugas_get_a_validation_error_when_create_pemilu_with_null_nama()
+    public function test_petugas_get_a_validation_error_when_create_pemilu_with_nama_field_null()
     {
         $faker = Faker::create('id_ID');
         $petugas = User::factory()->petugas()->create();
 
         //Jenis Pemilu ID
-        $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id');
+        $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id_jenis');
 
-        Sanctum::actingAs($petugas, ['create']);
-        $response = $this->postJson('api/pemilu/create', [
+        $dataPemilu = [
             'nama' => null,
             'tanggal_pelaksanaan' => $faker->date(),
-            'waktu_pelaksanaan' => $faker->time('H:i'),
-            'jenis_id' => $faker->randomElement($jenisPemiluID), // Pemilihan Kepala Desa
+            'jenis_id' => $faker->randomElement($jenisPemiluID), // Pemilihan Jenis Pemilu
             'kecamatan_id' => 3205230, // Banyuresmi
-            'kabupaten_id' => 3205, // Kabupaten Garut
-            'provinsi_id' => 32, // Jawa Barat // Banyuresmi
-            'detail_alamat' => 'Desa ' . $faker->numberBetween(0, 20),
-        ]);
+            'kabupaten_kota_id' => 3205, // Kabupaten Garut
+            'provinsi_id' => 32, // Jawa Barat
+            'desa' => 'Desa ' . $faker->numberBetween(0, 20),
+        ];
 
-        $response->assertUnprocessable()->dump();
+        Sanctum::actingAs($petugas, ['create']);
+        $response = $this->postJson('api/pemilu/create', $dataPemilu);
+
+        $response->assertUnprocessable()->assertJson(
+            [
+                "message" => "The nama field is required.",
+                "errors" => [
+                    "nama" => ["The nama field is required."],
+                ]
+            ]
+        );
     }
+
+
     public function test_petugas_can_update_nama_pemilu()
     {
         $faker = Faker::create('id_ID');
         $petugas = User::factory()->petugas()->create();
 
-        // getID Pemilu
-        $pemiluID = DB::table('pemilu')->pluck('id');
-        $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id');
+        // Deklarasi Data Pemilu Tetap
+        $jenisPemilu = DB::table('jenis_pemilu')->pluck('id_jenis');
+        $jenisPemiluId = $faker->randomElement($jenisPemilu);
+        $tanggal_pelaksanaan = $faker->date();
 
-        $dataPemilu = [
-            'nama' => 'Nama Pemilu Telah diedit',
-            'tanggal_pelaksanaan' => $faker->date(),
-            'waktu_pelaksanaan' => $faker->time('H:i'),
-            'jenis_id' => $faker->randomElement($jenisPemiluID), // Pemilihan Kepala Desa
-            'kecamatan_id' => 3205230, // Banyuresmi
-            'kabupaten_id' => 3205, // Kabupaten Garut
-            'provinsi_id' => 32, // Banyuresmi
-            'detail_alamat' => 'Desa' . $faker->numberBetween(0, 20),
+        $alamat = Alamat::factory()->generateGarutJawaBarat()->create();
+        $alamatId = $alamat->id_alamat;
+
+        $dataAwal = [
+            'nama' => 'Nama Pemilu Desa ',
+            'tanggal_pelaksanaan' => $tanggal_pelaksanaan,
+            'jenis_id' => $jenisPemiluId, // Pemilihan Kepala Desa
+            'alamat_id' => $alamatId,
         ];
 
-        Sanctum::actingAs($petugas, ['updatePemilu']);
+        //membuat data pemilu baru
+        $pemilu = Pemilu::factory()->create($dataAwal);
 
-        $response = $this->postJson('api/pemilu/update/' . $faker->randomElement($pemiluID), $dataPemilu);
+        $dataBaru = [
+            'nama' => 'Nama Pemilu Desa Sukamulya',
+            'tanggal_pelaksanaan' => $tanggal_pelaksanaan,
+            'jenis_id' => $jenisPemiluId, // Pemilihan Kepala Desa
+            'kecamatan_id' => 3205230, // Banyuresmi
+            'kabupaten_kota_id' => 3205, // Kabupaten Garut
+            'provinsi_id' => 32, // Jawa Barat
+            'desa' => 'Desa'
+        ];
+
+        Sanctum::actingAs($petugas, ['update']);
+
+        $response = $this->putJson('api/pemilu/update/' . $pemilu->id_pemilu, $dataBaru, ['Accept' => 'Application/json']);
 
         $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
             'message',
-            'data'
+            'data' => [
+                'nama',
+                'tanggal_pelaksanaan',
+                'jenis_id',
+                'alamat_id',
+
+            ]
         ]);
     }
 
     public function test_petugas_can_get_detail_pemilu()
     {
-        $this->withExceptionHandling();
-        $faker = Faker::create('id_ID');
+        $faker = Faker::create();
 
         $petugas = User::factory()->petugas()->create();
         Sanctum::actingAs($petugas, ['details']);
 
-        // getID Pemilu
-        $pemiluID = DB::table('pemilu')->pluck('id');
+        $jenisPemilu = DB::table('jenis_pemilu')->pluck('id_jenis');
+        $jenisPemiluId = $faker->randomElement($jenisPemilu);
 
-        $response = $this->getJson('api/pemilu/detail/' . $faker->randomElement($pemiluID));
+        $alamat = Alamat::factory()->create([
+            'provinsi_id' => 32,
+            'kabupaten_kota_id' => 3205,
+            'kecamatan_id' => 3205230,
+            'desa' => 'Sukaratu'
+        ]);
 
-        $response->assertOk()->dump();
+        $alamatId = $alamat->id_alamat;
+
+        $dataPemilu = [
+            'nama' => 'Pemilihan Desa Sukaratu',
+            'tanggal_pelaksanaan' => $faker->date(),
+            'jenis_id' => $jenisPemiluId,
+            'alamat_id' => $alamatId,
+        ];
+
+        $pemilu = Pemilu::factory()->create($dataPemilu);
+
+        $response = $this->getJson('api/pemilu/' . $pemilu->id_pemilu);
+
+        $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
+            'message',
+            'data' => [
+                'id_pemilu',
+                'nama',
+                'tanggal_pelaksanaan',
+                'jenis_id',
+                'alamat_id',
+            ]
+        ]);
     }
+
     public function test_petugas_can_delete_pemilu()
     {
+        $this->withExceptionHandling();
         $faker = Faker::create('id_ID');
 
         $petugas = User::factory()->petugas()->create();
         Sanctum::actingAs($petugas, ['deletePrmilu']);
+        $jenisPemilu = DB::table('jenis_pemilu')->pluck('id_jenis');
+        $jenisPemiluId = $faker->randomElement($jenisPemilu);
 
-        // getID Pemilu
-        $pemiluID = DB::table('pemilu')->pluck('id');
+        $alamat = Alamat::factory()->create([
+            'provinsi_id' => 32,
+            'kabupaten_kota_id' => 3205,
+            'kecamatan_id' => 3205230,
+            'desa' => 'Sukaratu'
+        ]);
 
-        $response = $this->postJson('api/pemilu/delete/' . $faker->randomElement($pemiluID));
+        $alamatId = $alamat->id_alamat;
 
-        $response->assertOk();
+        $dataPemilu = [
+            'nama' => 'Pemilihan Desa Sukaratu',
+            'tanggal_pelaksanaan' => $faker->date(),
+            'jenis_id' => $jenisPemiluId,
+            'alamat_id' => $alamatId,
+        ];
+
+        $pemilu = Pemilu::factory()->create($dataPemilu);
+
+        $response = $this->deleteJson('api/pemilu/delete/' . $pemilu->id_pemilu);
+
+        $response->assertOk()->dump()->assertJsonStructure(
+            [
+                'kode' => 200,
+                'status' => 'OK',
+                'message' => 'Data Pemilu Berhasil Dihapus',
+            ]
+        );
     }
 
 
@@ -152,8 +261,18 @@ class PemiluTest extends TestCase
         $response = $this->getJson('api/pemilu');
 
         $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
             'message',
-            'data'
+            'data' => [
+                '*' => [
+                    'id_pemilu',
+                    'nama',
+                    'tanggal_pelaksanaan',
+                    'jenis_id',
+                    'alamat_id'
+                ]
+            ]
         ]);
     }
 }

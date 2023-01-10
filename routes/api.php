@@ -41,8 +41,8 @@ Route::middleware('auth:sanctum')->group(
         // Pemilu
         Route::post('/pemilu/create', [PemiluController::class, 'create']);
         Route::put('/pemilu/update/{id}', [PemiluController::class, 'update']);
-        Route::get('/pemilu/detail/{id}', [PemiluController::class, 'details']);
-        Route::delete('/pemilu/delete/{id}', [PemiluController::class, 'deletePemilu']);
+        Route::get('/pemilu/{id}', [PemiluController::class, 'details']);
+        Route::delete('/pemilu/delete/{id}', [PemiluController::class, 'delete']);
 
         // FQA
         Route::post('/fqa/create', [FQAController::class, 'create']);

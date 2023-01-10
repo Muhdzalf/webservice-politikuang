@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Alamat;
 use App\Models\Pemilu;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -15,39 +14,49 @@ class PemiluController extends Controller
     {
         if (!Gate::allows('only-petugas')) {
             return response()->json([
-                'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
+                'kode' => 403,
+                'status' => 'Forbidden',
+                'message' => 'Anda tidak memiliki akses untuk fitur ini'
             ], 403);
         }
 
         $request->validate([
             'nama' => 'required|string',
             'tanggal_pelaksanaan' => 'required|date_format:Y-m-d',
-            'waktu_pelaksanaan' => 'required|date_format:h:i',
             'jenis_id' => 'required|numeric',
+
+            // validation for alamat
             'kecamatan_id' => 'required|numeric',
-            'kabupaten_id' => 'required|numeric',
+            'kabupaten_kota_id' => 'required|numeric',
             'provinsi_id' => 'required|numeric',
-            'detail_alamat' => 'required|string',
+            'desa' => 'required|string',
         ]);
+
+        //default alamat
+        $alamatId = 0;
 
         $alamat = Alamat::create([
             'kecamatan_id' => $request->kecamatan_id,
-            'kabupaten_id' => $request->kabupaten_id,
+            'kabupaten_kota_id' => $request->kabupaten_kota_id,
             'provinsi_id' => $request->provinsi_id,
-            'detail_alamat' => $request->detail_alamat,
+            'desa' => $request->desa,
         ]);
 
-        $alamatId = $alamat->id;
+        if ($alamat) {
+            // get alamat id
+            $alamatId = $alamat->id_alamat;
+        }
 
         $pemilu = Pemilu::create([
             'nama' => $request->nama,
             'tanggal_pelaksanaan' => $request->tanggal_pelaksanaan,
-            'waktu_pelaksanaan' => $request->waktu_pelaksanaan,
             'jenis_id' => $request->jenis_id,
             'alamat_id' => $alamatId,
         ]);
 
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'data pemilu berhasil ditambahkan',
             'data' => $pemilu
         ]);
@@ -56,65 +65,68 @@ class PemiluController extends Controller
     public function getAll()
     {
 
-        // $data = Pemilu::all();
-
-        // if ($id) {
-        //     $data = Pemilu::find($id);
-        //     if ($data) {
-        //         return response()->json([
-        //             'message' => 'Data Pemilu Berhasil Ditemukan',
-        //             'data' => $data
-        //         ]);
-        //     } else {
-        //         return response()->json([
-        //             'message' => 'Data Pemilu Tidak Ditemukan',
-        //             'data' => null
-        //         ], 404);
-        //     }
-        // }
-
-        // if ($nama || $id) {
         $data = Pemilu::query()->search(request(['nama', 'id']))->get();
         if (count($data) < 1) {
             return response()->json([
+                'kode' => 404,
+                'status' => 'Not Found',
                 'message' => 'Data Pemilu Tidak Ditemukan',
-                'data' => null
             ], 404);
         }
         // }
 
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Data Pemilu Berhasil Diambil',
             'data' => $data
         ]);
     }
 
-    public function updatePemilu(Request $request, $id)
+    public function update(Request $request, $id)
     {
         if (!Gate::allows('only-petugas')) {
             return response()->json([
+                'kode' => 403,
+                'status' => 'Forbidden',
                 'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
             ], 403);
         }
-        // MEncari data pemilu yang sesuai dengan id
+
+        //validation
+        $request->validate([
+            'nama' => 'required|string',
+            'tanggal_pelaksanaan' => 'required|date_format:Y-m-d',
+            'jenis_id' => 'required|numeric',
+
+            // validation for alamat
+            'kecamatan_id' => 'required|numeric',
+            'kabupaten_kota_id' => 'required|numeric',
+            'provinsi_id' => 'required|numeric',
+            'desa' => 'required|string',
+        ]);
+
+        // Mencari data pemilu yang sesuai dengan id
         $pemilu = Pemilu::find($id);
 
+        // update data pemilu
         $pemilu->nama = $request->nama;
         $pemilu->tanggal_pelaksanaan = $request->tanggal_pelaksanaan;
-        $pemilu->waktu_pelaksanaan = $request->waktu_pelaksanaan;
         $pemilu->jenis_id = $request->jenis_id;
+        $pemilu->save();
 
         $alamat = Alamat::find($pemilu->alamat_id);
 
+        //update data provinsi
         $alamat->provinsi_id = $request->provinsi_id;
-        $alamat->kabupaten_id = $request->kabupaten_id;
+        $alamat->kabupaten_kota_id = $request->kabupaten_kota_id;
         $alamat->kecamatan_id = $request->kecamatan_id;
-        $alamat->detail_alamat = $request->detail_alamat;
-
+        $alamat->desa = $request->desa;
         $alamat->save();
-        $pemilu->save();
 
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Data Pemilu Berhasil Diperbaharui',
             'data' => $pemilu,
         ]);
@@ -149,15 +161,19 @@ class PemiluController extends Controller
 
 
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Data Pemilu Berhasil Diambil',
             'data' => $pemilu
         ]);
     }
 
-    public function deletePemilu($id)
+    public function delete($id)
     {
         if (!Gate::allows('only-petugas')) {
             return response()->json([
+                'kode' => 403,
+                'status' => 'Forbidden',
                 'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
             ], 403);
         }
@@ -165,8 +181,19 @@ class PemiluController extends Controller
         $pemilu->delete();
 
         return response()->json([
+            'kode' => 200,
+            'status' => 'OK',
             'message' => 'Data Pemilu Berhasil Dihapus',
-            'status' => $pemilu
         ]);
     }
+
+    // private function generateAlamatPemilu(Request $request, $provinsiId, $kabupatenKotaId, $kecamatanId, $desa)
+    // {
+    //     $request->validate([
+    //         'kecamatan_id' => 'required|numeric',
+    //         'kabupaten_kota_id' => 'required|numeric',
+    //         'provinsi_id' => 'required|numeric',
+    //         'desa' => 'required|string',
+    //     ]);
+    // }
 }

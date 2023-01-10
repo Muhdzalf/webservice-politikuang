@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->group(
 
 
         //MASYARAKAT
-        Route::post('/laporan/create', [LaporanController::class, 'createLaporan']);
+        Route::post('/laporan/create', [LaporanController::class, 'create']);
         Route::delete('/laporan/delete/{nomor_laporan}', [LaporanController::class, 'delete']);
         Route::put('/laporan/update/{nomor_laporan}', [LaporanController::class, 'update']);
         Route::get('user/laporan/', [LaporanController::class, 'getUserLaporan']);
@@ -51,8 +51,8 @@ Route::middleware('auth:sanctum')->group(
 
 
         // Laporan
-        Route::get('/laporan', [LaporanController::class, 'allLaporan']);
-        Route::get('/laporan/details/{nomor_laporan}', [LaporanController::class, 'details']);
+        Route::get('/laporan', [LaporanController::class, 'getAll']);
+        Route::get('/laporan/{nomor_laporan}', [LaporanController::class, 'details']);
 
         // Progress Laporan
         Route::post('/laporan/respon/{id}', [ProgressController::class, 'responLaporan']);

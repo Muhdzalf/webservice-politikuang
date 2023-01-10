@@ -27,6 +27,8 @@ class Laporan extends Model
     ];
 
     protected $primaryKey = 'nomor_laporan';
+    protected $keyType = 'string';
+    public $incrementing = false;
 
 
     public function scopeFilter($query, array $filters)

@@ -34,11 +34,11 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('isOwner', function (User $user, Laporan $laporan) {
-            return $user->id === $laporan->pengirim_laporan;
+            return $user->nik === $laporan->pelapor;
         });
 
         Gate::define('owner-and-petugas-can-open', function (User $user, Laporan $laporan) {
-            if ($user->id === $laporan->pengirim_laporan) {
+            if ($user->nik === $laporan->pelapor) {
                 return true;
             } else if ($user->role === 'petugas') {
                 return true;

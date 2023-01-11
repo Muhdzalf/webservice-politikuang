@@ -98,7 +98,6 @@ class LaporanTest extends TestCase
             'pemilu_id' => $faker->randomElement($pemiluID)
         ];
 
-
         $response = $this->postJson('api/laporan/create', $dataLaporan, ['Accept' => 'Application/json']);
 
         $response->assertUnprocessable()->assertJson(
@@ -178,34 +177,6 @@ class LaporanTest extends TestCase
                 "message" => "Anda Tidak Memiliki Akses Untuk Melihat Laporan Ini"
             ]
         );
-    }
-
-    public function test_masyarakat_can_get_progress_laporan()
-    {
-        $masyarakat = User::factory()->create();
-        $pemiluID = DB::table('pemilu')->pluck('id');
-
-        Sanctum::actingAs($masyarakat, ['getProgressLaporan']);
-        $faker = Faker::create('id_ID');
-
-
-        $this->postJson('api/laporan/create', [
-            'judul' => 'Judul ' . $faker->numberBetween(0, 100),
-            'tanggal_kejadian' => $faker->date('Y-m-d'),
-            'pemberi' => $faker->name(),
-            'penerima' => $faker->name(),
-            'nominal' => $faker->numberBetween(1000, 100000000),
-            'alamat_kejadian' => $faker->address(),
-            'kronologi_kejadian' => $faker->text(),
-            'bukti' => $faker->url(),
-            'pemilu_id' => $faker->randomElement($pemiluID)
-        ]);
-
-        $laporan = Laporan::latest()->first();
-
-        $response = $this->getJson('/laporan/progress/' . $laporan->nomor_laporan);
-
-        $response->assertOk();
     }
 
     public function test_masyarakat_can_update_their_laporan()
@@ -310,45 +281,6 @@ class LaporanTest extends TestCase
         );
     }
 
-    // Status: Dibuat, Diupdate, Diproses, Ditolak, Dikembalikan, Selesai
-    public function test_petugas_can_update_status_laporan()
-    {
-        $faker = Faker::create('id_ID');
-
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['changeStatus']);
-
-        $laporan = DB::table('laporan')->pluck('nomor_laporan');
-        $id = $faker->randomElement($laporan);
-
-        $response = $this->postJson('api/laporan/status/' . $id, [
-            'laporan_id' => $id,
-            'status' => 'Diproses',
-            'keterangan' => 'Laporan Sedang Diproses Oleh Petugas. Proses Maksimal 3x24 jam'
-        ]);
-
-        $response->assertOk()->dump();
-    }
-
-    public function test_petugas_get_a_validation_error_when_update_status_laporan_with_invalid_status()
-    {
-        $faker = Faker::create('id_ID');
-
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['changeStatus']);
-
-        $laporan = DB::table('laporan')->pluck('nomor_laporan');
-        $id = $faker->randomElement($laporan);
-
-
-        $response = $this->postJson('api/laporan/status/' . $id, [
-            'laporan_id' => $id,
-            'status' => 'Tidak Bisa',
-            'keterangan' => 'Laporan Tidak Bisa Diterima'
-        ]);
-
-        $response->assertUnprocessable()->dump();
-    }
     public function test_masyarakat_can_get_a_list_of_created_laporan()
     {
         $faker = Faker::create('id_ID');

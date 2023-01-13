@@ -186,14 +186,4 @@ class PemiluController extends Controller
             'message' => 'Data Pemilu Berhasil Dihapus',
         ]);
     }
-
-    // private function generateAlamatPemilu(Request $request, $provinsiId, $kabupatenKotaId, $kecamatanId, $desa)
-    // {
-    //     $request->validate([
-    //         'kecamatan_id' => 'required|numeric',
-    //         'kabupaten_kota_id' => 'required|numeric',
-    //         'provinsi_id' => 'required|numeric',
-    //         'desa' => 'required|string',
-    //     ]);
-    // }
 }

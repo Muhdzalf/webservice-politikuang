@@ -19,12 +19,12 @@ return new class extends Migration
             $table->string('nama', 50);
             $table->string('email', 35)->unique();
             $table->date('tanggal_lahir');
-            $table->char('jenis_kelamin', 1);
+            $table->enum('jenis_kelamin', ['L', 'P']);
             $table->string('no_hp', 13);
             $table->string('alamat', 150);
             $table->string('pekerjaan', 35);
             $table->string('kewarganegaraan', 10)->default('Indonesia');
-            $table->string('role', 10)->set('administrator', 'pengawas', 'masyarakat')->default('masyarakat');
+            $table->enum('role', ['masyarakat', 'administrator', 'pengawas'])->default('masyarakat');
             $table->string('password');
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();

@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('progress_laporan', function (Blueprint $table) {
             $table->id('id_progress');
-            $table->string('status', 20);
+            $table->enum('status', ['dibuat', 'diupdate', 'dikembalikan', 'diproses', 'selesai']);
             $table->text('keterangan')->nullable();
 
             $table->string('nomor_laporan', 20);

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id('id_pemilu');
             $table->string('nama');
             $table->date('tanggal_pelaksanaan');
-
+            $table->time('waktu_pelaksanaan');
             $table->unsignedBigInteger('jenis_id');
             $table->foreign('jenis_id')->references('id_jenis')->on('jenis_pemilu')->onUpdate('cascade')->onDelete('cascade');
 

@@ -29,6 +29,7 @@ class PemiluTest extends TestCase
         $pemiluData = [
             'nama' => 'Pemilihan Kepala Desa Sukaratu',
             'tanggal_pelaksanaan' => $faker->date(),
+            'waktu_pelaksanaan' => $faker->time('H:i'),
             'jenis_id' => $jenisPemilu->id_jenis, // Pemilihan Kepala Desa
             'kecamatan_id' => 3205230, // Banyuresmi
             'kabupaten_kota_id' => 3205, // Kabupaten Garut
@@ -50,6 +51,7 @@ class PemiluTest extends TestCase
                     'id_pemilu',
                     'nama',
                     'tanggal_pelaksanaan',
+                    'waktu_pelaksanaan',
                     'jenis_id',
                     'alamat_id',
                 ]
@@ -68,6 +70,7 @@ class PemiluTest extends TestCase
         $dataPemilu = [
             'nama' => 'Pemilihan Kepala Desa',
             'tanggal_pelaksanaan' => $faker->date(),
+            'waktu_pelaksanaan' => $faker->time('H:i'),
             'jenis_id' => $faker->randomElement($jenisPemiluID), // Pemilihan Jenis Pemilu
             'kecamatan_id' => 3205230, // Banyuresmi
             'kabupaten_kota_id' => 3205, // Kabupaten Garut
@@ -99,6 +102,7 @@ class PemiluTest extends TestCase
         $dataPemilu = [
             'nama' => null,
             'tanggal_pelaksanaan' => $faker->date(),
+            'waktu_pelaksanaan' => $faker->time('H:i'),
             'jenis_id' => $faker->randomElement($jenisPemiluID), // Pemilihan Jenis Pemilu
             'kecamatan_id' => 3205230, // Banyuresmi
             'kabupaten_kota_id' => 3205, // Kabupaten Garut
@@ -129,6 +133,8 @@ class PemiluTest extends TestCase
         $jenisPemilu = DB::table('jenis_pemilu')->pluck('id_jenis');
         $jenisPemiluId = $faker->randomElement($jenisPemilu);
         $tanggal_pelaksanaan = $faker->date();
+        $waktu_pelaksanaan = $faker->time('H:i');
+
 
         $alamat = Alamat::factory()->generateGarutJawaBarat()->create();
         $alamatId = $alamat->id_alamat;
@@ -136,6 +142,7 @@ class PemiluTest extends TestCase
         $dataAwal = [
             'nama' => 'Nama Pemilu Desa ',
             'tanggal_pelaksanaan' => $tanggal_pelaksanaan,
+            'waktu_pelaksanaan' => $waktu_pelaksanaan,
             'jenis_id' => $jenisPemiluId, // Pemilihan Kepala Desa
             'alamat_id' => $alamatId,
         ];
@@ -146,6 +153,7 @@ class PemiluTest extends TestCase
         $dataBaru = [
             'nama' => 'Nama Pemilu Desa Sukamulya',
             'tanggal_pelaksanaan' => $tanggal_pelaksanaan,
+            'waktu_pelaksanaan' => $waktu_pelaksanaan,
             'jenis_id' => $jenisPemiluId, // Pemilihan Kepala Desa
             'kecamatan_id' => 3205230, // Banyuresmi
             'kabupaten_kota_id' => 3205, // Kabupaten Garut
@@ -164,6 +172,7 @@ class PemiluTest extends TestCase
             'data' => [
                 'nama',
                 'tanggal_pelaksanaan',
+                'waktu_pelaksanaan',
                 'jenis_id',
                 'alamat_id',
 
@@ -193,6 +202,7 @@ class PemiluTest extends TestCase
         $dataPemilu = [
             'nama' => 'Pemilihan Desa Sukaratu',
             'tanggal_pelaksanaan' => $faker->date(),
+            'waktu_pelaksanaan' => $faker->time('H:i'),
             'jenis_id' => $jenisPemiluId,
             'alamat_id' => $alamatId,
         ];
@@ -209,6 +219,7 @@ class PemiluTest extends TestCase
                 'id_pemilu',
                 'nama',
                 'tanggal_pelaksanaan',
+                'waktu_pelaksanaan',
                 'jenis_id',
                 'alamat_id',
             ]
@@ -237,6 +248,7 @@ class PemiluTest extends TestCase
         $dataPemilu = [
             'nama' => 'Pemilihan Desa Sukaratu',
             'tanggal_pelaksanaan' => $faker->date(),
+            'waktu_pelaksanaan' => $faker->time('H:i'),
             'jenis_id' => $jenisPemiluId,
             'alamat_id' => $alamatId,
         ];
@@ -268,6 +280,7 @@ class PemiluTest extends TestCase
                     'id_pemilu',
                     'nama',
                     'tanggal_pelaksanaan',
+                    'waktu_pelaksanaan',
                     'jenis_id',
                     'alamat_id'
                 ]

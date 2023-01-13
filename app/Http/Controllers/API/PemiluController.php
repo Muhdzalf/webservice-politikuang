@@ -23,6 +23,7 @@ class PemiluController extends Controller
         $request->validate([
             'nama' => 'required|string',
             'tanggal_pelaksanaan' => 'required|date_format:Y-m-d',
+            'waktu_pelaksanaan' => 'required|date_format:H:i',
             'jenis_id' => 'required|numeric',
 
             // validation for alamat
@@ -50,6 +51,7 @@ class PemiluController extends Controller
         $pemilu = Pemilu::create([
             'nama' => $request->nama,
             'tanggal_pelaksanaan' => $request->tanggal_pelaksanaan,
+            'waktu_pelaksanaan' => $request->waktu_pelaksanaan,
             'jenis_id' => $request->jenis_id,
             'alamat_id' => $alamatId,
         ]);
@@ -112,6 +114,7 @@ class PemiluController extends Controller
         // update data pemilu
         $pemilu->nama = $request->nama;
         $pemilu->tanggal_pelaksanaan = $request->tanggal_pelaksanaan;
+        $pemilu->waktu_pelaksanaan = $request->waktu_pelaksanaan;
         $pemilu->jenis_id = $request->jenis_id;
         $pemilu->save();
 

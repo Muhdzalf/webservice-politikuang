@@ -52,8 +52,8 @@ class LaporanController extends Controller
         ProgressLaporan::create([
             'nomor_laporan' => $nomorLaporan,
             'nik' => Auth::user()->nik,
-            'status' => 'dibuat',
-            'keterangan' => 'Laporan telah dibuat oleh ' . Auth::user()->nama
+            'status' => 'menunggu',
+            'keterangan' => 'Laporan telah dibuat oleh ' . Auth::user()->nama . ' menunggu untuk diproses oleh pengawas.'
         ]);
 
         return response()->json([

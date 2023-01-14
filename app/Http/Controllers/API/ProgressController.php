@@ -53,7 +53,7 @@ class ProgressController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|string|in:diproses, ditolak, dikembalikan, selesai',
+            'status' => 'required|string|in:menunggu, diproses, ditolak, dikembalikan, selesai',
             'keterangan' => 'required|string',
         ]);
 

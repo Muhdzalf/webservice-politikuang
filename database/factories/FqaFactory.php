@@ -17,8 +17,8 @@ class FqaFactory extends Factory
     public function definition()
     {
         return [
-            'pertanyaan' => 'Pertanyaan',
-            'Jawaban' => 'Jawaban'
+            'pertanyaan' => $this->faker->sentence(),
+            'Jawaban' => $this->faker->paragraph()
         ];
     }
 }

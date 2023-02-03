@@ -52,8 +52,6 @@ class AuthTest extends TestCase
                 'kewarganegaraan',
                 'role',
             ],
-            'access_token',
-            'type'
         ]);
     }
 

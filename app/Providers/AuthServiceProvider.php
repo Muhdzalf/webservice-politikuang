@@ -30,7 +30,10 @@ class AuthServiceProvider extends ServiceProvider
         //
         // create gate only petugas
         Gate::define('only-petugas', function (User $user) {
-            return $user->role === 'petugas';
+            $pengawas = $user->role == 'pengawas';
+            $admin = $user->role == 'administrator';
+            if ($pengawas || $admin)
+                return true;
         });
 
         Gate::define('isOwner', function (User $user, Laporan $laporan) {
@@ -40,7 +43,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('owner-and-petugas-can-open', function (User $user, Laporan $laporan) {
             if ($user->nik === $laporan->pelapor) {
                 return true;
-            } else if ($user->role === 'petugas') {
+            } else if ($user->role === 'pengawas') {
                 return true;
             }
         });

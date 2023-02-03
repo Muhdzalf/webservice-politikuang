@@ -1,7 +1,9 @@
 <?php
 
+use Database\Seeders\KabupatenSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -20,6 +22,10 @@ return new class extends Migration
             $table->foreign('provinsi_id')->references('id_provinsi')->on('provinsi')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
+
+        Artisan::call('db:seed', [
+            '--class' => KabupatenSeeder::class
+        ]);
     }
 
     /**

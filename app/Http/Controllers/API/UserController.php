@@ -35,7 +35,6 @@ class UserController extends Controller
 
         $user = $request->user();
 
-        $user->nik = $user->nik;
         $user->nama = $request->nama;
         $user->email = $request->email;
         $user->tanggal_lahir = $request->tanggal_lahir;

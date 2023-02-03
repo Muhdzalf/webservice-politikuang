@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Alamat;
+use App\Models\JenisPemilu;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,10 +19,10 @@ class PemiluFactory extends Factory
     public function definition()
     {
         return [
-            'nama' => 'Nama Pemilu Telah diedit',
-            'tanggal_pelaksanaan' => $this->faker->date(),
-            'jenis_id' => 0, // Jenis Pemilu
-            'alamat_id' => 0,
+            'nama' => 'Test Nama Pemilu ' . $this->faker->numberBetween(1, 500),
+            'tanggal_pelaksanaan' => $this->faker->dateTimeBetween('now', '+2 months'),
+            'jenis_id' => JenisPemilu::factory(),
+            'alamat_id' => Alamat::factory()->generateGarutJawaBarat()->create(),
         ];
     }
 }

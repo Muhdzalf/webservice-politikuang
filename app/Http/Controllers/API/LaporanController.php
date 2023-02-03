@@ -77,6 +77,16 @@ class LaporanController extends Controller
             ], 403);
         }
 
+        //mendapatkan proses laporan terakhir untuk melihat status terakhir dari progress laporan
+        $ProgressLaporan = ProgressLaporan::whereColumn('nomor_laporan', $nomor_laporan)->orderByDesc('created_at');
+        if (!$ProgressLaporan->status == "menunggu" || !$ProgressLaporan->status == "dikembalikan") {
+            return response()->json([
+                'kode' => 403,
+                'status' => 'Forbidden',
+                'message' => 'Laporan sudah diproses, Tidak dapat diubah'
+            ], 403);
+        }
+
         $laporan->judul = $request->judul;
         $laporan->tanggal_kejadian = $request->tanggal_kejadian;
         $laporan->pemberi = $request->pemberi;
@@ -87,12 +97,13 @@ class LaporanController extends Controller
         $laporan->bukti = $request->bukti;
         $laporan->save();
 
+        // memperbaharui status progress laporan
         if ($laporan->save()) {
             ProgressLaporan::create([
                 'nomor_laporan' => $laporan->nomor_laporan,
                 'nik' => Auth::user()->nik,
-                'status' => 'Diubah',
-                'keterangan' => 'Laporan telah diperbaharui oleh ' . Auth::user()->nama
+                'status' => 'menunggu',
+                'keterangan' => 'Laporan telah diperbaharui oleh ' . Auth::user()->nama . ' meunggu untuk diproses oleh pengawas'
             ], 200);
         }
 
@@ -109,20 +120,21 @@ class LaporanController extends Controller
     {
         if (!Gate::allows('only-petugas')) {
             return response()->json([
+                'kode' => 403,
+                'status' => 'Forbidden',
                 'message' => 'Hanya Petugas Yang dapat Mengakses Fitur Ini',
             ], 403);
         }
 
-        // cara ngakses statusnya gimana??!!
-        // $laporan = Laporan::with(['ProgressLaporans', 'user'])->where('judul', 'LIKE', '%' . $judul . '%')->get();
         $laporan = Laporan::query()->filter(request(['cari']))->get();
         if (count($laporan) < 1) {
             return response()->json([
+                'kode' => 200,
+                'status' => 'OK',
                 'message' => 'Data Laporan Tidak ditemukan',
                 'data' => null,
             ], 404);
         }
-
 
         return response()->json([
             'kode' => 200,

@@ -53,7 +53,16 @@ class UserFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'role' => 'petugas',
+                'role' => 'pengawas',
+            ];
+        });
+    }
+
+    public function admin()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'role' => 'administrator',
             ];
         });
     }

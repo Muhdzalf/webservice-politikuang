@@ -24,9 +24,10 @@ class AuthController extends Controller
             'no_hp' => 'required|regex:/(0)[0-9]{11}/',
             'alamat' => 'required|string',
             'pekerjaan' => 'required|string',
-            'kewarganegaraan' => 'required|string',
-            'role' => 'required|in:petugas,masyarakat,administrator'
+            'kewarganegaraan' => 'sometimes|string',
+            'role' => 'sometimes|in:pengawas,masyarakat,administrator'
         ]);
+
 
         $user = User::create([
             'nama' => $request->nama,

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,7 @@ class PengawasFactory extends Factory
             'jabatan' => $this->faker->randomElement(['Ketua Pengawas Desa', 'Ketua Pengawas Kecamatan', 'Anggota Pengawas Desa', 'Anggota Pengawas Kecamatan']),
             'mulai_tugas' => '2023-01-01',
             'selesai_tugas' => '2023-06-01',
+            'user_id' => User::inRandomOrder()->first()->id
         ];
     }
 }

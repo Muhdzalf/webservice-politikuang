@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('no_spt', 75);
             $table->date('mulai_tugas');
             $table->date('selesai_tugas');
-            $table->date('jabatan', 50);
+            $table->string('jabatan', 50);
 
             //foreign key to user table
             $table->unsignedBigInteger('user_id');

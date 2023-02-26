@@ -18,6 +18,8 @@ return new class extends Migration
         Schema::create('kecamatan', function (Blueprint $table) {
             $table->char('id_kecamatan', 7)->primary();
             $table->string('nama', 35);
+
+            // foreign key to kabupaten kota id
             $table->char('kabupaten_kota_id', 4);
             $table->foreign('kabupaten_kota_id')->references('id_kabupaten_kota')->on('kabupaten_kota')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();

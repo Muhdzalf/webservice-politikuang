@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('jenis_id');
             $table->foreign('jenis_id')->references('id_jenis')->on('jenis_pemilu')->onUpdate('cascade')->onDelete('cascade');
 
+            // foreign key to alamat pemilu table
             $table->unsignedBigInteger('alamat_id');
             $table->foreign('alamat_id')->references('id_alamat')->on('alamat_pemilu')->onUpdate('cascade')->onDelete('cascade');
 

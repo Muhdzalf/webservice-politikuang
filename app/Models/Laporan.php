@@ -41,10 +41,11 @@ class Laporan extends Model
 
     //Relasi
 
-    public function user()
+    public function masyarakat()
     {
-        return $this->belongsTo(User::class, 'pelapor', 'nik');
+        return $this->belongsTo(Masyarakat::class, 'pelapor', 'nik');
     }
+
     public function pemilu()
     {
         return $this->belongsTo(Pemilu::class, 'pemilu_id', 'id_pemilu');

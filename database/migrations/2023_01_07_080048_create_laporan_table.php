@@ -27,8 +27,8 @@ return new class extends Migration
             $table->unsignedBigInteger('pemilu_id')->nullable();
             $table->foreign('pemilu_id')->references('id_pemilu')->on('pemilu')->nullOnDelete()->onUpdate('cascade');
 
-            $table->char('pelapor', 16);
-            $table->foreign('pelapor')->references('nik')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->char('nik', 16);
+            $table->foreign('nik')->references('nik')->on('masyarakat')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamps();
         });

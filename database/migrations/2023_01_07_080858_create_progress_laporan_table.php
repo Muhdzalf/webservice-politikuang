@@ -18,11 +18,13 @@ return new class extends Migration
             $table->enum('status', ['dibuat', 'diupdate', 'dikembalikan', 'diproses', 'selesai']);
             $table->text('keterangan')->nullable();
 
+            // foreign key to laporan table
             $table->string('nomor_laporan', 20);
             $table->foreign('nomor_laporan')->references('nomor_laporan')->on('laporan')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->char('nik', 16);
-            $table->foreign('nik')->references('nik')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            // foreign key to petugas table
+            $table->unsignedBigInteger('pengawas_id');
+            $table->foreign('pengawas_id')->references('id')->on('pengawas')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamps();
         });

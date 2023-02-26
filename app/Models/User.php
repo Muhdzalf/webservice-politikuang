@@ -56,6 +56,6 @@ class User extends Authenticatable
 
     public function administrator()
     {
-        return $this->hasOne(administrator::class, 'user_id', 'id');
+        return $this->hasOne(Admin::class, 'user_id', 'id');
     }
 }

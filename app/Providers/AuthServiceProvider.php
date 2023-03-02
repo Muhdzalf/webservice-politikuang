@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Laporan;
+use App\Models\Masyarakat;
 use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -30,18 +31,22 @@ class AuthServiceProvider extends ServiceProvider
         //
         // create gate only petugas
         Gate::define('only-petugas', function (User $user) {
-            $pengawas = $user->role == 'pengawas';
-            $admin = $user->role == 'administrator';
-            if ($pengawas || $admin)
-                return true;
+            return $user->role === 'pengawas';
+        });
+
+        Gate::define('only-admin', function (User $user) {
+            return $user->role === 'administrator';
         });
 
         Gate::define('isOwner', function (User $user, Laporan $laporan) {
-            return $user->nik === $laporan->pelapor;
+            $masy = Masyarakat::where('user_id', $user->id)->first();
+            return $masy->nik === $laporan->nik;
         });
 
         Gate::define('owner-and-petugas-can-open', function (User $user, Laporan $laporan) {
-            if ($user->nik === $laporan->pelapor) {
+            $masy = Masyarakat::where('user_id', $user->id)->first();
+
+            if ($masy->nik === $laporan->nik) {
                 return true;
             } else if ($user->role === 'pengawas') {
                 return true;

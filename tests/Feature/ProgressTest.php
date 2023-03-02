@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Laporan;
+use App\Models\Masyarakat;
+use App\Models\Pengawas;
 use App\Models\ProgressLaporan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,13 +24,14 @@ class ProgressTest extends TestCase
     // Status masy: dibuat, dirubah, dihapus,
     // Status pengawas: diproses, ditolak, dikembalikan, Selesai
 
-    public function test_petugas_success_respon_laporan()
+    // untuk menguji bahwa pengawas dapat merespon laporan yang telah dibuat masyarakat
+    public function test_pengawas_success_respon_laporan()
     {
         $this->withExceptionHandling();
         $faker = Faker::create('id_ID');
 
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['changeStatus']);
+        $petugas = User::factory()->petugas()->has(Pengawas::factory())->create();
+        Sanctum::actingAs($petugas);
 
         // mengambil nomor laporan secara acak dari database
         $laporan = DB::table('laporan')->pluck('nomor_laporan');
@@ -37,7 +40,7 @@ class ProgressTest extends TestCase
         $response = $this->postJson('api/laporan/respon/' . $id, [
             'nomor_laporan' => $id,
             'status' => 'diproses',
-            'keterangan' => 'Laporan Sedang Diproses Oleh Petugas. Proses Maksimal 3x24 jam'
+            'keterangan' => 'Laporan Sedang Diproses Oleh Petugas'
         ]);
 
         $response->assertOk()->assertJsonStructure(
@@ -47,7 +50,7 @@ class ProgressTest extends TestCase
                 'message',
                 'data' => [
                     'nomor_laporan',
-                    'nik',
+                    'pengawas_id',
                     'status',
                     'keterangan'
                 ]
@@ -82,12 +85,16 @@ class ProgressTest extends TestCase
 
     public function test_masyarakat_can_get_progress_laporan()
     {
-        $masyarakat = User::factory()->create();
-        $petugas = User::factory()->petugas()->create();
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
+        $petugas = User::factory()->petugas()->has(Pengawas::factory())->create();
         $pemiluID = DB::table('pemilu')->pluck('id_pemilu');
 
         Sanctum::actingAs($masyarakat, ['getProgressLaporan']);
         $faker = Faker::create('id_ID');
+
+        //get user nik
+        $data = Masyarakat::where('user_id', $masyarakat->id)->first();
+        $usernik = $data->nik;
 
         $dataLaporan = [
             'nomor_laporan' => $faker->numerify('000-00-01-##'),
@@ -100,23 +107,22 @@ class ProgressTest extends TestCase
             'kronologi_kejadian' => $faker->text(),
             'bukti' => $faker->url(),
             'pemilu_id' => $faker->randomElement($pemiluID),
-            'pelapor' => $masyarakat->nik
+            'nik' => $usernik
         ];
 
         $laporan = Laporan::factory()->create($dataLaporan);
 
         ProgressLaporan::factory()->create([
             'nomor_laporan' => $laporan->nomor_laporan,
-            'status' => 'dibuat',
+            'status' => 'diproses',
             'keterangan' => 'laporan telah dibuat oleh ' . $masyarakat->nama,
-            'nik' => $masyarakat->nik
         ]);
 
         ProgressLaporan::factory()->create([
             'nomor_laporan' => $laporan->nomor_laporan,
-            'status' => 'diproses',
+            'status' => 'menunggu',
             'keterangan' => 'laporan sedang diproses, silahkan menunggu informasi dari kami',
-            'nik' => $petugas->nik
+            // 'pengawas_id' => $petugas->id
         ]);
 
         $response = $this->getJson('api/laporan/' . $laporan->nomor_laporan . '/progress');
@@ -130,10 +136,10 @@ class ProgressTest extends TestCase
                         'nomor_laporan',
                         'status',
                         'keterangan',
-                        'nik'
+                        'pengawas_id'
                     ]
                 ]
             ]
-        );
+        )->dump();
     }
 }

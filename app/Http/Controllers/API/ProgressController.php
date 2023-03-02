@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Laporan;
+use App\Models\Pengawas;
 use App\Models\ProgressLaporan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -53,13 +54,16 @@ class ProgressController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|string|in:menunggu, diproses, ditolak, dikembalikan, selesai',
+            'status' => 'required|string|in:diproses, ditolak, dikembalikan, selesai',
             'keterangan' => 'required|string',
         ]);
 
+        $userId = Auth::user()->id;
+        $pengawas = Pengawas::where('user_id', $userId)->first();
+
         $progress = ProgressLaporan::create([
             'nomor_laporan' => $nomor_laporan,
-            'nik' => Auth::user()->nik,
+            'pengawas_id' => $pengawas->id,
             'status' => $request->status,
             'keterangan' => $request->keterangan
         ]);

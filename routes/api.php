@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\API\AddressController;
+use App\Http\Controllers\API\AdministratorController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\FQAController;
 use App\Http\Controllers\API\JenisPemiluController;
 use App\Http\Controllers\API\LaporanController;
+use App\Http\Controllers\API\MasyarakatController;
 use App\Http\Controllers\API\PemiluController;
+use App\Http\Controllers\API\PengawasController;
 use App\Http\Controllers\API\ProgressController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
@@ -29,15 +32,31 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(
     function () {
 
+        /// API APLIKASI MASYARAKAT DAN PENGAWAS
+        // User
+        Route::get('/user', [UserController::class, 'fetchUser']);
+        Route::post('user/update', [UserController::class, 'updateProfile']);
 
-        //MASYARAKAT
+        /// API APLIKASI MASYARAKAT
+        //LAPORAN
         Route::post('/laporan/create', [LaporanController::class, 'create']);
         Route::delete('/laporan/delete/{nomor_laporan}', [LaporanController::class, 'delete']);
         Route::put('/laporan/update/{nomor_laporan}', [LaporanController::class, 'update']);
         Route::get('user/laporan/', [LaporanController::class, 'getUserLaporan']);
 
+        Route::get('/user/profile', [MasyarakatController::class, 'getProfile']);
 
-        //PETUGAS
+
+        /// API APLIKASI PENGAWAS
+        // Laporan
+        Route::get('/laporan', [LaporanController::class, 'getAll']);
+        Route::get('/laporan/{nomor_laporan}', [LaporanController::class, 'details']);
+
+        // Progress Laporan
+        Route::post('/laporan/respon/{id}', [ProgressController::class, 'responLaporan']);
+        Route::get('/laporan/{nomor_laporan}/progress/', [ProgressController::class, 'getProgressLaporan']);
+
+
         // Pemilu
         Route::post('/pemilu/create', [PemiluController::class, 'create']);
         Route::put('/pemilu/update/{id}', [PemiluController::class, 'update']);
@@ -49,29 +68,26 @@ Route::middleware('auth:sanctum')->group(
         Route::put('/fqa/update/{id}', [FQAController::class, 'update']);
         Route::delete('/fqa/delete/{id}', [FQAController::class, 'delete']);
 
-
-        // Laporan
-        Route::get('/laporan', [LaporanController::class, 'getAll']);
-        Route::get('/laporan/{nomor_laporan}', [LaporanController::class, 'details']);
-
-        // Progress Laporan
-        Route::post('/laporan/respon/{id}', [ProgressController::class, 'responLaporan']);
-        Route::get('/laporan/{nomor_laporan}/progress/', [ProgressController::class, 'getProgressLaporan']);
-
         // Jenis Pemilu
         Route::post('/jenis-pemilu/create', [JenisPemiluController::class, 'create']);
         Route::put('/jenis-pemilu/update/{id}', [JenisPemiluController::class, 'update']);
         Route::delete('/jenis-pemilu/delete/{id}', [JenisPemiluController::class, 'delete']);
 
-        // User
-        Route::get('/user', [UserController::class, 'fetchUser']);
-        Route::post('user/update', [UserController::class, 'updateProfile']);
+        /// API ADMIN
+        // PENGAWAS
+        Route::post('pengawas/create', [PengawasController::class, 'create']);
 
-        // Auth Route
+        // ADMIN
+        Route::post('admin/create', [AdministratorController::class, 'create']);
+
+
+        // Auth
         Route::post('/logout', [AuthController::class, 'logout']);
     }
 );
 
+
+// API UMUM
 // ALAMAT
 Route::get('/provinsi', [AddressController::class, 'getAllProvinsi']);
 Route::get('/provinsi/{id}/kabupaten-kota', [AddressController::class, 'getAllKabupatenByProvinsiId']);
@@ -85,8 +101,13 @@ Route::get('/pemilu', [PemiluController::class, 'getAll']);;
 // FQA API ROUTE
 Route::get('/fqa', [FQAController::class, 'getAll']);
 
+// REGISTRASI MASYARAKAT
+Route::post('/registrasi', [MasyarakatController::class, 'registerMasyarakat']);
+
 // AUTH ROUTE
 Route::Post('/login', [AuthController::class, 'login']);
+
+// REGISTRASI MASYARAKAT
 Route::Post('/register', [AuthController::class, 'register']);
 
 // Jenis Pemilu

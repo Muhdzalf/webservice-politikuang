@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('progress_laporan', function (Blueprint $table) {
             $table->id('id_progress');
-            $table->enum('status', ['dibuat', 'diupdate', 'dikembalikan', 'diproses', 'selesai']);
+            $table->enum('status', ['menunggu', 'dibuat', 'dikembalikan', 'diproses', 'selesai']);
             $table->text('keterangan')->nullable();
 
             // foreign key to laporan table
@@ -23,8 +23,8 @@ return new class extends Migration
             $table->foreign('nomor_laporan')->references('nomor_laporan')->on('laporan')->onUpdate('cascade')->onDelete('cascade');
 
             // foreign key to petugas table
-            $table->unsignedBigInteger('pengawas_id');
-            $table->foreign('pengawas_id')->references('id')->on('pengawas')->onDelete('cascade')->onUpdate('cascade');
+            $table->unsignedBigInteger('pengawas_id')->nullable();
+            $table->foreign('pengawas_id')->references('id')->on('pengawas')->nullOnDelete()->onUpdate('cascade');
 
             $table->timestamps();
         });

@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admin;
 use App\Models\Alamat;
 use App\Models\JenisPemilu;
+use App\Models\Masyarakat;
 use App\Models\Pemilu;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
@@ -18,10 +20,11 @@ class PemiluTest extends TestCase
      *
      * @return void
      */
-    public function test_petugas_success_create_pemilu()
+    public function test_admin_success_create_pemilu()
     {
+        $this->withExceptionHandling();
         $faker = Faker::create('id_ID');
-        $petugas = User::factory()->petugas()->create();
+        $admin = User::factory()->administrator()->create();
 
         // membuat jenis pemilu untuk diambil id jenisnya
         $jenisPemilu = JenisPemilu::factory()->create(['nama' => 'Pemilihan Kepala Desa']);
@@ -38,7 +41,7 @@ class PemiluTest extends TestCase
         ];
 
 
-        Sanctum::actingAs($petugas, ['create']);
+        Sanctum::actingAs($admin);
 
         $response = $this->postJson('api/pemilu/create', $pemiluData, ['Accept' => 'Application/Json']);
 
@@ -62,7 +65,7 @@ class PemiluTest extends TestCase
     public function test_masyarakat_get_forbidden_error_when_try_to_create_pemilu()
     {
         $faker = Faker::create('id_ID');
-        $masyarakat = User::factory()->create();
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
 
         //Jenis Pemilu ID
         $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id_jenis');
@@ -86,15 +89,15 @@ class PemiluTest extends TestCase
             [
                 'kode' => 403,
                 'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini'
+                'message' => 'Anda tidak memiliki akses untuk fitur ini. Hanya Admin yang memilik akses'
             ]
         );
     }
 
-    public function test_petugas_get_a_validation_error_when_create_pemilu_with_nama_field_null()
+    public function test_admin_get_a_validation_error_when_create_pemilu_with_nama_field_null()
     {
         $faker = Faker::create('id_ID');
-        $petugas = User::factory()->petugas()->create();
+        $admin = User::factory()->administrator()->create();
 
         //Jenis Pemilu ID
         $jenisPemiluID = DB::table('jenis_pemilu')->pluck('id_jenis');
@@ -110,7 +113,7 @@ class PemiluTest extends TestCase
             'desa' => 'Desa ' . $faker->numberBetween(0, 20),
         ];
 
-        Sanctum::actingAs($petugas, ['create']);
+        Sanctum::actingAs($admin, ['create']);
         $response = $this->postJson('api/pemilu/create', $dataPemilu);
 
         $response->assertUnprocessable()->assertJson(
@@ -124,12 +127,12 @@ class PemiluTest extends TestCase
     }
 
 
-    public function test_petugas_can_update_nama_pemilu()
+    public function test_admin_can_update_nama_pemilu()
     {
         $faker = Faker::create('id_ID');
-        $petugas = User::factory()->petugas()->create();
+        $admin = User::factory()->administrator()->create();
 
-        // Deklarasi Data Pemilu Tetap
+        // Deklarasi Data Tetap
         $jenisPemilu = DB::table('jenis_pemilu')->pluck('id_jenis');
         $jenisPemiluId = $faker->randomElement($jenisPemilu);
         $tanggal_pelaksanaan = $faker->date();
@@ -161,7 +164,7 @@ class PemiluTest extends TestCase
             'desa' => 'Desa'
         ];
 
-        Sanctum::actingAs($petugas, ['update']);
+        Sanctum::actingAs($admin, ['update']);
 
         $response = $this->putJson('api/pemilu/update/' . $pemilu->id_pemilu, $dataBaru, ['Accept' => 'Application/json']);
 
@@ -180,12 +183,12 @@ class PemiluTest extends TestCase
         ]);
     }
 
-    public function test_petugas_can_get_detail_pemilu()
+    public function test_admin_can_get_detail_pemilu()
     {
         $faker = Faker::create();
 
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['details']);
+        $admin = User::factory()->administrator()->create();
+        Sanctum::actingAs($admin, ['details']);
 
         $jenisPemilu = DB::table('jenis_pemilu')->pluck('id_jenis');
         $jenisPemiluId = $faker->randomElement($jenisPemilu);
@@ -226,38 +229,21 @@ class PemiluTest extends TestCase
         ]);
     }
 
-    public function test_petugas_can_delete_pemilu()
+    public function test_admin_can_delete_pemilu()
     {
         $this->withExceptionHandling();
         $faker = Faker::create('id_ID');
 
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['deletePrmilu']);
-        $jenisPemilu = DB::table('jenis_pemilu')->pluck('id_jenis');
-        $jenisPemiluId = $faker->randomElement($jenisPemilu);
+        $admin = User::factory()->administrator()->create();
 
-        $alamat = Alamat::factory()->create([
-            'provinsi_id' => 32,
-            'kabupaten_kota_id' => 3205,
-            'kecamatan_id' => 3205230,
-            'desa' => 'Sukaratu'
-        ]);
+        Sanctum::actingAs($admin);
 
-        $alamatId = $alamat->id_alamat;
 
-        $dataPemilu = [
-            'nama' => 'Pemilihan Desa Sukaratu',
-            'tanggal_pelaksanaan' => $faker->date(),
-            'waktu_pelaksanaan' => $faker->time('H:i'),
-            'jenis_id' => $jenisPemiluId,
-            'alamat_id' => $alamatId,
-        ];
-
-        $pemilu = Pemilu::factory()->create($dataPemilu);
+        $pemilu = Pemilu::factory()->create();
 
         $response = $this->deleteJson('api/pemilu/delete/' . $pemilu->id_pemilu);
 
-        $response->assertOk()->dump()->assertJsonStructure(
+        $response->assertOk()->assertJsonStructure(
             [
                 'kode' => 200,
                 'status' => 'OK',
@@ -265,7 +251,6 @@ class PemiluTest extends TestCase
             ]
         );
     }
-
 
     public function test_get_all_pemilu_data()
     {

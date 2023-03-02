@@ -21,6 +21,7 @@ class PemiluFactory extends Factory
         return [
             'nama' => 'Test Nama Pemilu ' . $this->faker->numberBetween(1, 500),
             'tanggal_pelaksanaan' => $this->faker->dateTimeBetween('now', '+2 months'),
+            'waktu_pelaksanaan' => $this->faker->time('H:i'),
             'jenis_id' => JenisPemilu::factory(),
             'alamat_id' => Alamat::factory()->generateGarutJawaBarat()->create(),
         ];

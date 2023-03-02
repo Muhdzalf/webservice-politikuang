@@ -32,11 +32,11 @@ class JenisPemiluController extends Controller
 
     public function create(Request $request)
     {
-        if (!Gate::allows('only-petugas')) {
+        if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
                 'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya petugas yang memiliki akses untuk fitur ini'
+                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya admin yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $request->validate([
@@ -57,11 +57,11 @@ class JenisPemiluController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('only-petugas')) {
+        if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
                 'status' => 'Forbidden',
-                'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
+                'message' => 'Hanya admin yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $request->validate([
@@ -82,11 +82,11 @@ class JenisPemiluController extends Controller
 
     public function delete($id)
     {
-        if (!Gate::allows('only-petugas')) {
+        if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
                 'status' => 'Forbidden',
-                'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
+                'message' => 'Hanya admin yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $data = JenisPemilu::find($id);

@@ -20,13 +20,13 @@ class Admin extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function fqa()
-    {
-        return $this->hasMany(Fqa::class, 'admin_id', 'id');
-    }
+    // public function fqa()
+    // {
+    //     return $this->hasMany(Fqa::class, 'admin_id', 'id');
+    // }
 
-    public function pemilu()
-    {
-        return $this->hasMany(pemilu::class, 'admin_id', 'id');
-    }
+    // public function pemilu()
+    // {
+    //     return $this->hasMany(pemilu::class, 'admin_id', 'id');
+    // }
 }

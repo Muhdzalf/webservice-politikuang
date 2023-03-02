@@ -24,7 +24,7 @@ class MasyarakatFactory extends Factory
             'alamat' => $this->faker->address(),
             'pekerjaan' => $this->faker->jobTitle(),
             'kewarganegaraan' => 'Indonesia',
-            'user_id' => User::inRandomOrder()->first()->id
+            'user_id' => User::factory(),
         ];
     }
 }

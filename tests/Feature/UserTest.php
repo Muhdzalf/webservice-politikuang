@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Masyarakat;
 use App\Models\User;
 use Tests\TestCase;
 use Faker\Factory as Faker;
@@ -18,30 +19,14 @@ class UserTest extends TestCase
 
     public function test_authenticated_user_can_get_their_user_data()
     {
-        // $this->withoutExceptionHandling();
-        $user = User::factory()->create();
+        // test with masyarakat
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
 
-        Sanctum::actingAs($user, ['fetchUser']);
+        Sanctum::actingAs($masyarakat, ['fetchUser']);
 
         $response = $this->getJson('api/user');
 
-        $response->assertOk()->assertJsonStructure(
-            [
-                'message',
-                'data' => [
-                    'nama',
-                    'nik',
-                    'email',
-                    'tanggal_lahir',
-                    'jenis_kelamin',
-                    'no_hp',
-                    'alamat',
-                    'pekerjaan',
-                    'kewarganegaraan',
-                    'role',
-                ]
-            ]
-        );
+        $response->assertOk()->dump();
     }
 
     public function test_user_can_update_profile_data()

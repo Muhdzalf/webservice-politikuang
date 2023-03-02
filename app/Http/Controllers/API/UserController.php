@@ -37,11 +37,7 @@ class UserController extends Controller
 
         $user->nama = $request->nama;
         $user->email = $request->email;
-        $user->tanggal_lahir = $request->tanggal_lahir;
-        $user->jenis_kelamin = $request->jenis_kelamin;
         $user->no_hp = $request->no_hp;
-        $user->alamat = $request->alamat;
-        $user->pekerjaan = $request->pekerjaan;
 
         $user->save();
 

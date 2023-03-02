@@ -23,7 +23,7 @@ class Laporan extends Model
         'kronologi_kejadian',
         'bukti',
         'pemilu_id',
-        'pelapor',
+        'nik',
     ];
 
     protected $primaryKey = 'nomor_laporan';
@@ -43,7 +43,7 @@ class Laporan extends Model
 
     public function masyarakat()
     {
-        return $this->belongsTo(Masyarakat::class, 'pelapor', 'nik');
+        return $this->belongsTo(Masyarakat::class, 'nik', 'nik');
     }
 
     public function pemilu()

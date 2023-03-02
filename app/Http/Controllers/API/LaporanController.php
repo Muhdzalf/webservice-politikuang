@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Laporan;
+use App\Models\Masyarakat;
 use App\Models\Pemilu;
 use App\Models\ProgressLaporan;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -29,7 +31,8 @@ class LaporanController extends Controller
         ]);
 
         // mendapatkan nik user yang sedang login
-        $pengirimId = Auth::user()->nik;
+        $userId = Auth::user()->id;
+        $pengirimId = Masyarakat::where('user_id', $userId)->first();
 
         // membuat nomor laporan
         $nomorLaporan = $this->generateNomorLaporan($request->pemilu_id);
@@ -44,14 +47,13 @@ class LaporanController extends Controller
             'alamat_kejadian' => $request->alamat_kejadian,
             'kronologi_kejadian' => $request->kronologi_kejadian,
             'bukti' => $request->bukti,
-            'pelapor' => $pengirimId,
+            'nik' => $pengirimId->nik,
             'pemilu_id' => $request->pemilu_id
         ]);
 
         // pada saat pembuatan laporan maka otomatis akan langsung tercatat pada progress laporan
         ProgressLaporan::create([
             'nomor_laporan' => $nomorLaporan,
-            'nik' => Auth::user()->nik,
             'status' => 'menunggu',
             'keterangan' => 'Laporan telah dibuat oleh ' . Auth::user()->nama . ' menunggu untuk diproses oleh pengawas.'
         ]);
@@ -78,12 +80,13 @@ class LaporanController extends Controller
         }
 
         //mendapatkan proses laporan terakhir untuk melihat status terakhir dari progress laporan
-        $ProgressLaporan = ProgressLaporan::whereColumn('nomor_laporan', $nomor_laporan)->orderByDesc('created_at');
-        if (!$ProgressLaporan->status == "menunggu" || !$ProgressLaporan->status == "dikembalikan") {
+        $ProgressLaporan = ProgressLaporan::where('nomor_laporan', $nomor_laporan)->latest()->first();
+
+        if ($ProgressLaporan->status === 'diproses' || $ProgressLaporan->status === 'ditolak' || $ProgressLaporan->status === 'selesai') {
             return response()->json([
                 'kode' => 403,
                 'status' => 'Forbidden',
-                'message' => 'Laporan sudah diproses, Tidak dapat diubah'
+                'message' => 'Laporan sedang diproses, Tidak dapat diubah'
             ], 403);
         }
 
@@ -101,9 +104,8 @@ class LaporanController extends Controller
         if ($laporan->save()) {
             ProgressLaporan::create([
                 'nomor_laporan' => $laporan->nomor_laporan,
-                'nik' => Auth::user()->nik,
                 'status' => 'menunggu',
-                'keterangan' => 'Laporan telah diperbaharui oleh ' . Auth::user()->nama . ' meunggu untuk diproses oleh pengawas'
+                'keterangan' => 'Laporan telah diperbaharui oleh ' . Auth::user()->nama . ' menunggu untuk diproses oleh pengawas'
             ], 200);
         }
 
@@ -147,8 +149,9 @@ class LaporanController extends Controller
     // get User Owned Laporan
     public function getUserLaporan()
     {
-        $userNIK = Auth::user()->nik;
-        $laporan = Laporan::where('pelapor', $userNIK)->get();
+        $user = Auth::user();
+        $masy = Masyarakat::where('user_id', $user->id)->first();
+        $laporan = Laporan::where('nik', $masy->nik)->get();
 
         if ($laporan->count() < 1) {
             return response()->json([
@@ -170,6 +173,7 @@ class LaporanController extends Controller
     public function details($nomor_laporan)
     {
         $laporan = Laporan::find($nomor_laporan);
+
         if (!Gate::allows('owner-and-petugas-can-open', $laporan)) {
             return response()->json([
                 'kode' => 403,
@@ -178,7 +182,7 @@ class LaporanController extends Controller
             ], 403);
         }
 
-        $result = Laporan::with('user', 'pemilu', 'progressLaporans')->find($nomor_laporan);
+        $result = Laporan::with('masyarakat.user', 'pemilu', 'progressLaporans')->find($nomor_laporan);
         return response()->json([
             'kode' => 200,
             'status' => 'OK',

@@ -16,8 +16,8 @@ class FQATest extends TestCase
      */
     public function test_required_field_for_registration()
     {
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['create']);
+        $admin = User::factory()->administrator()->create();
+        Sanctum::actingAs($admin, ['create']);
 
         $response = $this->postJson('api/fqa/create');
 
@@ -32,10 +32,10 @@ class FQATest extends TestCase
         );
     }
 
-    public function test_only_petugas_can_create_fqa()
+    public function test_only_admin_can_create_fqa()
     {
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['create']);
+        $admin = User::factory()->administrator()->create();
+        Sanctum::actingAs($admin, ['create']);
 
         $response = $this->postJson('api/fqa/create', [
             'pertanyaan' => 'Test Contoh Pertanyaan',
@@ -72,15 +72,15 @@ class FQATest extends TestCase
             [
                 'kode' => 403,
                 'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya petugas yang memiliki akses untuk fitur ini'
+                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya admin yang memiliki akses untuk fitur ini'
             ]
         ); //403
     }
 
-    public function test_petugas_get_a_validation_error_when_create_fqa_with_jawaban_value_null()
+    public function test_admin_get_a_validation_error_when_create_fqa_with_jawaban_value_null()
     {
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['create']);
+        $admin = User::factory()->administrator()->create();
+        Sanctum::actingAs($admin, ['create']);
 
         $response = $this->postJson('api/fqa/create', [
             'pertanyaan' => 'pertanyaan 1',
@@ -97,13 +97,13 @@ class FQATest extends TestCase
         ); //422
     }
 
-    public function test_petugas_can_update_fqa_data()
+    public function test_admin_can_update_fqa_data()
     {
 
         $fqa = Fqa::factory()->create();
 
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['update']);
+        $admin = User::factory()->administrator()->create();
+        Sanctum::actingAs($admin, ['update']);
 
         $response = $this->putJson('api/fqa/update/' . $fqa->id_fqa, [
             'pertanyaan' => 'pertanyaan telah diedit',
@@ -126,12 +126,12 @@ class FQATest extends TestCase
         ); //200
     }
 
-    public function test_petugas_get_a_validation_error_when_try_to_update_fqa_data_with_jawaban_value_null()
+    public function test_admin_get_a_validation_error_when_try_to_update_fqa_data_with_jawaban_value_null()
     {
         $fqa = Fqa::factory()->create([]);
 
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['update']);
+        $admin = User::factory()->administrator()->create();
+        Sanctum::actingAs($admin, ['update']);
 
         $response = $this->putJson('api/fqa/update/' . $fqa->id_fqa, [
             'pertanyaan' => 'Contoh pertanyaan teredit',
@@ -147,12 +147,12 @@ class FQATest extends TestCase
         ); //422
     }
 
-    public function test_petugas_success_delete_fqa_data()
+    public function test_admin_success_delete_fqa_data()
     {
         $fqa = Fqa::factory()->create([]);
 
-        $petugas = User::factory()->petugas()->create();
-        Sanctum::actingAs($petugas, ['delete']);
+        $admin = User::factory()->administrator()->create();
+        Sanctum::actingAs($admin, ['delete']);
 
         $response = $this->deleteJson('api/fqa/delete/' . $fqa->id_fqa);
 
@@ -167,15 +167,15 @@ class FQATest extends TestCase
     {
         $fqa = Fqa::factory()->create([]);
 
-        $petugas = User::factory()->create();
-        Sanctum::actingAs($petugas, ['delete']);
+        $admin = User::factory()->create();
+        Sanctum::actingAs($admin, ['delete']);
 
         $response = $this->deleteJson('api/fqa/delete/' . $fqa->id_fqa);
 
         $response->assertForbidden()->assertJson([
             'kode' => 403,
             'status' => 'Forbidden',
-            'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya petugas yang memiliki akses untuk fitur ini'
+            'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya admin yang memiliki akses untuk fitur ini'
         ]); //403
     }
 

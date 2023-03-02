@@ -5,7 +5,10 @@ namespace Tests\Feature;
 use App\Models\Alamat;
 use App\Models\JenisPemilu;
 use App\Models\Laporan;
+use App\Models\Masyarakat;
 use App\Models\Pemilu;
+use App\Models\Pengawas;
+use App\Models\ProgressLaporan;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -21,7 +24,7 @@ class LaporanTest extends TestCase
      */
     public function test_masyarakat_sucess_create_laporan()
     {
-        $masyarakat = User::factory()->create();
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
 
         Sanctum::actingAs($masyarakat, ['createLaporan']);
         $faker = Faker::create('id_ID');
@@ -38,6 +41,7 @@ class LaporanTest extends TestCase
         $pemilu = Pemilu::factory()->create([
             'nama' => 'Pemilihan Desa Sukaratu',
             'tanggal_pelaksanaan' => $faker->date(),
+            'waktu_pelaksanaan' => $faker->time('H:i'),
             'jenis_id' => $jenisPemilu->id_jenis,
             'alamat_id' => $alamat->id_alamat
         ]);
@@ -52,7 +56,7 @@ class LaporanTest extends TestCase
             'kronologi_kejadian' => $faker->text(),
             'bukti' => $faker->url(),
             'pemilu_id' => $pemilu->id_pemilu,
-            'pelapor' => $masyarakat->nik
+            'nik' => $masyarakat->nik
         ];
 
         $response = $this->postJson('api/laporan/create', $laporanData, ['Accept' => 'Application/json']);
@@ -72,7 +76,7 @@ class LaporanTest extends TestCase
                 'tanggal_kejadian',
                 'bukti',
                 'pemilu_id',
-                'pelapor'
+                'nik'
             ]
         ]);
     }
@@ -81,7 +85,7 @@ class LaporanTest extends TestCase
     {
         $faker = Faker::create('id_ID');
 
-        $masyarakat = User::factory()->create();
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         Sanctum::actingAs($masyarakat, ['createLaporan']);
 
         $pemiluID = DB::table('pemilu')->pluck('id_pemilu');
@@ -116,8 +120,12 @@ class LaporanTest extends TestCase
         $faker = Faker::create('id_ID');
         $pemiluID = DB::table('pemilu')->pluck('id_pemilu');
 
-        $masyarakat = User::factory()->create();
-        Sanctum::actingAs($masyarakat, ['details']);
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
+        Sanctum::actingAs($masyarakat);
+
+        //get user nik
+        $data = Masyarakat::where('user_id', $masyarakat->id)->first();
+        $usernik = $data->nik;
 
         $laporanData = [
             'nomor_laporan' => $faker->numerify('000-00-00-##'),
@@ -130,7 +138,7 @@ class LaporanTest extends TestCase
             'kronologi_kejadian' => $faker->text(),
             'bukti' => $faker->url(),
             'pemilu_id' => $faker->randomElement($pemiluID),
-            'pelapor' => $masyarakat->nik
+            'nik' => $usernik
         ];
 
         $laporan = Laporan::factory()->create($laporanData);
@@ -152,16 +160,16 @@ class LaporanTest extends TestCase
                 'tanggal_kejadian',
                 'bukti',
                 'pemilu_id',
-                'pelapor'
+                'nik'
             ]
-        ]);
+        ])->dump();
     }
 
     public function test_masyarakat_cannot_access_laporan_owned_by_other_masyarakat()
     {
         $faker = Faker::create('id_ID');
 
-        $masyarakat = User::factory()->create();
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         Sanctum::actingAs($masyarakat, ['details']);
 
         //mengambil secara acak nomor laporan dari database
@@ -182,7 +190,7 @@ class LaporanTest extends TestCase
     public function test_masyarakat_can_update_their_laporan()
     {
         $faker = Faker::create('id_ID');
-        $masyarakat = User::factory()->create();
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         $pemiluID = DB::table('pemilu')->pluck('id_pemilu');
 
         Sanctum::actingAs($masyarakat, ['createLaporan', 'updateByUser']);
@@ -195,8 +203,12 @@ class LaporanTest extends TestCase
         $bukti = $faker->url();
         $pemiluId = $faker->randomElement($pemiluID);
 
+        //get user nik
+        $data = Masyarakat::where('user_id', $masyarakat->id)->first();
+        $usernik = $data->nik;
+
         $laporanData = [
-            'nomor_laporan' => $faker->numerify('000-00-00-##'),
+            'nomor_laporan' => $faker->numerify('20##-##-00-##'),
             'judul' => 'Judul ' . $faker->numberBetween(0, 100),
             'tanggal_kejadian' => $tanggal,
             'pemberi' => 'mister X',
@@ -206,7 +218,7 @@ class LaporanTest extends TestCase
             'kronologi_kejadian' => $kronologi,
             'bukti' => $bukti,
             'pemilu_id' => $pemiluId,
-            'pelapor' => $masyarakat->nik
+            'nik' => $usernik
         ];
 
         // data baru akan menyertakan perubahan data judul serta nominal
@@ -223,6 +235,12 @@ class LaporanTest extends TestCase
         ];
 
         $laporan = Laporan::factory()->create($laporanData);
+
+        ProgressLaporan::factory()->create([
+            'nomor_laporan' => $laporan->nomor_laporan,
+            'status' => 'menunggu',
+            'keterangan' => 'laporan telah dibuat oleh ' . $masyarakat->nama,
+        ]);
 
         $response = $this->putJson('api/laporan/update/' . $laporan->nomor_laporan, $dataBaru);
 
@@ -241,9 +259,9 @@ class LaporanTest extends TestCase
                 'tanggal_kejadian',
                 'bukti',
                 'pemilu_id',
-                'pelapor'
+                'nik'
             ]
-        ]);
+        ])->dump();
     }
 
     public function test_masyarakat_can_delete_their_laporan_data()
@@ -251,7 +269,7 @@ class LaporanTest extends TestCase
         $faker = Faker::create('id_ID');
         $pemiluID = DB::table('pemilu')->pluck('id_pemilu');
 
-        $masyarakat = User::factory()->create();
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         Sanctum::actingAs($masyarakat, ['delete']);
 
         $laporanData = [
@@ -265,7 +283,7 @@ class LaporanTest extends TestCase
             'kronologi_kejadian' => $faker->text(),
             'bukti' => $faker->url(),
             'pemilu_id' => $faker->randomElement($pemiluID),
-            'pelapor' => $masyarakat->nik
+            'nik' => $masyarakat->nik
         ];
 
         $laporan = Laporan::factory()->create($laporanData);
@@ -287,11 +305,14 @@ class LaporanTest extends TestCase
         $pemiluID = DB::table('pemilu')->pluck('id_pemilu');
 
 
-        $masyarakat = User::factory()->create();
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         Sanctum::actingAs($masyarakat, ['getUserLaporan']);
 
+        //get nik
+        $nik = Masyarakat::where('user_id', $masyarakat->id)->first()->nik;
+
         $laporanData = [
-            'nomor_laporan' => $faker->numerify('000-00-01-##'),
+            'nomor_laporan' => $faker->numerify('####-20-01-##'),
             'judul' => 'Judul ' . $faker->numberBetween(0, 100),
             'tanggal_kejadian' => $faker->date('Y-m-d'),
             'pemberi' => 'mister A',
@@ -301,10 +322,10 @@ class LaporanTest extends TestCase
             'kronologi_kejadian' => $faker->text(),
             'bukti' => $faker->url(),
             'pemilu_id' => $faker->randomElement($pemiluID),
-            'pelapor' => $masyarakat->nik
+            'nik' => $nik
         ];
 
-        $laporan = Laporan::factory()->create($laporanData);
+        Laporan::factory()->create($laporanData);
 
         $response = $this->getJson('api/user/laporan');
 
@@ -324,15 +345,15 @@ class LaporanTest extends TestCase
                     'tanggal_kejadian',
                     'bukti',
                     'pemilu_id',
-                    'pelapor'
+                    'nik'
                 ]
             ]
-        ]);
+        ])->dump();
     }
 
     public function test_petugas_can_get_all_list_laporan_that_have_been_made_by_masyarakat()
     {
-        $petugas = User::factory()->petugas()->create();
+        $petugas = User::factory()->petugas()->has(Pengawas::factory())->create();
         Sanctum::actingAs($petugas, ['getAll']);
 
         $response = $this->getJson('api/laporan');
@@ -353,9 +374,9 @@ class LaporanTest extends TestCase
                     'tanggal_kejadian',
                     'bukti',
                     'pemilu_id',
-                    'pelapor'
+                    'nik'
                 ]
             ]
-        ]);
+        ])->dump();
     }
 }

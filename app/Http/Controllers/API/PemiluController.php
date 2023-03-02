@@ -12,11 +12,11 @@ class PemiluController extends Controller
 {
     public function create(Request $request)
     {
-        if (!Gate::allows('only-petugas')) {
+        if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
                 'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini'
+                'message' => 'Anda tidak memiliki akses untuk fitur ini. Hanya Admin yang memilik akses'
             ], 403);
         }
 
@@ -43,10 +43,16 @@ class PemiluController extends Controller
             'desa' => $request->desa,
         ]);
 
-        if ($alamat) {
-            // get alamat id
-            $alamatId = $alamat->id_alamat;
+        if (!$alamat) {
+            return response()->json([
+                'kode' => 500,
+                'status' => 'ERROR',
+                'message' => 'TERDAPAT KESALAHAN PADA ALAMAT',
+            ]);
         }
+
+        // get alamat id
+        $alamatId = $alamat->id_alamat;
 
         $pemilu = Pemilu::create([
             'nama' => $request->nama,
@@ -59,7 +65,7 @@ class PemiluController extends Controller
         return response()->json([
             'kode' => 200,
             'status' => 'OK',
-            'message' => 'data pemilu berhasil ditambahkan',
+            'message' => 'data pemilu berhasil dibuat',
             'data' => $pemilu
         ]);
     }
@@ -87,7 +93,7 @@ class PemiluController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('only-petugas')) {
+        if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
                 'status' => 'Forbidden',
@@ -137,7 +143,7 @@ class PemiluController extends Controller
 
     public function details(Request $request, $id)
     {
-        if (!Gate::allows('only-petugas')) {
+        if (!Gate::allows('only-admin')) {
             return response()->json([
                 'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
             ], 403);
@@ -162,7 +168,6 @@ class PemiluController extends Controller
             $pemilu = Pemilu::with('jenis')->find($id);
         }
 
-
         return response()->json([
             'kode' => 200,
             'status' => 'OK',
@@ -173,7 +178,7 @@ class PemiluController extends Controller
 
     public function delete($id)
     {
-        if (!Gate::allows('only-petugas')) {
+        if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
                 'status' => 'Forbidden',

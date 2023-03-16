@@ -6,18 +6,32 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+
 
 class UserController extends Controller
 {
-    public function fetchUser(Request $request)
+    public function fetchUser()
     {
-        $user = $request->user();
+        $user = Auth::user();
+
+        if ($user->role == 'masyarakat') {
+            $data = User::where('id', $user->id)->with('masyarakat')->first();
+        }
+
+        if ($user->role == 'administrator') {
+            $data = User::where('id', $user->id)->with('administrator')->first();
+        }
+
+        if ($user->role == 'pengawas') {
+            $data = User::where('id', $user->id)->with('pengawas')->first();
+        }
 
         return response()->json([
             'kode' => 200,
             'status' => 'OK',
             'message' => 'data user berhasil diambil',
-            'data' => $user
+            'data' => $data
         ]);
     }
 
@@ -26,11 +40,7 @@ class UserController extends Controller
         $request->validate([
             'nama' => 'required|string|max:50',
             'email' => 'required|email',
-            'tanggal_lahir' => 'required|date_format:Y-m-d',
-            'jenis_kelamin' => 'required|string|max:1|in:L,P',
             'no_hp' => 'required|regex:/(0)[0-9]{11}/',
-            'alamat' => 'required|string',
-            'pekerjaan' => 'required|string',
         ]);
 
         $user = $request->user();
@@ -43,8 +53,28 @@ class UserController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => "data berhasil diperbaharui",
+            'data' => $user
+        ]);
+    }
+
+    public function getAllUser()
+    {
+        if (!Gate::allows('only-admin')) {
+            return response()->json([
+                'kode' => 403,
+                'status' => 'Forbidden',
+                'message' => 'Hanya Petugas Yang dapat Mengakses Fitur Ini',
+            ], 403);
+        }
+
+        $user = User::all();
+
+        return response()->json([
+            'kode' => 200,
+            'status' => true,
+            'message' => 'Data User Berhasil Diambil',
             'data' => $user
         ]);
     }

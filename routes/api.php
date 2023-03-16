@@ -80,6 +80,8 @@ Route::middleware('auth:sanctum')->group(
         // ADMIN
         Route::post('admin/create', [AdministratorController::class, 'create']);
 
+        Route::get('user/all', [UserController::class, 'getAllUser']);
+
 
         // Auth
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -105,10 +107,10 @@ Route::get('/fqa', [FQAController::class, 'getAll']);
 Route::post('/registrasi', [MasyarakatController::class, 'registerMasyarakat']);
 
 // AUTH ROUTE
-Route::Post('/login', [AuthController::class, 'login']);
+Route::Post('/user/login', [AuthController::class, 'login']);
 
 // REGISTRASI MASYARAKAT
-Route::Post('/register', [AuthController::class, 'register']);
+Route::Post('/user/register', [AuthController::class, 'register']);
 
 // Jenis Pemilu
 Route::get('/jenis-pemilu', [JenisPemiluController::class, 'getAll']);

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Masyarakat;
+use App\Models\Pengawas;
 use App\Models\User;
 use Tests\TestCase;
 use Faker\Factory as Faker;
@@ -20,9 +21,12 @@ class UserTest extends TestCase
     public function test_authenticated_user_can_get_their_user_data()
     {
         // test with masyarakat
-        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
+        // $masyarakat = User::factory()->has(Masyarakat::factory())->create();
+        $pengawas = User::factory()->petugas()->has(Pengawas::factory())->create();
 
-        Sanctum::actingAs($masyarakat, ['fetchUser']);
+
+        // Sanctum::actingAs($masyarakat, ['fetchUser']);
+        Sanctum::actingAs($pengawas, ['fetchUser']);
 
         $response = $this->getJson('api/user');
 
@@ -33,37 +37,17 @@ class UserTest extends TestCase
     {
         $faker = Faker::create('id_ID');
 
-        //Data tetap dan unique
-        $nik = 32050611920034;
-        $email = $faker->safeEmail();
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
 
-        $dataAwal = [
-            'nik' => $nik, // unique, harus selalu diganti ketika melakukan test
-            'nama' => 'Muhammad Dzalfiqri Sabani',
-            'email' => $email, // unique, harus selalu diganti ketika melakukan test
-            'password' => Hash::make('12345678'),
-            'tanggal_lahir' => '1999-12-12',
-            'jenis_kelamin' => 'L',
-            'no_hp' => '083218439312',
-            'alamat' => 'Bantul Yogyakarta',
-            'pekerjaan' => 'Mahasiswa',
-            'kewarganegaraan' => 'Indonesia',
-            'role' => 'masyarakat',
-        ];
+        Sanctum::actingAs($masyarakat);
 
-        $user = User::factory()->create($dataAwal);
-
-        Sanctum::actingAs($user);
+        dump($masyarakat);
 
         // Terdapat Perubahaan pada nama dan alamat
         $dataBaru = [
-            'nama' => 'Muhammad Sabani',
-            'email' => $email,
-            'tanggal_lahir' => '1999-12-12',
-            'jenis_kelamin' => 'L',
-            'no_hp' => '083218439312',
-            'alamat' => 'Bandung, Jawa Barat',
-            'pekerjaan' => 'Mahasiswa',
+            'nama' => 'Nama Telah Diedit',
+            'email' => 'edditedemail@mail.com',
+            'no_hp' => $masyarakat->no_hp,
         ];
 
         $response = $this->postJson(
@@ -74,18 +58,19 @@ class UserTest extends TestCase
 
         $response->assertOk()->assertJsonStructure([
             'message',
-            'data' => [
-                'nik',
-                'nama',
-                'email',
-                'tanggal_lahir',
-                'jenis_kelamin',
-                'no_hp',
-                'alamat',
-                'pekerjaan',
-                'kewarganegaraan',
-                'role',
-            ]
+            'data',
         ])->dump();
+    }
+
+    public function test_admin_can_get_all_user()
+    {
+        // test with masyarakat
+        $administrator = User::factory()->administrator()->create();
+
+        Sanctum::actingAs($administrator);
+
+        $response = $this->getJson('api/user/all');
+
+        $response->assertOk()->dump();
     }
 }

@@ -58,11 +58,13 @@ class LaporanController extends Controller
             'keterangan' => 'Laporan telah dibuat oleh ' . Auth::user()->nama . ' menunggu untuk diproses oleh pengawas.'
         ]);
 
+        $data = Laporan::where('nomor_laporan', $laporan->nomor_laporan)->with('masyarakat.user', 'pemilu.alamat', 'pemilu.alamat.provinsi', 'pemilu.alamat.kabupaten', 'pemilu.alamat.kecamatan')->first();
+
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
-            'message' => 'Laporan Berhasil dibuat dengan nomor' . $laporan->nomor_laporan,
-            'data' => $laporan
+            'status' => true,
+            'message' => 'Laporan Berhasil dibuat dengan nomor ' . $laporan->nomor_laporan,
+            'data' => $data
         ]);
     }
 
@@ -74,8 +76,8 @@ class LaporanController extends Controller
         if (!Gate::allows('isOwner', $laporan)) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Hanya Pebuat laporan yang dapat mengupdate laporan ini'
+                'status' => false,
+                'message' => 'Akses Ditolak!. Hanya pemilik Laporan yang dapat menggunakan fitur ini'
             ], 403);
         }
 
@@ -85,8 +87,8 @@ class LaporanController extends Controller
         if ($ProgressLaporan->status === 'diproses' || $ProgressLaporan->status === 'ditolak' || $ProgressLaporan->status === 'selesai') {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Laporan sedang diproses, Tidak dapat diubah'
+                'status' => false,
+                'message' => 'Akses Ditolak. Laporan sedang diproses, Tidak dapat diubah'
             ], 403);
         }
 
@@ -197,14 +199,26 @@ class LaporanController extends Controller
         $laporan = Laporan::find($nomor_laporan);
         if (!Gate::allows('isOwner', $laporan)) {
             return response()->json([
+                'kode' => 403,
+                'status' => false,
                 'message' => 'Data Laporan Hanya dapat dihapus oleh Pemilik Laporan'
+            ]);
+        }
+
+        $ProgressLaporan = ProgressLaporan::where('nomor_laporan', $nomor_laporan)->latest()->first();
+
+        if ($ProgressLaporan->status !== 'menunggu') {
+            return response()->json([
+                'kode' => 403,
+                'status' => false,
+                'message' => 'Permintaan Ditolak. Laporan sedang diproses, tidak dapat dihapus'
             ]);
         }
         $laporan->delete();
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Laporan ' . $laporan->judul . ' berhasil dihapus'
         ]);
     }

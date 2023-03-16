@@ -32,7 +32,7 @@ class Alamat extends Model
     }
     public function kabupaten()
     {
-        return $this->belongsTo(Kabupaten::class, 'kabupaten_kota_id', 'id_kabupaten)kota');
+        return $this->belongsTo(KabupatenKota::class, 'kabupaten_kota_id', 'id_kabupaten_kota');
     }
     public function kecamatan()
     {

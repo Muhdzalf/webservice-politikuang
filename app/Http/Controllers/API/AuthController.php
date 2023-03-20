@@ -59,7 +59,7 @@ class AuthController extends Controller
         // JSON response user
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Proses Registrasi Berhasil!',
             'access_token' => $token,
             'type' => 'Bearer',
@@ -81,7 +81,7 @@ class AuthController extends Controller
             return response()->json(
                 [
                     'kode' => 401,
-                    'status' => 'Unauthorized',
+                    'status' => false,
                     'message' => 'Proses login gagal, siahkan cek kembali email dan password Anda'
                 ],
                 401
@@ -113,7 +113,7 @@ class AuthController extends Controller
         // return berhasil
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Login Berhasil',
             'access_token' => $token,
             'type' => 'Bearer',
@@ -129,7 +129,7 @@ class AuthController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Logout Berhasil',
         ], 200);
     }

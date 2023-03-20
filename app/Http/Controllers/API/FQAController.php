@@ -16,7 +16,7 @@ class FQAController extends Controller
         if (count($fqa) < 1) {
             return response()->json([
                 'kode' => 404,
-                'status' => 'Not Found',
+                'status' => false,
                 'message' => 'Data FQA yang anda cari tidak ditemukan',
             ], 404);
         }
@@ -34,8 +34,8 @@ class FQAController extends Controller
         if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya admin yang memiliki akses untuk fitur ini'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $request->validate([
@@ -61,8 +61,8 @@ class FQAController extends Controller
         if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya admin yang memiliki akses untuk fitur ini'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $fqa = Fqa::find($id);
@@ -89,8 +89,8 @@ class FQAController extends Controller
         if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya admin yang memiliki akses untuk fitur ini'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $fqa = Fqa::find($id);

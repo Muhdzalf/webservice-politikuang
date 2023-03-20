@@ -24,7 +24,7 @@ class JenisPemiluController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Jenis Pemilu Berhasil Diambil',
             'data' => $jenis,
         ], 200);
@@ -35,8 +35,8 @@ class JenisPemiluController extends Controller
         if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya admin yang memiliki akses untuk fitur ini'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $request->validate([
@@ -49,7 +49,7 @@ class JenisPemiluController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Jenis Pemilu berhasil dibuat',
             'data' => $jenisPemilu
         ]);
@@ -60,8 +60,8 @@ class JenisPemiluController extends Controller
         if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Hanya admin yang memiliki akses untuk fitur ini'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $request->validate([
@@ -74,7 +74,7 @@ class JenisPemiluController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Jenis Pemilu Berhasil Diperbaharui',
             'data' => $data
         ], 200);
@@ -85,8 +85,8 @@ class JenisPemiluController extends Controller
         if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Hanya admin yang memiliki akses untuk fitur ini'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini'
             ], 403);
         }
         $data = JenisPemilu::find($id);
@@ -94,7 +94,7 @@ class JenisPemiluController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Jenis Pemilu Berhasil Dihapus'
         ]);
     }

@@ -58,7 +58,7 @@ class MasyarakatController extends Controller
         // JSON response user
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Proses Registrasi User Berhasil!',
             'access_token' => $token,
             'type' => 'Bearer',
@@ -74,7 +74,7 @@ class MasyarakatController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'data user berhasil diambil',
             'data' => $data
         ]);

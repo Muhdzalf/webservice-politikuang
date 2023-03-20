@@ -17,12 +17,12 @@ class JenisPemiluTest extends TestCase
      *
      * @return void
      */
-    public function test_required_field_jenis_pemilu()
+    public function test_admin_get_a_validation_error_when_try__to_create_without_nama()
     {
         $admin = User::factory()->administrator()->create();
         Sanctum::actingAs($admin);
 
-        $response = $this->postJson('api/jenis-pemilu/create', [], ['Accept' => 'application/json']);
+        $response = $this->postJson('api/jenis-pemilu', [], ['Accept' => 'application/json']);
 
         $response->assertUnprocessable()->assertJson([
             "message" => "The nama field is required.",
@@ -38,9 +38,9 @@ class JenisPemiluTest extends TestCase
 
         Sanctum::actingAs($admin, ['create']);
 
-        $response = $this->postJson('api/jenis-pemilu/create', [
-            'nama' => 'Pemilihan Presiden dan Wakil Presiden'
-        ], ['Accept' => 'application/json']);
+        $payload = ['nama' => 'Pemilihan Presiden dan Wakil Presiden'];
+
+        $response = $this->postJson('api/jenis-pemilu', $payload, ['Accept' => 'application/json']);
 
         $response->assertOk()->assertJsonStructure([
             'kode',
@@ -56,22 +56,21 @@ class JenisPemiluTest extends TestCase
         ]); // 200
     }
 
-
     public function test_masyarakat_get_a_forbidden_error_when_try_to_create_jenis_pemilu()
     {
         $masyarakat = User::factory()->create();
 
         Sanctum::actingAs($masyarakat, ['create']);
 
-        $response = $this->postJson('api/jenis-pemilu/create', [
-            'nama' => 'Pemilihan Presiden dan Wakil Presiden'
-        ]);
+        $payload = ['nama' => 'Pemilihan Presiden dan Wakil Presiden'];
+
+        $response = $this->postJson('api/jenis-pemilu', $payload);
 
         $response->assertForbidden()->assertJson(
             [
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya admin yang memiliki akses untuk fitur ini'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini'
             ]
         ); //403
     }
@@ -84,7 +83,7 @@ class JenisPemiluTest extends TestCase
 
         Sanctum::actingAs($admin, ['update']);
 
-        $response = $this->putJson('api/jenis-pemilu/update/' . $jenisPemilu->id_jenis, [
+        $response = $this->putJson('api/jenis-pemilu/' . $jenisPemilu->id_jenis, [
             'nama' => 'Pemilihan Presiden dan Wakil Presiden (hasil edit)'
         ]);
 
@@ -104,27 +103,6 @@ class JenisPemiluTest extends TestCase
         );
     }
 
-    public function test_masyarakat_get_a_forbidden_error_when_try_to_update_jenis_pemilu()
-    {
-        $jenisPemilu = JenisPemilu::factory()->create();
-
-        $masyarakat = User::factory()->create();
-
-        Sanctum::actingAs($masyarakat, ['update']);
-
-        $response = $this->putJson('api/jenis-pemilu/update/' . $jenisPemilu->id_jenis, [
-            'nama' => 'Pemilihan Presiden (PILPRES)'
-        ], ['Accept' => 'application/json']);
-
-        $response->assertForbidden()->assertJson(
-            [
-                'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Hanya admin yang memiliki akses untuk fitur ini'
-            ]
-        );
-    }
-
     public function test_admin_can_delete_Jenis_pemilu()
     {
         $jenisPemilu = JenisPemilu::factory()->create();
@@ -133,17 +111,40 @@ class JenisPemiluTest extends TestCase
 
         Sanctum::actingAs($admin, ['delete']);
 
-        $response = $this->deleteJson('api/jenis-pemilu/delete/' . $jenisPemilu->id_jenis, [], ['Accept' => 'application/json']);
+        $response = $this->deleteJson('api/jenis-pemilu/' . $jenisPemilu->id_jenis, [], ['Accept' => 'application/json']);
 
         $response->assertOk()->assertJson([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Jenis Pemilu Berhasil Dihapus'
         ]);
     }
 
+    public function test_masyarakat_get_a_forbidden_error_when_try_to_delete_jenis_pemilu()
+    {
+        $jenisPemilu = JenisPemilu::factory()->create();
+
+        $masyarakat = User::factory()->create();
+
+        Sanctum::actingAs($masyarakat, ['update']);
+
+        $response = $this->deleteJson('api/jenis-pemilu/' . $jenisPemilu->id_jenis, ['Accept' => 'application/json']);
+
+        $response->assertForbidden()->assertJson(
+            [
+                'kode' => 403,
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini'
+            ]
+        );
+    }
+
     public function test_user_can_get_all_data_jenis_pemilu()
     {
+        $admin = User::factory()->administrator()->create();
+
+        Sanctum::actingAs($admin, ['delete']);
+
         $response = $this->getJson('api/jenis-pemilu');
 
         $response->assertOk()->assertJsonStructure([

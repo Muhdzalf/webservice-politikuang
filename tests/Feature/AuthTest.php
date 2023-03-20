@@ -6,6 +6,7 @@ use App\Models\Masyarakat;
 use App\Models\User;
 use Tests\TestCase;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 
 class AuthTest extends TestCase
@@ -19,12 +20,10 @@ class AuthTest extends TestCase
     public function test_masyarakat_success_register()
     {
         $faker = Faker::create('id_ID');
-
-
         $payload = [
-            'nik' => '3205061112980002',
+            'nik' => $faker->numerify('320506######0002'),
             'nama' => 'Muhammad Dzalfiqri Sabani',
-            'email' => 'muhdzalfikri@gmail.com',
+            'email' => $faker->safeEmail(),
             'password' => '12345678',
             'tanggal_lahir' => '2000-12-12',
             'jenis_kelamin' => 'L',
@@ -100,10 +99,13 @@ class AuthTest extends TestCase
     // Test registrasi dengan email yang sudah digunakan
     public function test_masyarakat_get_a_validation_error_when_try_to_register_with_registered_email()
     {
+        $faker = Faker::create('id_ID');
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
+
         $payload = [
-            'nik' => '3205061112980012',
+            'nik' => $faker->numerify('320506######0002'),
             'nama' => 'Muhammad Dzalfiqri Sabani',
-            'email' => 'muhdzalfikri@gmail.com',
+            'email' => $masyarakat->email,
             'password' => '12345678',
             'tanggal_lahir' => '2000-12-12',
             'jenis_kelamin' => 'L',
@@ -142,8 +144,10 @@ class AuthTest extends TestCase
     // test login berhasil
     public function test_user_success_login()
     {
+        $payload = User::factory()->has(Masyarakat::factory())->create();
+
         $response = $this->postJson('api/user/login', [
-            'email' => 'muhdzalfikri@gmail.com',
+            'email' => $payload->email,
             'password' => '12345678'
         ]);
 
@@ -170,7 +174,7 @@ class AuthTest extends TestCase
         ]);
         $response->assertUnauthorized()->assertJson([
             'kode' => 401,
-            'status' => 'Unauthorized',
+            'status' => false,
             'message' => 'Proses login gagal, siahkan cek kembali email dan password Anda'
         ]);
     }
@@ -183,7 +187,7 @@ class AuthTest extends TestCase
         ]);
         $response->assertUnauthorized()->assertJson([
             'kode' => 401,
-            'status' => 'Unauthorized',
+            'status' => false,
             'message' => 'Proses login gagal, siahkan cek kembali email dan password Anda'
         ]);
     }

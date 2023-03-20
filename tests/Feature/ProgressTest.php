@@ -21,7 +21,7 @@ class ProgressTest extends TestCase
      *
      * @return void
      */
-    // Status masy: dibuat, dirubah, dihapus,
+
     // Status pengawas: diproses, ditolak, dikembalikan, Selesai
 
     // untuk menguji bahwa pengawas dapat merespon laporan yang telah dibuat masyarakat
@@ -35,13 +35,16 @@ class ProgressTest extends TestCase
 
         // mengambil nomor laporan secara acak dari database
         $laporan = DB::table('laporan')->pluck('nomor_laporan');
-        $id = $faker->randomElement($laporan);
+        $nomor = $faker->randomElement($laporan);
 
-        $response = $this->postJson('api/laporan/respon/' . $id, [
-            'nomor_laporan' => $id,
+        //payload
+        $payload = [
+            'nomor_laporan' => $nomor,
             'status' => 'diproses',
-            'keterangan' => 'Laporan Sedang Diproses Oleh Petugas'
-        ]);
+            'keterangan' => 'Laporan Sedang Diproses Oleh Petugas.'
+        ];
+
+        $response = $this->postJson('api/laporan/respon/' . $nomor, $payload);
 
         $response->assertOk()->assertJsonStructure(
             [
@@ -62,7 +65,7 @@ class ProgressTest extends TestCase
     {
         $faker = Faker::create('id_ID');
 
-        $petugas = User::factory()->petugas()->create();
+        $petugas = User::factory()->petugas()->has(Pengawas::factory())->create();
         Sanctum::actingAs($petugas, ['changeStatus']);
 
         $laporan = DB::table('laporan')->pluck('nomor_laporan');
@@ -75,12 +78,12 @@ class ProgressTest extends TestCase
             'keterangan' => 'Laporan Tidak Bisa Diterima karena tidak adanya data pendukung'
         ]);
 
-        $response->assertUnprocessable()->assertJsonStructure([
+        $response->assertUnprocessable()->assertJsonStructure(
             [
                 'message',
                 'errors'
             ]
-        ]);
+        )->dump();
     }
 
     public function test_masyarakat_can_get_progress_laporan()
@@ -114,15 +117,22 @@ class ProgressTest extends TestCase
 
         ProgressLaporan::factory()->create([
             'nomor_laporan' => $laporan->nomor_laporan,
-            'status' => 'diproses',
+            'status' => 'menunggu',
             'keterangan' => 'laporan telah dibuat oleh ' . $masyarakat->nama,
         ]);
 
         ProgressLaporan::factory()->create([
             'nomor_laporan' => $laporan->nomor_laporan,
-            'status' => 'menunggu',
+            'status' => 'diproses',
             'keterangan' => 'laporan sedang diproses, silahkan menunggu informasi dari kami',
-            // 'pengawas_id' => $petugas->id
+            'pengawas_id' => $petugas->pengawas->id,
+        ]);
+
+        ProgressLaporan::factory()->create([
+            'nomor_laporan' => $laporan->nomor_laporan,
+            'status' => 'dikembalikan',
+            'keterangan' => 'Setelah melalui Proses peninjauan.masih terdapat data yang belum jelas. silahkan lengkapi kembali',
+            'pengawas_id' => $petugas->pengawas->id,
         ]);
 
         $response = $this->getJson('api/laporan/' . $laporan->nomor_laporan . '/progress');

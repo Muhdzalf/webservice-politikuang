@@ -184,7 +184,7 @@ class LaporanController extends Controller
             ], 403);
         }
 
-        $result = Laporan::with('masyarakat.user', 'pemilu', 'progressLaporans')->find($nomor_laporan);
+        $result = Laporan::where('nomor_laporan', $nomor_laporan)->first();
         return response()->json([
             'kode' => 200,
             'status' => 'OK',

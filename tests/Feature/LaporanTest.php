@@ -24,11 +24,12 @@ class LaporanTest extends TestCase
      */
 
     // Masyarakat Membuat Laporan
-    public function test_masyarakat_sucess_create_laporan()
+    public function test_masyarakat_success_create_laporan()
     {
-        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
 
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         Sanctum::actingAs($masyarakat, ['createLaporan']);
+
         $faker = Faker::create('id_ID');
 
         // membuat jenis pemilu baru
@@ -61,7 +62,7 @@ class LaporanTest extends TestCase
             // 'nik' => $masyarakat->nik
         ];
 
-        $response = $this->postJson('api/laporan/create', $payload, ['Accept' => 'Application/json']);
+        $response = $this->postJson('api/laporan', $payload, ['Accept' => 'Application/json']);
 
         $response->assertOk()->assertJsonStructure(
             [
@@ -112,7 +113,7 @@ class LaporanTest extends TestCase
             // 'nik' => $masyarakat->nik
         ];
 
-        $response = $this->postJson('api/laporan/create', $payload, ['Accept' => 'Application/json']);
+        $response = $this->postJson('api/laporan', $payload, ['Accept' => 'Application/json']);
 
         $response->assertUnprocessable()->assertJson(
             [
@@ -125,6 +126,48 @@ class LaporanTest extends TestCase
         );
     }
 
+    public function test_masyarakat_cannot_create_laporan_without_login()
+    {
+        $faker = Faker::create('id_ID');
+
+        // membuat jenis pemilu baru
+        $jenisPemilu = JenisPemilu::factory()->create([
+            'nama' => 'Pemilihan Kepala Desa'
+        ]);
+
+        // Alamat
+        $alamat = Alamat::factory()->generateGarutJawaBarat()->create();
+
+        // membuat pemilu baru
+        $pemilu = Pemilu::factory()->create([
+            'nama' => 'Pemilihan Kepala Desa Sukaratu',
+            'tanggal_pelaksanaan' => '2023-03-20',
+            'waktu_pelaksanaan' => $faker->time('H:i'),
+            'jenis_id' => $jenisPemilu->id_jenis,
+            'alamat_id' => $alamat->id_alamat
+        ]);
+
+        $payload = [
+            'judul' => 'Laporan Pemberian Uang Oleh Partai B',
+            'tanggal_kejadian' => '2023-03-13',
+            'pemberi' => 'Bapak Samsudin',
+            'penerima' => 'Warga Kampung Sukamentri',
+            'nominal' => 200000,
+            'alamat_kejadian' => 'Kp Sukaratu, Garut',
+            'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiao warga',
+            'bukti' => 'https://www.drive.google.com',
+            'pemilu_id' => $pemilu->id_pemilu, // Pemilihan Kepala Desa Sukaratu
+            // 'nik' => $masyarakat->nik
+        ];
+
+        $response = $this->postJson('api/laporan', $payload, ['Accept' => 'Application/json']);
+
+        $response->assertUnauthorized()->assertJson(
+            [
+                'message' => 'Unauthenticated.'
+            ]
+        );
+    }
     // masyarakat melihat detail laporan berdasarkan nomor laporan
     public function test_masyarakat_can_get_laporan_by_nomor_laporan()
     {
@@ -140,14 +183,14 @@ class LaporanTest extends TestCase
 
         $payload = [
             //dummy nomor laporan
-            'nomor_laporan' => '20230-05-07-11',
+            'nomor_laporan' => $faker->numerify('2023-01-0#-##'),
             'judul' => 'Laporan Pemberian Uang Oleh Partai A',
             'tanggal_kejadian' => '2023-03-13',
             'pemberi' => 'Bapak Samsudin',
-            'penerima' => 'Warga Kampung Sukamentri',
+            'penerima' => 'Ormas sejahtera',
             'nominal' => 200000,
             'alamat_kejadian' => 'Kp Sukamentri, Garut',
-            'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiao warga',
+            'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiap warga',
             'bukti' => 'https://www.drive.google.com',
             'pemilu_id' => $faker->randomElement($pemiluID),
             'nik' => $usernik
@@ -174,7 +217,7 @@ class LaporanTest extends TestCase
                 'pemilu_id',
                 'nik'
             ]
-        ])->dump();
+        ]);
     }
 
     // masyarakat tidak dapat mengakses laporan yang dimiliki oleh orang lain
@@ -256,7 +299,7 @@ class LaporanTest extends TestCase
             'keterangan' => 'laporan telah dibuat oleh ' . $masyarakat->nama,
         ]);
 
-        $response = $this->putJson('api/laporan/update/' . $laporan->nomor_laporan, $dataBaru);
+        $response = $this->putJson('api/laporan/' . $laporan->nomor_laporan, $dataBaru);
 
         $response->assertOk()->assertJsonStructure([
             'kode',
@@ -275,7 +318,7 @@ class LaporanTest extends TestCase
                 'pemilu_id',
                 'nik'
             ]
-        ])->dump();
+        ]);
     }
 
     public function test_masyarakat_cannot_update_laporan_with_progress_status_is_diproses()
@@ -299,7 +342,7 @@ class LaporanTest extends TestCase
         $usernik = $data->nik;
 
         $payload = [
-            'nomor_laporan' => $faker->numerify('20##-##-00-##'),
+            'nomor_laporan' => $faker->numerify('202#-##-00-##'),
             'judul' => 'Judul ' . $faker->numberBetween(0, 100),
             'tanggal_kejadian' => $tanggal,
             'pemberi' => 'mister X',
@@ -339,7 +382,7 @@ class LaporanTest extends TestCase
             'keterangan' => 'laporan sedang dilaksanakan peninjauan oleh pengawas',
         ]);
 
-        $response = $this->putJson('api/laporan/update/' . $laporan->nomor_laporan, $dataBaru);
+        $response = $this->putJson('api/laporan/' . $laporan->nomor_laporan, $dataBaru);
 
         $response->assertForbidden()->assertJsonStructure([
             'kode',
@@ -351,7 +394,7 @@ class LaporanTest extends TestCase
                 'status' => false,
                 'message' => 'Akses Ditolak. Laporan sedang diproses, Tidak dapat diubah'
             ]
-        )->dump();
+        );
     }
 
     public function test_masyarakat_cannot_update_unowned_laporan()
@@ -377,7 +420,7 @@ class LaporanTest extends TestCase
             // 'nik' => $masyarakat->nik
         ];
 
-        $response = $this->putJson('api/laporan/update/' . $faker->randomElement($nomorLaporan), $payload);
+        $response = $this->putJson('api/laporan/' . $faker->randomElement($nomorLaporan), $payload);
 
         $response->assertForbidden()->assertJsonStructure([
             'kode',
@@ -401,7 +444,7 @@ class LaporanTest extends TestCase
         Sanctum::actingAs($masyarakat, ['delete']);
 
         $payload = [
-            'nomor_laporan' => '2023-01-01-98',
+            'nomor_laporan' => $faker->numerify('2023-01-0#-##'),
             'judul' => 'Judul ' . $faker->numberBetween(0, 100),
             'tanggal_kejadian' => $faker->date('Y-m-d'),
             'pemberi' => 'mister A',
@@ -422,7 +465,7 @@ class LaporanTest extends TestCase
             'keterangan' => 'Laporan telah dibuat oleh ' . $masyarakat->nama,
         ]);
 
-        $response = $this->deleteJson('api/laporan/delete/' . $laporan->nomor_laporan);
+        $response = $this->deleteJson('api/laporan/' . $laporan->nomor_laporan);
 
         $response->assertOk()->assertJson(
             [
@@ -442,7 +485,7 @@ class LaporanTest extends TestCase
         Sanctum::actingAs($masyarakat, ['delete']);
 
         $payload = [
-            'nomor_laporan' => '2023-05-01-78',
+            'nomor_laporan' => $faker->numerify('2023-01-0#-##'),
             'judul' => 'Judul ' . $faker->numberBetween(0, 100),
             'tanggal_kejadian' => $faker->date('Y-m-d'),
             'pemberi' => 'mister A',
@@ -463,7 +506,7 @@ class LaporanTest extends TestCase
             'keterangan' => 'laporan sedang dilaksanakan peninjauan oleh pengawas',
         ]);
 
-        $response = $this->deleteJson('api/laporan/delete/' . $laporan->nomor_laporan);
+        $response = $this->deleteJson('api/laporan/' . $laporan->nomor_laporan);
 
         $response->assertOk()->assertJson(
             [
@@ -538,7 +581,7 @@ class LaporanTest extends TestCase
                     'nik'
                 ]
             ]
-        ])->dump();
+        ]);
     }
 
     public function test_petugas_can_get_all_laporan_masyarakat()
@@ -567,6 +610,6 @@ class LaporanTest extends TestCase
                     'nik'
                 ]
             ]
-        ])->dump();
+        ]);
     }
 }

@@ -15,8 +15,8 @@ class PemiluController extends Controller
         if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini. Hanya Admin yang memilik akses'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini.'
             ], 403);
         }
 
@@ -46,8 +46,8 @@ class PemiluController extends Controller
         if (!$alamat) {
             return response()->json([
                 'kode' => 500,
-                'status' => 'ERROR',
-                'message' => 'TERDAPAT KESALAHAN PADA ALAMAT',
+                'status' => false,
+                'message' => 'Terdapat kesalahan pada alamat',
             ]);
         }
 
@@ -64,8 +64,8 @@ class PemiluController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
-            'message' => 'data pemilu berhasil dibuat',
+            'status' => true,
+            'message' => 'Data pemilu berhasil ditambahkan',
             'data' => $pemilu
         ]);
     }
@@ -77,7 +77,7 @@ class PemiluController extends Controller
         if (count($data) < 1) {
             return response()->json([
                 'kode' => 404,
-                'status' => 'Not Found',
+                'status' => false,
                 'message' => 'Data Pemilu Tidak Ditemukan',
             ], 404);
         }
@@ -85,7 +85,7 @@ class PemiluController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Pemilu Berhasil Diambil',
             'data' => $data
         ]);
@@ -96,8 +96,8 @@ class PemiluController extends Controller
         if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya petugas yang memiliki akses untuk fitur ini'
             ], 403);
         }
 
@@ -135,42 +135,25 @@ class PemiluController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Pemilu Berhasil Diperbaharui',
             'data' => $pemilu,
         ]);
     }
 
-    public function details(Request $request, $id)
+    public function details($id)
     {
-        if (!Gate::allows('only-admin')) {
-            return response()->json([
-                'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
-            ], 403);
-        }
+        // if (!Gate::allows('only-admin')) {
+        //     return response()->json([
+        //         'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
+        //     ], 403);
+        // }
 
-        $laporans = $request->input('show_laporan');
-        $alamat = $request->input('show_alamat');
-        $jenis = $request->input('show_jenis');
-
-        // $pemilu = Pemilu::with(['laporans', 'alamat', 'jenis'])->find($id);
-        $pemilu = Pemilu::find($id);
-
-        if ($laporans) {
-            $pemilu = Pemilu::with('laporans')->find($id);
-        }
-
-        if ($alamat) {
-            $pemilu = Pemilu::with('alamat')->find($id);
-        }
-
-        if ($jenis) {
-            $pemilu = Pemilu::with('jenis')->find($id);
-        }
+        $pemilu = Pemilu::find($id)->first();
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Pemilu Berhasil Diambil',
             'data' => $pemilu
         ]);
@@ -181,17 +164,18 @@ class PemiluController extends Controller
         if (!Gate::allows('only-admin')) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya petugas yang memiliki akses untuk fitur ini'
             ], 403);
         }
-        $pemilu = Pemilu::find($id);
+
+        $pemilu = Pemilu::find($id)->first();
         $pemilu->delete();
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Pemilu Berhasil Dihapus',
-        ]);
+        ], 200);
     }
 }

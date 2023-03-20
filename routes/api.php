@@ -35,22 +35,20 @@ Route::middleware('auth:sanctum')->group(
         /// API APLIKASI MASYARAKAT DAN PENGAWAS
         // User
         Route::get('/user', [UserController::class, 'fetchUser']);
-        Route::post('user/update', [UserController::class, 'updateProfile']);
+        Route::post('/user/update', [UserController::class, 'updateProfile']);
+        Route::post('/user/pengawas', [PengawasController::class, 'create']);
+        Route::post('/user/admin', [AdministratorController::class, 'create']);
 
-        /// API APLIKASI MASYARAKAT
         //LAPORAN
-        Route::post('/laporan/create', [LaporanController::class, 'create']);
-        Route::delete('/laporan/delete/{nomor_laporan}', [LaporanController::class, 'delete']);
-        Route::put('/laporan/update/{nomor_laporan}', [LaporanController::class, 'update']);
-        Route::get('user/laporan/', [LaporanController::class, 'getUserLaporan']);
-
-        Route::get('/user/profile', [MasyarakatController::class, 'getProfile']);
-
-
-        /// API APLIKASI PENGAWAS
-        // Laporan
         Route::get('/laporan', [LaporanController::class, 'getAll']);
         Route::get('/laporan/{nomor_laporan}', [LaporanController::class, 'details']);
+        Route::post('/laporan', [LaporanController::class, 'create']);
+        Route::delete('/laporan/{nomor_laporan}', [LaporanController::class, 'delete']);
+        Route::put('/laporan/{nomor_laporan}', [LaporanController::class, 'update']);
+        Route::get('/user/laporan/', [LaporanController::class, 'getUserLaporan']);
+
+
+        Route::get('/user/profile', [MasyarakatController::class, 'getProfile']);
 
         // Progress Laporan
         Route::post('/laporan/respon/{id}', [ProgressController::class, 'responLaporan']);
@@ -58,29 +56,25 @@ Route::middleware('auth:sanctum')->group(
 
 
         // Pemilu
-        Route::post('/pemilu/create', [PemiluController::class, 'create']);
-        Route::put('/pemilu/update/{id}', [PemiluController::class, 'update']);
+        Route::get('/pemilu', [PemiluController::class, 'getAll']);
+        Route::post('/pemilu', [PemiluController::class, 'create']);
+        Route::put('/pemilu/{id}', [PemiluController::class, 'update']);
         Route::get('/pemilu/{id}', [PemiluController::class, 'details']);
-        Route::delete('/pemilu/delete/{id}', [PemiluController::class, 'delete']);
+        Route::delete('/pemilu/{id}', [PemiluController::class, 'delete']);
 
         // FQA
-        Route::post('/fqa/create', [FQAController::class, 'create']);
-        Route::put('/fqa/update/{id}', [FQAController::class, 'update']);
-        Route::delete('/fqa/delete/{id}', [FQAController::class, 'delete']);
+        Route::get('/fqa', [FQAController::class, 'getAll']);
+        Route::post('/fqa', [FQAController::class, 'create']);
+        Route::put('/fqa/{id}', [FQAController::class, 'update']);
+        Route::delete('/fqa/{id}', [FQAController::class, 'delete']);
 
         // Jenis Pemilu
-        Route::post('/jenis-pemilu/create', [JenisPemiluController::class, 'create']);
-        Route::put('/jenis-pemilu/update/{id}', [JenisPemiluController::class, 'update']);
-        Route::delete('/jenis-pemilu/delete/{id}', [JenisPemiluController::class, 'delete']);
+        Route::get('/jenis-pemilu', [JenisPemiluController::class, 'getAll']);
+        Route::post('/jenis-pemilu', [JenisPemiluController::class, 'create']);
+        Route::put('/jenis-pemilu/{id}', [JenisPemiluController::class, 'update']);
+        Route::delete('/jenis-pemilu/{id}', [JenisPemiluController::class, 'delete']);
 
-        /// API ADMIN
-        // PENGAWAS
-        Route::post('pengawas/create', [PengawasController::class, 'create']);
-
-        // ADMIN
-        Route::post('admin/create', [AdministratorController::class, 'create']);
-
-        Route::get('user/all', [UserController::class, 'getAllUser']);
+        Route::get('/user/all', [UserController::class, 'getAllUser']);
 
 
         // Auth
@@ -93,24 +87,10 @@ Route::middleware('auth:sanctum')->group(
 // ALAMAT
 Route::get('/provinsi', [AddressController::class, 'getAllProvinsi']);
 Route::get('/provinsi/{id}/kabupaten-kota', [AddressController::class, 'getAllKabupatenByProvinsiId']);
-Route::get('/kabupaten-kota', [AddressController::class, 'getAllKabupaten']);
 Route::get('/kabupaten-kota/{id}/kecamatan', [AddressController::class, 'getAllKecamatanByKabupatenKotaId']);
-Route::get('/kecamatan', [AddressController::class, 'getAllKecamatan']);
-
-// Pemilu Route
-Route::get('/pemilu', [PemiluController::class, 'getAll']);;
-
-// FQA API ROUTE
-Route::get('/fqa', [FQAController::class, 'getAll']);
-
-// REGISTRASI MASYARAKAT
-Route::post('/registrasi', [MasyarakatController::class, 'registerMasyarakat']);
 
 // AUTH ROUTE
 Route::Post('/user/login', [AuthController::class, 'login']);
 
 // REGISTRASI MASYARAKAT
 Route::Post('/user/register', [AuthController::class, 'register']);
-
-// Jenis Pemilu
-Route::get('/jenis-pemilu', [JenisPemiluController::class, 'getAll']);

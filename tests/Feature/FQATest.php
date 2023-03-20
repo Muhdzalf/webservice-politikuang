@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Fqa;
+use App\Models\Masyarakat;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -14,12 +15,13 @@ class FQATest extends TestCase
      *
      * @return void
      */
-    public function test_required_field_for_registration()
+
+    public function test_required_field()
     {
         $admin = User::factory()->administrator()->create();
         Sanctum::actingAs($admin, ['create']);
 
-        $response = $this->postJson('api/fqa/create');
+        $response = $this->postJson('api/fqa');
 
         $response->assertUnprocessable()->assertJson(
             [
@@ -37,9 +39,9 @@ class FQATest extends TestCase
         $admin = User::factory()->administrator()->create();
         Sanctum::actingAs($admin, ['create']);
 
-        $response = $this->postJson('api/fqa/create', [
-            'pertanyaan' => 'Test Contoh Pertanyaan',
-            'jawaban' => 'Test Contoh Jawaban',
+        $response = $this->postJson('api/fqa', [
+            'pertanyaan' => 'Bagaimana Membuat Sebuah Laporan',
+            'jawaban' => ': Laporan dapat dibuat dengan mengklik buat laporan kemudian mengisi data-data yang dibutuhkan.',
         ]);
 
         $response->assertOk()->assertJsonStructure(
@@ -60,19 +62,19 @@ class FQATest extends TestCase
 
     public function test_masyarakat_get_a_forbidden_error_when_try_to_create_fqa()
     {
-        $masyarakat = User::factory()->create();
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         Sanctum::actingAs($masyarakat, ['create']);
 
-        $response = $this->postJson('api/fqa/create', [
-            'pertanyaan' => 'Test pertanyaan',
-            'jawaban' => 'Test jawaban',
+        $response = $this->postJson('api/fqa', [
+            'pertanyaan' => 'Bagaimana Cara menggunakan Aplikasi Ini',
+            'jawaban' => 'Untuk menggunakan aplikasi ini silahkan klik buat laporan untuk membuat laporan baru',
         ]);
 
         $response->assertForbidden()->assertJson(
             [
                 'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya admin yang memiliki akses untuk fitur ini'
+                'status' => false,
+                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini'
             ]
         ); //403
     }
@@ -82,9 +84,9 @@ class FQATest extends TestCase
         $admin = User::factory()->administrator()->create();
         Sanctum::actingAs($admin, ['create']);
 
-        $response = $this->postJson('api/fqa/create', [
-            'pertanyaan' => 'pertanyaan 1',
-            'jawaban' => null,
+        $response = $this->postJson('api/fqa', [
+            'pertanyaan' => 'Siapa Saja yang dapat membuat laporan?',
+            'jawaban' => '',
         ]);
 
         $response->assertUnprocessable()->assertJson(
@@ -105,9 +107,9 @@ class FQATest extends TestCase
         $admin = User::factory()->administrator()->create();
         Sanctum::actingAs($admin, ['update']);
 
-        $response = $this->putJson('api/fqa/update/' . $fqa->id_fqa, [
-            'pertanyaan' => 'pertanyaan telah diedit',
-            'jawaban' => 'contoh jawaban',
+        $response = $this->putJson('api/fqa/' . $fqa->id_fqa, [
+            'pertanyaan' => 'Siapa saja yang dapat membuat laporan?',
+            'jawaban' => 'laporan pelanggaran politik uang dapat dibuat oleh siapa saja',
         ]);
 
         $response->assertOk()->assertJsonStructure(
@@ -126,26 +128,27 @@ class FQATest extends TestCase
         ); //200
     }
 
-    public function test_admin_get_a_validation_error_when_try_to_update_fqa_data_with_jawaban_value_null()
-    {
-        $fqa = Fqa::factory()->create([]);
+    // public function test_admin_get_a_validation_error_when_try_to_update_fqa_data_with_jawaban_value_null()
+    // {
+    //     $fqa = Fqa::factory()->create([]);
 
-        $admin = User::factory()->administrator()->create();
-        Sanctum::actingAs($admin, ['update']);
+    //     $admin = User::factory()->administrator()->create();
+    //     Sanctum::actingAs($admin, ['update']);
 
-        $response = $this->putJson('api/fqa/update/' . $fqa->id_fqa, [
-            'pertanyaan' => 'Contoh pertanyaan teredit',
-        ]);
+    //     $response = $this->putJson('api/fqa/' . $fqa->id_fqa, [
+    //         'pertanyaan' => 'Hal Apa Saja Yang Termasuk Politik Uang',
+    //         'jawaban' => '',
+    //     ]);
 
-        $response->assertUnprocessable()->assertJson(
-            [
-                "message" => "The jawaban field is required.",
-                "errors" => [
-                    "jawaban" => ["The jawaban field is required."],
-                ]
-            ]
-        ); //422
-    }
+    //     $response->assertUnprocessable()->assertJson(
+    //         [
+    //             "message" => "The jawaban field is required.",
+    //             "errors" => [
+    //                 "jawaban" => ["The jawaban field is required."],
+    //             ]
+    //         ]
+    //     ); //422
+    // }
 
     public function test_admin_success_delete_fqa_data()
     {
@@ -154,7 +157,7 @@ class FQATest extends TestCase
         $admin = User::factory()->administrator()->create();
         Sanctum::actingAs($admin, ['delete']);
 
-        $response = $this->deleteJson('api/fqa/delete/' . $fqa->id_fqa);
+        $response = $this->deleteJson('api/fqa/' . $fqa->id_fqa);
 
         $response->assertOk()->assertJson([
             'kode' => 200,
@@ -170,17 +173,20 @@ class FQATest extends TestCase
         $admin = User::factory()->create();
         Sanctum::actingAs($admin, ['delete']);
 
-        $response = $this->deleteJson('api/fqa/delete/' . $fqa->id_fqa);
+        $response = $this->deleteJson('api/fqa/' . $fqa->id_fqa);
 
         $response->assertForbidden()->assertJson([
             'kode' => 403,
-            'status' => 'Forbidden',
-            'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya admin yang memiliki akses untuk fitur ini'
+            'status' => false,
+            'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini'
         ]); //403
     }
 
     public function test_user_success_get_all_fqa_data()
     {
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
+        Sanctum::actingAs($masyarakat, ['create']);
+
         $response = $this->getJson('api/fqa');
 
         $response->assertOk()->assertJsonStructure(

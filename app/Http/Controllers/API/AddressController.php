@@ -17,7 +17,7 @@ class AddressController extends Controller
             $provinsi = Provinsi::all();
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'Data provinsi berhasil diambil',
                 'data' => $provinsi
             ]);
@@ -36,7 +36,7 @@ class AddressController extends Controller
             $kabupaten = KabupatenKota::all();
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'Data kabupaten berhasil diambil',
                 'data' => $kabupaten
             ]);
@@ -54,7 +54,7 @@ class AddressController extends Controller
             $kabupaten = KabupatenKota::query()->where('provinsi_id', $id)->get();
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'List kabupaten berhasil diambil',
                 'data' => $kabupaten
             ]);
@@ -73,7 +73,7 @@ class AddressController extends Controller
             $kecamatan = Kecamatan::all();
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'Data kecamatan berhasil diambil',
                 'data' => $kecamatan
             ]);
@@ -91,7 +91,7 @@ class AddressController extends Controller
             $kecamatan = kecamatan::query()->where('kabupaten_kota_id', $id)->get();
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'List kecamatan berhasil diambil',
                 'data' => $kecamatan
             ]);

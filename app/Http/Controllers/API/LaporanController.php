@@ -58,7 +58,7 @@ class LaporanController extends Controller
             'keterangan' => 'Laporan telah dibuat oleh ' . Auth::user()->nama . ' menunggu untuk diproses oleh pengawas.'
         ]);
 
-        $data = Laporan::where('nomor_laporan', $laporan->nomor_laporan)->with('masyarakat.user', 'pemilu.alamat', 'pemilu.alamat.provinsi', 'pemilu.alamat.kabupaten', 'pemilu.alamat.kecamatan')->first();
+        $data = Laporan::where('nomor_laporan', $laporan->nomor_laporan)->first();
 
         return response()->json([
             'kode' => 200,

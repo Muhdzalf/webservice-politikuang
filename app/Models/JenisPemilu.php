@@ -10,15 +10,21 @@ class JenisPemilu extends Model
     use HasFactory;
 
     protected $table = 'jenis_pemilu';
+    protected $primaryKey = 'id_jenis';
 
     protected $fillable = [
         'nama'
     ];
 
-    protected $primaryKey = 'id_jenis';
 
     public function pemilu()
     {
         return $this->hasMany(Pemilu::class, 'jenis_id', 'id_jenis');
+    }
+
+
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'admin_id', 'id_admin');
     }
 }

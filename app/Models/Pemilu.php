@@ -10,6 +10,7 @@ class Pemilu extends Model
     use HasFactory;
 
     protected $table = 'pemilu';
+    protected $primaryKey = 'id_pemilu';
 
     protected $fillable = [
         'nama',
@@ -19,7 +20,6 @@ class Pemilu extends Model
         'jenis_id',
     ];
 
-    protected $primaryKey = 'id_pemilu';
 
 
     public function scopeSearch($query, array $filters)

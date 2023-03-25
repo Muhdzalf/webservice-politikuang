@@ -10,20 +10,20 @@ class Masyarakat extends Model
     use HasFactory;
 
     protected $table = 'masyarakat';
+    public $incrementing = false;
+    protected $primaryKey = 'nik';
 
     protected $fillable = [
         'nik',
         'tanggal_lahir',
         'jenis_kelamin',
-        'alamat',
         'pekerjaan',
         'kewarganegaraan',
+        'alamat_id',
         'user_id'
     ];
 
 
-    public $incrementing = false;
-    protected $primaryKey = 'nik';
 
     public function laporan()
     {
@@ -33,5 +33,10 @@ class Masyarakat extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function alamat()
+    {
+        return $this->hasMany(Alamat::class, 'alamat_id', 'id_alamat');
     }
 }

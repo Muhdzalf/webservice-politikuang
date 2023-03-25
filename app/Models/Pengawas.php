@@ -10,6 +10,8 @@ class Pengawas extends Model
     use HasFactory;
 
     protected $table = 'pengawas';
+    protected $primaryKey = 'id_pengawas';
+
 
 
     protected $fillable = [

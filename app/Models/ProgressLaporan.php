@@ -10,6 +10,7 @@ class ProgressLaporan extends Model
     use HasFactory;
 
     protected $table = 'progress_laporan';
+    protected $primaryKey = 'id_progress';
 
 
     protected $fillable = [
@@ -19,7 +20,6 @@ class ProgressLaporan extends Model
         'keterangan'
     ];
 
-    protected $primaryKey = 'id_progress';
 
     public function laporan()
     {

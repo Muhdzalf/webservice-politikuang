@@ -11,6 +11,9 @@ class Laporan extends Model
     use HasFactory;
 
     protected $table = 'laporan';
+    protected $primaryKey = 'nomor_laporan';
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
         'nomor_laporan',
@@ -26,9 +29,6 @@ class Laporan extends Model
         'nik',
     ];
 
-    protected $primaryKey = 'nomor_laporan';
-    protected $keyType = 'string';
-    public $incrementing = false;
 
 
     public function scopeFilter($query, array $filters)

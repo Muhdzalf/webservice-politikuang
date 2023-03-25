@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,8 @@ class JenisPemiluFactory extends Factory
     public function definition()
     {
         return [
-            'nama' => 'Contoh jenis pemilu ' . $this->faker->randomNumber()
+            'nama' => 'Contoh jenis pemilu ' . $this->faker->randomNumber(),
+            'id_admin' => Admin::factory()
         ];
     }
 }

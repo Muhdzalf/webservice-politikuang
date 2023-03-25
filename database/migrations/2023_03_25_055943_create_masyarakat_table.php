@@ -23,6 +23,7 @@ return new class extends Migration
             //foreign key to alamat table
             $table->unsignedBigInteger('alamat_id')->nullable();
             $table->foreign('alamat_id')->references('id_alamat')->on('alamat')->nullOnDelete()->cascadeOnUpdate();
+
             //foreign key to user table
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id_user')->on('users')->onDelete('cascade')->onUpdate('cascade');

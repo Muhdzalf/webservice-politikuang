@@ -22,7 +22,7 @@ class Laporan extends Model
         'pemberi',
         'penerima',
         'tanggal_kejadian',
-        'alamat_kejadian',
+        'tempat_kejadian',
         'kronologi_kejadian',
         'bukti',
         'pemilu_id',

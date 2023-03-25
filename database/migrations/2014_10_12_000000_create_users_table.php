@@ -15,8 +15,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama', 50);
+            $table->id('id_user');
+            $table->string('nama', 35);
             $table->string('email', 35)->unique();
             $table->string('no_hp', 13);
             $table->enum('role', ['masyarakat', 'administrator', 'pengawas'])->default('masyarakat');

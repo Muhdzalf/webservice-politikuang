@@ -17,13 +17,15 @@ return new class extends Migration
             $table->char('nik', 16)->primary();
             $table->date('tanggal_lahir');
             $table->enum('jenis_kelamin', ['L', 'P']);
-            $table->string('alamat', 150);
             $table->string('pekerjaan', 35);
             $table->string('kewarganegaraan', 10)->default('Indonesia');
 
+            //foreign key to alamat table
+            $table->unsignedBigInteger('alamat_id')->nullable();
+            $table->foreign('alamat_id')->references('id_alamat')->on('alamat')->nullOnDelete()->cascadeOnUpdate();
             //foreign key to user table
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('user_id')->references('id_user')->on('users')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamps();
         });

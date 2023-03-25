@@ -18,12 +18,15 @@ return new class extends Migration
             $table->string('nama');
             $table->date('tanggal_pelaksanaan');
             $table->time('waktu_pelaksanaan');
+
+            // foreign key to jenis pemilu table
             $table->unsignedBigInteger('jenis_id');
             $table->foreign('jenis_id')->references('id_jenis')->on('jenis_pemilu')->onUpdate('cascade')->onDelete('cascade');
 
-            // foreign key to alamat pemilu table
-            $table->unsignedBigInteger('alamat_id');
-            $table->foreign('alamat_id')->references('id_alamat')->on('alamat_pemilu')->onUpdate('cascade')->onDelete('cascade');
+            //foreign key to alamat table
+            $table->unsignedBigInteger('alamat_id')->nullable();
+            $table->foreign('alamat_id')->references('id_alamat')->on('alamat')->nullOnDelete()->cascadeOnUpdate();
+
 
             $table->timestamps();
         });

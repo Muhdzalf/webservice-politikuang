@@ -24,7 +24,7 @@ return new class extends Migration
 
             // foreign key to petugas table
             $table->unsignedBigInteger('pengawas_id')->nullable();
-            $table->foreign('pengawas_id')->references('id')->on('pengawas')->nullOnDelete()->onUpdate('cascade');
+            $table->foreign('pengawas_id')->references('id_pengawas')->on('pengawas')->nullOnDelete()->onUpdate('cascade');
 
             $table->timestamps();
         });

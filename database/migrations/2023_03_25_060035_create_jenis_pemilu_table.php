@@ -16,6 +16,11 @@ return new class extends Migration
         Schema::create('jenis_pemilu', function (Blueprint $table) {
             $table->id('id_jenis');
             $table->string('nama', 50);
+
+            // foreign key to admin_id
+            $table->unsignedBigInteger('admin_id')->nullable();
+            $table->foreign('admin_id')->references('id_admin')->on('administrator')->cascadeOnUpdate()->nullOnDelete();
+
             $table->timestamps();
         });
     }

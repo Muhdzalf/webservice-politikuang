@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('pemberi', 50);
             $table->string('penerima', 50);
             $table->date('tanggal_kejadian');
-            $table->string('alamat_kejadian', 150);
+            $table->string('tempat_kejadian', 150);
             $table->longText('kronologi_kejadian');
             $table->string('bukti', 200);
 

@@ -113,7 +113,7 @@ class LaporanController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Laporan ' . $laporan->nama . 'Telah berhasil diperbaharui',
             'data' => $laporan
         ], 200);
@@ -125,7 +125,7 @@ class LaporanController extends Controller
         if (!Gate::allows('only-petugas')) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
+                'status' => false,
                 'message' => 'Hanya Petugas Yang dapat Mengakses Fitur Ini',
             ], 403);
         }
@@ -134,7 +134,7 @@ class LaporanController extends Controller
         if (count($laporan) < 1) {
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'Data Laporan Tidak ditemukan',
                 'data' => null,
             ], 404);
@@ -142,7 +142,7 @@ class LaporanController extends Controller
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Data Laporan Berhasil ditemukan',
             'data' => $laporan,
         ], 200);
@@ -158,14 +158,14 @@ class LaporanController extends Controller
         if ($laporan->count() < 1) {
             return response()->json([
                 'kode' => 404,
-                'status' => 'Not Found',
-                'message' => 'Anda Belum Membuat Laporan',
+                'status' => false,
+                'message' => 'Laporan Tidak Ditemukan. Anda Belum Membuat Laporan',
             ], 404);
         }
 
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Daftar Laporan Berhasil diambil',
             'data' => $laporan
         ]);
@@ -179,7 +179,7 @@ class LaporanController extends Controller
         if (!Gate::allows('owner-and-petugas-can-open', $laporan)) {
             return response()->json([
                 'kode' => 403,
-                'status' => 'Forbidden',
+                'status' => false,
                 'message' => 'Anda Tidak Memiliki Akses Untuk Melihat Laporan Ini'
             ], 403);
         }
@@ -187,7 +187,7 @@ class LaporanController extends Controller
         $result = Laporan::where('nomor_laporan', $nomor_laporan)->first();
         return response()->json([
             'kode' => 200,
-            'status' => 'OK',
+            'status' => true,
             'message' => 'Detail Laporan berhasil diambil',
             'data' => $result
         ]);

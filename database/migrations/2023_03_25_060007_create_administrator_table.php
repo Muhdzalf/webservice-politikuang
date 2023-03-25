@@ -1,9 +1,7 @@
 <?php
 
-use Database\Seeders\ProvinsiSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -15,15 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('provinsi', function (Blueprint $table) {
-            $table->char('id_provinsi', 2)->primary();
-            $table->string('nama', 35);
+        Schema::create('administrator', function (Blueprint $table) {
+            $table->id('id_admin');
+
+            //foreign key to user table
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id_user')->on('users')->onDelete('cascade')->onUpdate('cascade');
+
             $table->timestamps();
         });
-
-        Artisan::call('db:seed', [
-            '--class' => ProvinsiSeeder::class
-        ]);
     }
 
     /**
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('provinsi');
+        Schema::dropIfExists('administrator');
     }
 };

@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('pengawas', function (Blueprint $table) {
-            $table->id();
+            $table->id('id_pengawas');
             $table->string('no_spt', 75);
             $table->date('mulai_tugas');
             $table->date('selesai_tugas');
@@ -22,7 +22,7 @@ return new class extends Migration
 
             //foreign key to user table
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('user_id')->references('id_user')->on('users')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamps();
         });

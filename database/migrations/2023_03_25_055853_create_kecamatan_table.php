@@ -1,6 +1,5 @@
 <?php
 
-use Database\Seeders\KecamatanSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;
@@ -22,6 +21,7 @@ return new class extends Migration
             // foreign key to kabupaten kota id
             $table->char('kabupaten_kota_id', 4);
             $table->foreign('kabupaten_kota_id')->references('id_kabupaten_kota')->on('kabupaten_kota')->onDelete('cascade')->onUpdate('cascade');
+
             $table->timestamps();
         });
 

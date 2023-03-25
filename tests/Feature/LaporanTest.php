@@ -26,7 +26,7 @@ class LaporanTest extends TestCase
     // Masyarakat Membuat Laporan
     public function test_masyarakat_success_create_laporan()
     {
-
+        /// PERSIAPAN
         $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         Sanctum::actingAs($masyarakat, ['createLaporan']);
 
@@ -62,8 +62,10 @@ class LaporanTest extends TestCase
             // 'nik' => $masyarakat->nik
         ];
 
+        /// PENGUJIAN
         $response = $this->postJson('api/laporan', $payload, ['Accept' => 'Application/json']);
 
+        /// VERIFKASI
         $response->assertOk()->assertJsonStructure(
             [
                 'kode',
@@ -237,7 +239,7 @@ class LaporanTest extends TestCase
         $response->assertForbidden()->assertJson(
             [
                 "kode" => 403,
-                "status" => "Forbidden",
+                "status" => false,
                 "message" => "Anda Tidak Memiliki Akses Untuk Melihat Laporan Ini"
             ]
         );
@@ -401,13 +403,29 @@ class LaporanTest extends TestCase
     {
         $faker = Faker::create('id_ID');
         $masyarakat = User::factory()->has(Masyarakat::factory())->create();
-        $pemiluID = DB::table('pemilu')->pluck('id_pemilu');
-        $nomorLaporan = DB::table('laporan')->pluck('nomor_laporan');
+        Sanctum::actingAs($masyarakat);
 
-        Sanctum::actingAs($masyarakat, ['createLaporan', 'updateByUser']);
+        $pemiluID = DB::table('pemilu')->pluck('id_pemilu');
+        $nik = DB::table('masyarakat')->pluck('nik');
+
+        $payload1 = [
+            'nomor_laporan' => $faker->numerify('2023-0#-0#-##'),
+            'judul' => 'Laporan Pemberian Uang Oleh Partai A',
+            'tanggal_kejadian' => '2023-03-13',
+            'pemberi' => 'Bapak Samsudin',
+            'penerima' => 'Warga Kampung Sukamentri',
+            'nominal' => 200000,
+            'alamat_kejadian' => 'Kp Sukamentri, Garut',
+            'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiao warga',
+            'bukti' => 'https://www.drive.google.com',
+            'pemilu_id' => $faker->randomElement($pemiluID), // Pemilihan Kepala Desa Sukaratu
+            'nik' => $faker->randomElement($nik)
+        ];
+
+        $laporan = Laporan::factory()->create($payload1);
 
         // data baru akan menyertakan perubahan data judul serta nominal
-        $payload = [
+        $payload2 = [
             'judul' => 'Laporan Pemberian Uang Oleh Partai A',
             'tanggal_kejadian' => '2023-03-13',
             'pemberi' => 'Bapak Samsudin',
@@ -420,7 +438,7 @@ class LaporanTest extends TestCase
             // 'nik' => $masyarakat->nik
         ];
 
-        $response = $this->putJson('api/laporan/' . $faker->randomElement($nomorLaporan), $payload);
+        $response = $this->putJson('api/laporan/' . $laporan->nomor_laporan, $payload2);
 
         $response->assertForbidden()->assertJsonStructure([
             'kode',

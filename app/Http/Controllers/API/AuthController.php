@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Alamat;
 use App\Models\Masyarakat;
 use App\Models\User;
 use Exception;
@@ -23,10 +24,16 @@ class AuthController extends Controller
             'tanggal_lahir' => 'required|date_format:Y-m-d',
             'jenis_kelamin' => 'required|string|max:1|in:L,P',
             'no_hp' => 'required|regex:/(0)[0-9]{11}/',
-            'alamat' => 'required|string',
             'pekerjaan' => 'required|string',
             'kewarganegaraan' => 'sometimes|string',
-            'role' => 'sometimes|in:pengawas,masyarakat,administrator'
+            'role' => 'sometimes|in:pengawas,masyarakat,administrator',
+
+            //validation Alamat
+            'provinsi_id' => 'required|numeric',
+            'kabupaten_kota_id' => 'required|numeric',
+            'kecamatan_id' => 'required|numeric',
+            'desa' => 'required|string',
+            'detail_alamat' => 'required|string',
         ]);
 
         // create User
@@ -39,12 +46,20 @@ class AuthController extends Controller
             'role' => 'masyarakat',
         ]);
 
-        if (!is_null($user)) {
+        $alamat = Alamat::create([
+            'kecamatan_id' => $request->kecamatan_id,
+            'kabupaten_kota_id' => $request->kabupaten_kota_id,
+            'provinsi_id' => $request->provinsi_id,
+            'desa' => $request->desa,
+            'detail_alamat' => $request->detail_alamat,
+        ]);
+
+        if (!is_null($user) && !is_null($alamat)) {
             Masyarakat::create([
                 'nik' => $request->nik,
                 'tanggal_lahir' => $request->tanggal_lahir,
                 'jenis_kelamin' => $request->jenis_kelamin,
-                'alamat' => $request->alamat,
+                'alamat_id' => $alamat->id_alamat,
                 'pekerjaan' => $request->pekerjaan,
                 'kewarganegaraan' => $request->kewarganegaraan,
                 'user_id' => $user->id

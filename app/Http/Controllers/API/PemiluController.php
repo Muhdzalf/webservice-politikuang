@@ -31,6 +31,7 @@ class PemiluController extends Controller
             'kabupaten_kota_id' => 'required|numeric',
             'provinsi_id' => 'required|numeric',
             'desa' => 'required|string',
+            'detail_alamat' => 'required|string'
         ]);
 
         //default alamat
@@ -41,6 +42,7 @@ class PemiluController extends Controller
             'kabupaten_kota_id' => $request->kabupaten_kota_id,
             'provinsi_id' => $request->provinsi_id,
             'desa' => $request->desa,
+            'detail_alamat' => $request->detail_alamat,
         ]);
 
         if (!$alamat) {

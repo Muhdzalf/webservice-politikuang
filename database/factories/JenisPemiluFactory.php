@@ -19,7 +19,6 @@ class JenisPemiluFactory extends Factory
     {
         return [
             'nama' => 'Contoh jenis pemilu ' . $this->faker->randomNumber(),
-            'id_admin' => Admin::factory()
         ];
     }
 }

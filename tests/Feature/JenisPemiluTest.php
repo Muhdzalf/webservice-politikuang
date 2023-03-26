@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Administrator;
 use App\Models\JenisPemilu;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,8 @@ class JenisPemiluTest extends TestCase
      */
     public function test_admin_get_a_validation_error_when_try__to_create_without_nama()
     {
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
         Sanctum::actingAs($admin);
 
         $response = $this->postJson('api/jenis-pemilu', [], ['Accept' => 'application/json']);
@@ -34,7 +36,7 @@ class JenisPemiluTest extends TestCase
 
     public function test_admin_success_create_jenis_pemilu()
     {
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
 
         Sanctum::actingAs($admin, ['create']);
 
@@ -79,7 +81,8 @@ class JenisPemiluTest extends TestCase
     {
         $jenisPemilu = JenisPemilu::factory()->create();
 
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
 
         Sanctum::actingAs($admin, ['update']);
 
@@ -105,9 +108,10 @@ class JenisPemiluTest extends TestCase
 
     public function test_admin_can_delete_Jenis_pemilu()
     {
-        $jenisPemilu = JenisPemilu::factory()->create();
 
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
+        $jenisPemilu = JenisPemilu::factory()->create();
 
         Sanctum::actingAs($admin, ['delete']);
 
@@ -141,7 +145,7 @@ class JenisPemiluTest extends TestCase
 
     public function test_user_can_get_all_data_jenis_pemilu()
     {
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
 
         Sanctum::actingAs($admin, ['delete']);
 

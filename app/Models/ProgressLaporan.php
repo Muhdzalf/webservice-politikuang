@@ -28,6 +28,6 @@ class ProgressLaporan extends Model
 
     public function pengawas()
     {
-        return $this->belongsTo(Pengawas::class, 'pengawas_id', 'id');
+        return $this->belongsTo(Pengawas::class, 'pengawas_id', 'id_pengawas');
     }
 }

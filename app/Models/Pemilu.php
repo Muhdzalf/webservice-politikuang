@@ -18,6 +18,8 @@ class Pemilu extends Model
         'waktu_pelaksanaan',
         'alamat_id',
         'jenis_id',
+        'admin_id'
+
     ];
 
 
@@ -48,5 +50,10 @@ class Pemilu extends Model
     public function jenis()
     {
         return $this->belongsTo(JenisPemilu::class, 'jenis_id', 'id_jenis');
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(Administrator::class, 'admin_id', 'id_admin');
     }
 }

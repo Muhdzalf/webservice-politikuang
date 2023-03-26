@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Alamat;
 use App\Models\Masyarakat;
 use App\Models\User;
 use Tests\TestCase;
@@ -20,6 +21,7 @@ class AuthTest extends TestCase
     public function test_masyarakat_success_register()
     {
         $faker = Faker::create('id_ID');
+
         $payload = [
             'nik' => $faker->numerify('320506######0002'),
             'nama' => 'Muhammad Dzalfiqri Sabani',
@@ -28,7 +30,11 @@ class AuthTest extends TestCase
             'tanggal_lahir' => '2000-12-12',
             'jenis_kelamin' => 'L',
             'no_hp' => '085156184235',
-            'alamat' => 'Kp. Sompok, Banyuresmi, Garut',
+            'provinsi_id' => 32,
+            'kabupaten_kota_id' => 3205,
+            'kecamatan_id' => 3205230,
+            'desa' => 'Desa Sukaratu',
+            'detail_alamat' => 'Aula Desa',
             'pekerjaan' => 'Mahasiswa',
             'kewarganegaraan' => 'Indonesia',
         ];
@@ -46,13 +52,6 @@ class AuthTest extends TestCase
                 'email',
                 'no_hp',
                 'role',
-                'masyarakat' => [
-                    'nik',
-                    'tanggal_lahir',
-                    'jenis_kelamin',
-                    'alamat',
-                    'pekerjaan',
-                ]
             ],
         ]);
     }
@@ -69,7 +68,11 @@ class AuthTest extends TestCase
             'tanggal_lahir' => '',
             'jenis_kelamin' => '',
             'no_hp' => '',
-            'alamat' => '',
+            'provinsi_id' => '',
+            'kabupaten_kota_id' => '',
+            'kecamatan_id' => '',
+            'desa' => '',
+            'detail_alamat' => '',
             'pekerjaan' => '',
             'kewarganegaraan' => '',
         ];
@@ -87,7 +90,11 @@ class AuthTest extends TestCase
                     'tanggal_lahir',
                     'jenis_kelamin',
                     'no_hp',
-                    'alamat',
+                    'provinsi_id',
+                    'kabupaten_kota_id',
+                    'kecamatan_id',
+                    'desa',
+                    'detail_alamat',
                     'pekerjaan',
                     'kewarganegaraan',
 
@@ -110,7 +117,11 @@ class AuthTest extends TestCase
             'tanggal_lahir' => '2000-12-12',
             'jenis_kelamin' => 'L',
             'no_hp' => '085156184235',
-            'alamat' => 'Kp. Sompok, Banyuresmi, Garut',
+            'provinsi_id' => 32,
+            'kabupaten_kota_id' => 3205,
+            'kecamatan_id' => 3205230,
+            'desa' => 'Desa Sukaratu',
+            'detail_alamat' => 'Aula Desa',
             'pekerjaan' => 'Mahasiswa',
             'kewarganegaraan' => 'Indonesia',
         ];
@@ -158,12 +169,13 @@ class AuthTest extends TestCase
             'access_token',
             'type',
             'data' => [
+                'id_user',
                 'nama',
                 'email',
                 'no_hp',
                 'role',
             ],
-        ]);
+        ])->dump();
     }
 
     public function test_user_get_a_unauthorized_error_when_login_with_wrong_email()

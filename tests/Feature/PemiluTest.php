@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Admin;
+use App\Models\Administrator;
 use App\Models\Alamat;
 use App\Models\JenisPemilu;
 use App\Models\Masyarakat;
@@ -22,11 +23,9 @@ class PemiluTest extends TestCase
      */
     public function test_admin_success_create_pemilu()
     {
-        $this->withExceptionHandling();
         $faker = Faker::create('id_ID');
-        $admin = User::factory()->administrator()->create();
-
-        Admin::factory()->create(['user_id' => $admin->id]);
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+        Sanctum::actingAs($admin);
 
         // membuat jenis pemilu untuk diambil id jenisnya
         $jenisPemilu = JenisPemilu::factory()->create(['nama' => 'Pemilihan Kepala Desa']);
@@ -39,11 +38,9 @@ class PemiluTest extends TestCase
             'kecamatan_id' => 3205230, // Banyuresmi
             'kabupaten_kota_id' => 3205, // Kabupaten Garut
             'provinsi_id' => 32, // Jawa Barat // Banyuresmi
-            'desa' => 'Desa Sukaratu'
+            'desa' => 'Desa Sukaratu',
+            'detail_alamat' => 'Aula Desa',
         ];
-
-
-        Sanctum::actingAs($admin);
 
         $response = $this->postJson('api/pemilu', $pemiluData, ['Accept' => 'Application/Json']);
 
@@ -81,6 +78,7 @@ class PemiluTest extends TestCase
             'kabupaten_kota_id' => 3205, // Kabupaten Garut
             'provinsi_id' => 32, // Jawa Barat
             'desa' => 'Desa ' . $faker->numberBetween(0, 20),
+            'detail_alamat' => 'Aula Desa'
         ];
 
         Sanctum::actingAs($masyarakat, ['create']);
@@ -99,7 +97,8 @@ class PemiluTest extends TestCase
     public function test_admin_get_a_validation_error_when_create_pemilu_with_tanggal_pelaksanaan_field__on_null()
     {
         $faker = Faker::create('id_ID');
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
         Sanctum::actingAs($admin, ['create']);
 
         //Jenis Pemilu ID
@@ -114,6 +113,7 @@ class PemiluTest extends TestCase
             'kabupaten_kota_id' => 3205, // Kabupaten Garut
             'provinsi_id' => 32, // Jawa Barat
             'desa' => 'Desa ' . $faker->numberBetween(0, 20),
+            'detail_alamat' => 'Aula Desa'
         ];
 
         $response = $this->postJson('api/pemilu', $dataPemilu);
@@ -131,7 +131,8 @@ class PemiluTest extends TestCase
     public function test_admin_can_update_nama_pemilu()
     {
         $faker = Faker::create('id_ID');
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
         Sanctum::actingAs($admin, ['update']);
 
         // Deklarasi Data Tetap
@@ -147,6 +148,7 @@ class PemiluTest extends TestCase
             'waktu_pelaksanaan' => $faker->time('H:i'),
             'jenis_id' => $jenisPemiluId, // Pemilihan Kepala Desa
             'alamat_id' => $alamatId,
+            'admin_id' => $admin->id_admin
         ];
 
         //membuat data pemilu baru
@@ -160,7 +162,8 @@ class PemiluTest extends TestCase
             'kecamatan_id' => 3205230, // Banyuresmi
             'kabupaten_kota_id' => 3205, // Kabupaten Garut
             'provinsi_id' => 32, // Jawa Barat
-            'desa' => 'Desa Sukamulya'
+            'desa' => 'Desa Sukamulya',
+            'detail_alamat' => 'Aula Desa'
         ];
 
 
@@ -184,7 +187,8 @@ class PemiluTest extends TestCase
     {
         $faker = Faker::create();
 
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
         Sanctum::actingAs($admin, ['details']);
 
         $jenisPemilu = DB::table('jenis_pemilu')->pluck('id_jenis');
@@ -194,7 +198,8 @@ class PemiluTest extends TestCase
             'provinsi_id' => 32,
             'kabupaten_kota_id' => 3205,
             'kecamatan_id' => 3205230,
-            'desa' => 'Sukaratu'
+            'desa' => 'Desa Sukaratu',
+            'detail_alamat' => 'Aula Desa',
         ]);
 
         $alamatId = $alamat->id_alamat;
@@ -205,6 +210,7 @@ class PemiluTest extends TestCase
             'waktu_pelaksanaan' => $faker->time('H:i'),
             'jenis_id' => $jenisPemiluId,
             'alamat_id' => $alamatId,
+            'admin_id' => $admin->id_admin
         ];
 
         $pemilu = Pemilu::factory()->create($dataPemilu);
@@ -230,7 +236,8 @@ class PemiluTest extends TestCase
     {
         // $this->withExceptionHandling();
 
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
 
         Sanctum::actingAs($admin);
 

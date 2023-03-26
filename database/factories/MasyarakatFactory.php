@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Alamat;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,7 +22,7 @@ class MasyarakatFactory extends Factory
             'nik' => $this->faker->nik(),
             'tanggal_lahir' => '2000-12-12',
             'jenis_kelamin' => $this->faker->randomElement(['L', 'P']),
-            'alamat' => $this->faker->address(),
+            'alamat_id' => Alamat::factory(),
             'pekerjaan' => $this->faker->jobTitle(),
             'kewarganegaraan' => 'Indonesia',
             'user_id' => User::factory(),

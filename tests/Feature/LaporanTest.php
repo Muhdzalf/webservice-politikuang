@@ -55,7 +55,7 @@ class LaporanTest extends TestCase
             'pemberi' => 'Bapak Samsudin',
             'penerima' => 'Warga Kampung Sukamentri',
             'nominal' => 200000,
-            'alamat_kejadian' => 'Kp Sukamentri, Garut',
+            'tempat_kejadian' => 'Kp Sukamentri, Garut',
             'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiao warga',
             'bukti' => 'https://www.drive.google.com',
             'pemilu_id' => $pemilu->id_pemilu, // Pemilihan Kepala Desa Sukaratu
@@ -108,7 +108,7 @@ class LaporanTest extends TestCase
             'pemberi' => '',
             'penerima' => '',
             'nominal' => 200000,
-            'alamat_kejadian' => 'Kp Sukamentri, Garut',
+            'tempat_kejadian' => 'Kp Sukamentri, Garut',
             'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiao warga',
             'bukti' => 'https://www.drive.google.com',
             'pemilu_id' => $pemilu->id_pemilu // Pemilihan Kepala Desa Sukaratu
@@ -155,7 +155,7 @@ class LaporanTest extends TestCase
             'pemberi' => 'Bapak Samsudin',
             'penerima' => 'Warga Kampung Sukamentri',
             'nominal' => 200000,
-            'alamat_kejadian' => 'Kp Sukaratu, Garut',
+            'tempat_kejadian' => 'Kp Sukaratu, Garut',
             'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiao warga',
             'bukti' => 'https://www.drive.google.com',
             'pemilu_id' => $pemilu->id_pemilu, // Pemilihan Kepala Desa Sukaratu
@@ -173,15 +173,13 @@ class LaporanTest extends TestCase
     // masyarakat melihat detail laporan berdasarkan nomor laporan
     public function test_masyarakat_can_get_laporan_by_nomor_laporan()
     {
+
+        $this->withoutExceptionHandling();
         $faker = Faker::create('id_ID');
         $pemiluID = DB::table('pemilu')->pluck('id_pemilu');
 
         $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         Sanctum::actingAs($masyarakat);
-
-        //get user nik
-        $data = Masyarakat::where('user_id', $masyarakat->id)->first();
-        $usernik = $data->nik;
 
         $payload = [
             //dummy nomor laporan
@@ -191,11 +189,11 @@ class LaporanTest extends TestCase
             'pemberi' => 'Bapak Samsudin',
             'penerima' => 'Ormas sejahtera',
             'nominal' => 200000,
-            'alamat_kejadian' => 'Kp Sukamentri, Garut',
+            'tempat_kejadian' => 'Kp Sukamentri, Garut',
             'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiap warga',
             'bukti' => 'https://www.drive.google.com',
             'pemilu_id' => $faker->randomElement($pemiluID),
-            'nik' => $usernik
+            'nik' => $masyarakat->masyarakat->nik
         ];
 
         $laporan = Laporan::factory()->create($payload);
@@ -212,7 +210,7 @@ class LaporanTest extends TestCase
                 'pemberi',
                 'penerima',
                 'nominal',
-                'alamat_kejadian',
+                'tempat_kejadian',
                 'kronologi_kejadian',
                 'tanggal_kejadian',
                 'bukti',
@@ -260,10 +258,7 @@ class LaporanTest extends TestCase
         $kronologi = $faker->text();
         $bukti = $faker->url();
         $pemiluId = $faker->randomElement($pemiluID);
-
-        //get user nik
-        $data = Masyarakat::where('user_id', $masyarakat->id)->first();
-        $usernik = $data->nik;
+        $nik = $masyarakat->masyarakat->nik;
 
         $payload = [
             'nomor_laporan' => $faker->numerify('202#-0#-1#-2#'),
@@ -272,11 +267,11 @@ class LaporanTest extends TestCase
             'pemberi' => 'mister X',
             'penerima' => 'mister Y',
             'nominal' => $nominal,
-            'alamat_kejadian' => $alamat,
+            'tempat_kejadian' => $alamat,
             'kronologi_kejadian' => $kronologi,
             'bukti' => $bukti,
             'pemilu_id' => $pemiluId,
-            'nik' => $usernik
+            'nik' => $nik
         ];
         $laporan = Laporan::factory()->create($payload);
 
@@ -287,11 +282,11 @@ class LaporanTest extends TestCase
             'pemberi' => $laporan->pemberi,
             'penerima' => $laporan->penerima,
             'nominal' => $laporan->nominal,
-            'alamat_kejadian' => $alamat,
+            'tempat_kejadian' => $alamat,
             'kronologi_kejadian' => $kronologi,
             'bukti' => $bukti,
             'pemilu_id' => $pemiluId,
-            'nik' => $usernik
+            'nik' => $nik
         ];
 
 
@@ -313,7 +308,7 @@ class LaporanTest extends TestCase
                 'pemberi',
                 'penerima',
                 'nominal',
-                'alamat_kejadian',
+                'tempat_kejadian',
                 'kronologi_kejadian',
                 'tanggal_kejadian',
                 'bukti',
@@ -340,7 +335,7 @@ class LaporanTest extends TestCase
         $pemiluId = $faker->randomElement($pemiluID);
 
         //get user nik
-        $data = Masyarakat::where('user_id', $masyarakat->id)->first();
+        $data = Masyarakat::where('user_id', $masyarakat->id_user)->first();
         $usernik = $data->nik;
 
         $payload = [
@@ -350,7 +345,7 @@ class LaporanTest extends TestCase
             'pemberi' => 'mister X',
             'penerima' => 'mister Y',
             'nominal' => $nominal,
-            'alamat_kejadian' => $alamat,
+            'tempat_kejadian' => $alamat,
             'kronologi_kejadian' => $kronologi,
             'bukti' => $bukti,
             'pemilu_id' => $pemiluId,
@@ -364,7 +359,7 @@ class LaporanTest extends TestCase
             'pemberi' => 'mister X',
             'penerima' => 'mister Y',
             'nominal' => 100000000,
-            'alamat_kejadian' => $alamat,
+            'tempat_kejadian' => $alamat,
             'kronologi_kejadian' => $kronologi,
             'bukti' => $bukti,
             'pemilu_id' => $pemiluId,
@@ -415,7 +410,7 @@ class LaporanTest extends TestCase
             'pemberi' => 'Bapak Samsudin',
             'penerima' => 'Warga Kampung Sukamentri',
             'nominal' => 200000,
-            'alamat_kejadian' => 'Kp Sukamentri, Garut',
+            'tempat_kejadian' => 'Kp Sukamentri, Garut',
             'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiao warga',
             'bukti' => 'https://www.drive.google.com',
             'pemilu_id' => $faker->randomElement($pemiluID), // Pemilihan Kepala Desa Sukaratu
@@ -431,7 +426,7 @@ class LaporanTest extends TestCase
             'pemberi' => 'Bapak Samsudin',
             'penerima' => 'Warga Kampung Sukamentri',
             'nominal' => 200000,
-            'alamat_kejadian' => 'Kp Sukamentri, Garut',
+            'tempat_kejadian' => 'Kp Sukamentri, Garut',
             'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiao warga',
             'bukti' => 'https://www.drive.google.com',
             'pemilu_id' => $faker->randomElement($pemiluID), // Pemilihan Kepala Desa Sukaratu
@@ -468,7 +463,7 @@ class LaporanTest extends TestCase
             'pemberi' => 'mister A',
             'penerima' => 'mister B',
             'nominal' => $faker->numberBetween(1000, 100000000),
-            'alamat_kejadian' => $faker->address(),
+            'tempat_kejadian' => $faker->address(),
             'kronologi_kejadian' => $faker->text(),
             'bukti' => $faker->url(),
             'pemilu_id' => $faker->randomElement($pemiluID),
@@ -509,7 +504,7 @@ class LaporanTest extends TestCase
             'pemberi' => 'mister A',
             'penerima' => 'mister B',
             'nominal' => $faker->numberBetween(1000, 100000000),
-            'alamat_kejadian' => $faker->address(),
+            'tempat_kejadian' => $faker->address(),
             'kronologi_kejadian' => $faker->text(),
             'bukti' => $faker->url(),
             'pemilu_id' => $faker->randomElement($pemiluID),
@@ -545,7 +540,7 @@ class LaporanTest extends TestCase
         Sanctum::actingAs($masyarakat, ['getUserLaporan']);
 
         //get nik
-        $nik = Masyarakat::where('user_id', $masyarakat->id)->first()->nik;
+        $nik = Masyarakat::where('user_id', $masyarakat->id_user)->first()->nik;
         $payload1 = [
             'nomor_laporan' => $faker->numerify('202#-20-01-##'),
             'judul' => 'Judul ' . $faker->numberBetween(0, 100),
@@ -553,7 +548,7 @@ class LaporanTest extends TestCase
             'pemberi' => 'mister A',
             'penerima' => 'mister B',
             'nominal' => $faker->numberBetween(1000, 100000000),
-            'alamat_kejadian' => $faker->address(),
+            'tempat_kejadian' => $faker->address(),
             'kronologi_kejadian' => $faker->text(),
             'bukti' => $faker->url(),
             'pemilu_id' => $faker->randomElement($pemiluID),
@@ -567,7 +562,7 @@ class LaporanTest extends TestCase
             'pemberi' => 'mister A',
             'penerima' => 'mister B',
             'nominal' => $faker->numberBetween(1000, 100000000),
-            'alamat_kejadian' => $faker->address(),
+            'tempat_kejadian' => $faker->address(),
             'kronologi_kejadian' => $faker->text(),
             'bukti' => $faker->url(),
             'pemilu_id' => $faker->randomElement($pemiluID),
@@ -591,7 +586,7 @@ class LaporanTest extends TestCase
                     'pemberi',
                     'penerima',
                     'nominal',
-                    'alamat_kejadian',
+                    'tempat_kejadian',
                     'kronologi_kejadian',
                     'tanggal_kejadian',
                     'bukti',
@@ -620,7 +615,7 @@ class LaporanTest extends TestCase
                     'pemberi',
                     'penerima',
                     'nominal',
-                    'alamat_kejadian',
+                    'tempat_kejadian',
                     'kronologi_kejadian',
                     'tanggal_kejadian',
                     'bukti',

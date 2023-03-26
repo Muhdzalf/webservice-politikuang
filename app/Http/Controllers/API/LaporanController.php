@@ -24,14 +24,14 @@ class LaporanController extends Controller
             'pemberi' => 'required|string',
             'penerima' => 'required|string',
             'nominal' => 'required|numeric',
-            'alamat_kejadian' => 'required|string',
+            'tempat_kejadian' => 'required|string',
             'kronologi_kejadian' => 'required|string',
             'bukti' => 'required|url',
             'pemilu_id' => 'required|numeric'
         ]);
 
         // mendapatkan nik user yang sedang login
-        $userId = Auth::user()->id;
+        $userId = Auth::user()->id_user;
         $pengirimId = Masyarakat::where('user_id', $userId)->first();
 
         // membuat nomor laporan
@@ -44,7 +44,7 @@ class LaporanController extends Controller
             'pemberi' => $request->pemberi,
             'penerima' => $request->penerima,
             'nominal' => $request->nominal,
-            'alamat_kejadian' => $request->alamat_kejadian,
+            'tempat_kejadian' => $request->tempat_kejadian,
             'kronologi_kejadian' => $request->kronologi_kejadian,
             'bukti' => $request->bukti,
             'nik' => $pengirimId->nik,
@@ -97,7 +97,7 @@ class LaporanController extends Controller
         $laporan->pemberi = $request->pemberi;
         $laporan->penerima = $request->penerima;
         $laporan->nominal = $request->nominal;
-        $laporan->alamat_kejadian = $request->alamat_kejadian;
+        $laporan->tempat_kejadian = $request->tempat_kejadian;
         $laporan->kronologi_kejadian = $request->kronologi_kejadian;
         $laporan->bukti = $request->bukti;
         $laporan->save();
@@ -152,7 +152,7 @@ class LaporanController extends Controller
     public function getUserLaporan()
     {
         $user = Auth::user();
-        $masy = Masyarakat::where('user_id', $user->id)->first();
+        $masy = Masyarakat::where('user_id', $user->id_user)->first();
         $laporan = Laporan::where('nik', $masy->nik)->get();
 
         if ($laporan->count() < 1) {

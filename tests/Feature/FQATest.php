@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Administrator;
 use App\Models\Fqa;
 use App\Models\Masyarakat;
 use App\Models\User;
@@ -18,7 +19,8 @@ class FQATest extends TestCase
 
     public function test_required_field()
     {
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
         Sanctum::actingAs($admin, ['create']);
 
         $response = $this->postJson('api/fqa');
@@ -36,7 +38,8 @@ class FQATest extends TestCase
 
     public function test_only_admin_can_create_fqa()
     {
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
         Sanctum::actingAs($admin, ['create']);
 
         $response = $this->postJson('api/fqa', [
@@ -81,7 +84,8 @@ class FQATest extends TestCase
 
     public function test_admin_get_a_validation_error_when_create_fqa_with_jawaban_value_null()
     {
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
         Sanctum::actingAs($admin, ['create']);
 
         $response = $this->postJson('api/fqa', [
@@ -101,16 +105,20 @@ class FQATest extends TestCase
 
     public function test_admin_can_update_fqa_data()
     {
+        $this->withoutExceptionHandling();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
+        Sanctum::actingAs($admin, ['update']);
 
         $fqa = Fqa::factory()->create();
 
-        $admin = User::factory()->administrator()->create();
-        Sanctum::actingAs($admin, ['update']);
-
-        $response = $this->putJson('api/fqa/' . $fqa->id_fqa, [
+        $payload = [
             'pertanyaan' => 'Siapa saja yang dapat membuat laporan?',
             'jawaban' => 'laporan pelanggaran politik uang dapat dibuat oleh siapa saja',
-        ]);
+            'admin_id' => $admin->id_admin
+        ];
+
+        $response = $this->putJson('api/fqa/' . $fqa->id_fqa, $payload);
 
         $response->assertOk()->assertJsonStructure(
             [
@@ -132,7 +140,8 @@ class FQATest extends TestCase
     // {
     //     $fqa = Fqa::factory()->create([]);
 
-    //     $admin = User::factory()->administrator()->create();
+    // $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+    //
     //     Sanctum::actingAs($admin, ['update']);
 
     //     $response = $this->putJson('api/fqa/' . $fqa->id_fqa, [
@@ -152,10 +161,11 @@ class FQATest extends TestCase
 
     public function test_admin_success_delete_fqa_data()
     {
-        $fqa = Fqa::factory()->create([]);
 
-        $admin = User::factory()->administrator()->create();
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
         Sanctum::actingAs($admin, ['delete']);
+
+        $fqa = Fqa::factory()->create();
 
         $response = $this->deleteJson('api/fqa/' . $fqa->id_fqa);
 

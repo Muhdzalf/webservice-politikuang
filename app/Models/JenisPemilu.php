@@ -13,18 +13,12 @@ class JenisPemilu extends Model
     protected $primaryKey = 'id_jenis';
 
     protected $fillable = [
-        'nama'
+        'nama',
     ];
 
 
     public function pemilu()
     {
         return $this->hasMany(Pemilu::class, 'jenis_id', 'id_jenis');
-    }
-
-
-    public function admin()
-    {
-        return $this->belongsTo(Admin::class, 'admin_id', 'id_admin');
     }
 }

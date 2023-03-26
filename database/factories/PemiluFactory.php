@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Admin;
+use App\Models\Administrator;
 use App\Models\Alamat;
 use App\Models\JenisPemilu;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,7 +26,7 @@ class PemiluFactory extends Factory
             'waktu_pelaksanaan' => $this->faker->time('H:i'),
             'jenis_id' => JenisPemilu::factory(),
             'alamat_id' => Alamat::factory()->generateGarutJawaBarat()->create(),
-            'id_admin' => Admin::factory()
+            'admin_id' => Administrator::factory()
         ];
     }
 }

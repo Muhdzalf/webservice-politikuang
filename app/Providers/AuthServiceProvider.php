@@ -39,12 +39,12 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('isOwner', function (User $user, Laporan $laporan) {
-            $masy = Masyarakat::where('user_id', $user->id)->first();
+            $masy = Masyarakat::where('user_id', $user->id_user)->first();
             return $masy->nik === $laporan->nik;
         });
 
         Gate::define('owner-and-petugas-can-open', function (User $user, Laporan $laporan) {
-            $masy = Masyarakat::where('user_id', $user->id)->first();
+            $masy = Masyarakat::where('user_id', $user->id_user)->first();
 
             if ($masy->nik === $laporan->nik) {
                 return true;

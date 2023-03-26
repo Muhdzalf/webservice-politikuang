@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Fqa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class FQAController extends Controller
@@ -45,7 +46,8 @@ class FQAController extends Controller
 
         $fqa = Fqa::create([
             'pertanyaan' => $request->pertanyaan,
-            'jawaban' => $request->jawaban
+            'jawaban' => $request->jawaban,
+            'admin_id' => Auth::user()->administrator->id_admin
         ]);
 
         return response()->json([
@@ -74,6 +76,7 @@ class FQAController extends Controller
 
         $fqa->pertanyaan = $request->pertanyaan;
         $fqa->jawaban = $request->jawaban;
+        $fqa->admin_id = $fqa->admin_id;
         $fqa->save();
 
         return response()->json([

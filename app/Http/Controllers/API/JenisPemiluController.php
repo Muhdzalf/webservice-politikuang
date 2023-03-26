@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Administrator;
 use App\Models\JenisPemilu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class JenisPemiluController extends Controller
@@ -43,8 +45,9 @@ class JenisPemiluController extends Controller
             'nama' => 'required|string'
         ]);
 
+
         $jenisPemilu = JenisPemilu::create([
-            'nama' => $request->nama
+            'nama' => $request->nama,
         ]);
 
         return response()->json([

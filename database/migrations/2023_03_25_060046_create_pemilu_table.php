@@ -27,6 +27,9 @@ return new class extends Migration
             $table->unsignedBigInteger('alamat_id')->nullable();
             $table->foreign('alamat_id')->references('id_alamat')->on('alamat')->nullOnDelete()->cascadeOnUpdate();
 
+            // foreign key to admin_id
+            $table->unsignedBigInteger('admin_id')->nullable();
+            $table->foreign('admin_id')->references('id_admin')->on('administrator')->cascadeOnUpdate()->nullOnDelete();
 
             $table->timestamps();
         });

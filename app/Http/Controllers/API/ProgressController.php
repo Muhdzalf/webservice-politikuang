@@ -58,12 +58,12 @@ class ProgressController extends Controller
             'keterangan' => 'required|string',
         ]);
 
-        $userId = Auth::user()->id;
+        $userId = Auth::user()->id_user;
         $pengawas = Pengawas::where('user_id', $userId)->first();
 
         $progress = ProgressLaporan::create([
             'nomor_laporan' => $nomor_laporan,
-            'pengawas_id' => $pengawas->id,
+            'pengawas_id' => $pengawas->id_pengawas,
             'status' => $request->status,
             'keterangan' => $request->keterangan
         ]);

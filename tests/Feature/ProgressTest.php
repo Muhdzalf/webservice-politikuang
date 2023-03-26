@@ -83,7 +83,7 @@ class ProgressTest extends TestCase
                 'message',
                 'errors'
             ]
-        )->dump();
+        );
     }
 
     public function test_masyarakat_can_get_progress_laporan()
@@ -95,9 +95,7 @@ class ProgressTest extends TestCase
         Sanctum::actingAs($masyarakat, ['getProgressLaporan']);
         $faker = Faker::create('id_ID');
 
-        //get user nik
-        $data = Masyarakat::where('user_id', $masyarakat->id)->first();
-        $usernik = $data->nik;
+        $nik = $masyarakat->masyarakat->nik;
 
         $dataLaporan = [
             'nomor_laporan' => $faker->numerify('000-00-01-##'),
@@ -106,11 +104,11 @@ class ProgressTest extends TestCase
             'pemberi' => '',
             'penerima' => '',
             'nominal' => $faker->numberBetween(1000, 100000000),
-            'alamat_kejadian' => $faker->address(),
+            'tempat_kejadian' => $faker->address(),
             'kronologi_kejadian' => $faker->text(),
             'bukti' => $faker->url(),
             'pemilu_id' => $faker->randomElement($pemiluID),
-            'nik' => $usernik
+            'nik' => $nik
         ];
 
         $laporan = Laporan::factory()->create($dataLaporan);
@@ -150,6 +148,6 @@ class ProgressTest extends TestCase
                     ]
                 ]
             ]
-        )->dump();
+        );
     }
 }

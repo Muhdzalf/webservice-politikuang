@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
+use App\Models\Administrator;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -28,7 +28,7 @@ class AdministratorController extends Controller
             'role' => 'administrator',
         ]);
 
-        Admin::create([
+        Administrator::create([
             'user_id' => $user->id
         ]);
 

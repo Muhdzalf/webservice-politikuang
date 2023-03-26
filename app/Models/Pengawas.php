@@ -24,11 +24,11 @@ class Pengawas extends Model
 
     public function Progresslaporan()
     {
-        return $this->hasMany(ProgressLaporan::class, 'pengawas_id', 'id');
+        return $this->hasMany(ProgressLaporan::class, 'pengawas_id', 'id_pengawas');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id_user');
     }
 }

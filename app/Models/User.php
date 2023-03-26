@@ -49,16 +49,16 @@ class User extends Authenticatable
 
     public function masyarakat()
     {
-        return $this->hasOne(Masyarakat::class, 'user_id', 'id');
+        return $this->hasOne(Masyarakat::class, 'user_id', 'id_user');
     }
 
     public function pengawas()
     {
-        return $this->hasOne(Pengawas::class, 'user_id', 'id');
+        return $this->hasOne(Pengawas::class, 'user_id', 'id_user');
     }
 
     public function administrator()
     {
-        return $this->hasOne(Admin::class, 'user_id', 'id');
+        return $this->hasOne(Administrator::class, 'user_id', 'id_user');
     }
 }

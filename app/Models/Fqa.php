@@ -15,7 +15,7 @@ class Fqa extends Model
     protected $fillable = [
         'pertanyaan',
         'jawaban',
-        'admin_id'
+        'admin_id',
     ];
 
 
@@ -28,6 +28,6 @@ class Fqa extends Model
 
     public function admin()
     {
-        return $this->belongsTo(Admin::class, 'admin_id', 'id_admin');
+        return $this->belongsTo(Administrator::class, 'admin_id', 'id_admin');
     }
 }

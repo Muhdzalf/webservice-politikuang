@@ -27,12 +27,12 @@ class Masyarakat extends Model
 
     public function laporan()
     {
-        return $this->hasMany(Laporan::class, 'pelapor', 'nik');
+        return $this->hasMany(Laporan::class, 'nik', 'nik');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id_user');
     }
 
     public function alamat()

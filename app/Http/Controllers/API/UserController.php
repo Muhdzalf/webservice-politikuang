@@ -16,15 +16,15 @@ class UserController extends Controller
         $user = Auth::user();
 
         if ($user->role == 'masyarakat') {
-            $data = User::where('id', $user->id)->with('masyarakat')->first();
+            $data = User::where('id_user', $user->id_user)->with('masyarakat')->first();
         }
 
         if ($user->role == 'administrator') {
-            $data = User::where('id', $user->id)->with('administrator')->first();
+            $data = User::where('id_user', $user->id_user)->with('administrator')->first();
         }
 
         if ($user->role == 'pengawas') {
-            $data = User::where('id', $user->id)->with('pengawas')->first();
+            $data = User::where('id_user', $user->id_user)->with('pengawas')->first();
         }
 
         return response()->json([

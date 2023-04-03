@@ -79,17 +79,15 @@ Route::middleware('auth:sanctum')->group(
 
         // Auth
         Route::post('/logout', [AuthController::class, 'logout']);
+
+        // ALAMAT
+        Route::get('/provinsi', [AddressController::class, 'getAllProvinsi']);
+        Route::get('/provinsi/{id}/kabupaten-kota', [AddressController::class, 'getAllKabupatenByProvinsiId']);
+        Route::get('/kabupaten-kota/{id}/kecamatan', [AddressController::class, 'getAllKecamatanByKabupatenKotaId']);
     }
 );
 
-
-// API UMUM
-// ALAMAT
-Route::get('/provinsi', [AddressController::class, 'getAllProvinsi']);
-Route::get('/provinsi/{id}/kabupaten-kota', [AddressController::class, 'getAllKabupatenByProvinsiId']);
-Route::get('/kabupaten-kota/{id}/kecamatan', [AddressController::class, 'getAllKecamatanByKabupatenKotaId']);
-
-// AUTH ROUTE
+// LOGIN ROUTE
 Route::Post('/user/login', [AuthController::class, 'login']);
 
 // REGISTRASI MASYARAKAT

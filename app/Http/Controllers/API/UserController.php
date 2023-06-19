@@ -4,39 +4,53 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-
+use Throwable;
 
 class UserController extends Controller
 {
     public function fetchUser()
     {
-        $user = Auth::user();
+        $kode = 200;
+        try{ $user = Auth::user();
 
-        if ($user->role == 'masyarakat') {
-            $data = User::where('id_user', $user->id_user)->with('masyarakat')->first();
-        }
+            If(!$user){
+                throw new Exception('Unauthenticated');
+            }
 
-        if ($user->role == 'administrator') {
-            $data = User::where('id_user', $user->id_user)->with('administrator')->first();
-        }
+            if ($user->role == 'masyarakat') {
+                $data = User::where('id_user', $user->id_user)->with('masyarakat')->first();
+            }
 
-        if ($user->role == 'pengawas') {
-            $data = User::where('id_user', $user->id_user)->with('pengawas')->first();
-        }
+            if ($user->role == 'administrator') {
+                $data = User::where('id_user', $user->id_user)->with('administrator')->first();
+            }
 
-        return response()->json([
-            'kode' => 200,
-            'status' => 'OK',
-            'message' => 'data user berhasil diambil',
-            'data' => $data
-        ]);
+            if ($user->role == 'pengawas') {
+                $data = User::where('id_user', $user->id_user)->with('pengawas')->first();
+            }
+
+            return response()->json([
+                'kode' => 200,
+                'status' => 'OK',
+                'message' => 'data user berhasil diambil',
+                'data' => $data
+            ]);}catch(Throwable $err){
+            return response()->json([
+                'kode' => $kode,
+                'status' => 'false',
+                'message' => 'Gagal: '. $err->getMessage(),
+            ], $kode);
+        };
     }
 
     public function updateProfile(Request $request, User $user)
     {
+        $kode = 200;
+        try{}catch(Throwable $err){}
         $request->validate([
             'nama' => 'required|string|max:50',
             'email' => 'required|email',
@@ -61,21 +75,24 @@ class UserController extends Controller
 
     public function getAllUser()
     {
-        if (!Gate::allows('only-admin')) {
+        $kode = 200;
+        try{
+            if (!Gate::allows('only-admin')) {
+                $kode = 403;
+                throw new Exception('Hanya Petugas Yang dapat Mengakses Fitur Ini');
+            }
+            $user = User::all();
             return response()->json([
-                'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Hanya Petugas Yang dapat Mengakses Fitur Ini',
-            ], 403);
-        }
-
-        $user = User::all();
-
-        return response()->json([
-            'kode' => 200,
-            'status' => true,
-            'message' => 'Data User Berhasil Diambil',
-            'data' => $user
-        ]);
+                'kode' => 200,
+                'status' => true,
+                'message' => 'Data User Berhasil Diambil',
+                'data' => $user
+            ]);
+        }catch(Throwable $err){
+            return response()->json([
+            'kode' => $kode,
+            'status' => 'false',
+            'message' => 'Gagal: '.$err->getMessage(),
+        ], $kode);}
     }
 }

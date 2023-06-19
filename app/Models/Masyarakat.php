@@ -23,8 +23,6 @@ class Masyarakat extends Model
         'user_id'
     ];
 
-
-
     public function laporan()
     {
         return $this->hasMany(Laporan::class, 'nik', 'nik');

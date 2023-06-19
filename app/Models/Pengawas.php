@@ -12,8 +12,6 @@ class Pengawas extends Model
     protected $table = 'pengawas';
     protected $primaryKey = 'id_pengawas';
 
-
-
     protected $fillable = [
         'no_spt',
         'jabatan',

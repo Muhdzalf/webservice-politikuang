@@ -16,7 +16,6 @@ class Provinsi extends Model
         'nama',
     ];
 
-
     public function kabupaten()
     {
         return $this->hasMany(Kabupaten::class, 'provinsi_id', 'id_provinsi');

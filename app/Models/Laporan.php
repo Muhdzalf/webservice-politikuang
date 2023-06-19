@@ -29,8 +29,6 @@ class Laporan extends Model
         'nik',
     ];
 
-
-
     public function scopeFilter($query, array $filters)
     {
 
@@ -40,7 +38,6 @@ class Laporan extends Model
     }
 
     //Relasi
-
     public function masyarakat()
     {
         return $this->belongsTo(Masyarakat::class, 'nik', 'nik');

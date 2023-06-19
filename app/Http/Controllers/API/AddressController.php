@@ -15,6 +15,7 @@ class AddressController extends Controller
     {
         try {
             $provinsi = Provinsi::all();
+
             return response()->json([
                 'kode' => 200,
                 'status' => true,

@@ -18,7 +18,6 @@ class Fqa extends Model
         'admin_id',
     ];
 
-
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['cari'] ?? false, function ($query, $cari) {

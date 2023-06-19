@@ -38,6 +38,10 @@ class AuthServiceProvider extends ServiceProvider
             return $user->role === 'administrator';
         });
 
+        Gate::define('only-masyarakat', function (User $user) {
+            return $user->role === 'masyarakat';
+        });
+
         Gate::define('isOwner', function (User $user, Laporan $laporan) {
             $masy = Masyarakat::where('user_id', $user->id_user)->first();
             return $masy->nik === $laporan->nik;

@@ -33,11 +33,18 @@ Route::middleware('auth:sanctum')->group(
     function () {
 
         /// API APLIKASI MASYARAKAT DAN PENGAWAS
+
         // User
         Route::get('/user', [UserController::class, 'fetchUser']);
         Route::post('/user/update', [UserController::class, 'updateProfile']);
         Route::post('/user/pengawas', [PengawasController::class, 'create']);
         Route::post('/user/admin', [AdministratorController::class, 'create']);
+
+        // User Profile
+        Route::get('/user/profile', [MasyarakatController::class, 'getProfile']);
+
+        // ALL User
+        Route::get('/user/all', [UserController::class, 'getAllUser']);
 
         //LAPORAN
         Route::get('/laporan', [LaporanController::class, 'getAll']);
@@ -47,13 +54,9 @@ Route::middleware('auth:sanctum')->group(
         Route::put('/laporan/{nomor_laporan}', [LaporanController::class, 'update']);
         Route::get('/user/laporan/', [LaporanController::class, 'getUserLaporan']);
 
-
-        Route::get('/user/profile', [MasyarakatController::class, 'getProfile']);
-
-        // Progress Laporan
+        // Progress Laporan (Respon Laporan)
         Route::post('/laporan/respon/{id}', [ProgressController::class, 'responLaporan']);
         Route::get('/laporan/{nomor_laporan}/progress/', [ProgressController::class, 'getProgressLaporan']);
-
 
         // Pemilu
         Route::get('/pemilu', [PemiluController::class, 'getAll']);
@@ -74,9 +77,6 @@ Route::middleware('auth:sanctum')->group(
         Route::put('/jenis-pemilu/{id}', [JenisPemiluController::class, 'update']);
         Route::delete('/jenis-pemilu/{id}', [JenisPemiluController::class, 'delete']);
 
-        Route::get('/user/all', [UserController::class, 'getAllUser']);
-
-
         // Auth
         Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -91,4 +91,4 @@ Route::middleware('auth:sanctum')->group(
 Route::Post('/user/login', [AuthController::class, 'login']);
 
 // REGISTRASI MASYARAKAT
-Route::Post('/user/register', [AuthController::class, 'register']);
+Route::Post('/user/register', [MasyarakatController::class, 'register']);

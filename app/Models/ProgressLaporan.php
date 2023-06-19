@@ -12,14 +12,12 @@ class ProgressLaporan extends Model
     protected $table = 'progress_laporan';
     protected $primaryKey = 'id_progress';
 
-
     protected $fillable = [
         'nomor_laporan',
         'pengawas_id',
         'status',
         'keterangan'
     ];
-
 
     public function laporan()
     {

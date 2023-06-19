@@ -22,8 +22,6 @@ class Pemilu extends Model
 
     ];
 
-
-
     public function scopeSearch($query, array $filters)
     {
         //Pencarian berdasarkan nama

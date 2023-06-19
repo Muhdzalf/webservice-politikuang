@@ -5,179 +5,225 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Alamat;
 use App\Models\Pemilu;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Throwable;
 
 class PemiluController extends Controller
 {
     public function create(Request $request)
     {
-        if (!Gate::allows('only-admin')) {
-            return response()->json([
-                'kode' => 403,
-                'status' => false,
-                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini.'
-            ], 403);
-        }
+        $kode = 200;
+        try {
+            if (!Gate::allows('only-admin')) {
+                $kode = 403;
+                throw new Exception('Akses ditolak. Hanya petugas yang memiliki akses untuk fitur ini');
+            }
+            $request->validate([
+                'nama' => 'required|string',
+                'tanggal_pelaksanaan' => 'required|date_format:Y-m-d',
+                'waktu_pelaksanaan' => 'required|date_format:H:i',
+                'jenis_id' => 'required|numeric',
 
-        $request->validate([
-            'nama' => 'required|string',
-            'tanggal_pelaksanaan' => 'required|date_format:Y-m-d',
-            'waktu_pelaksanaan' => 'required|date_format:H:i',
-            'jenis_id' => 'required|numeric',
-
-            // validation for alamat
-            'kecamatan_id' => 'required|numeric',
-            'kabupaten_kota_id' => 'required|numeric',
-            'provinsi_id' => 'required|numeric',
-            'desa' => 'required|string',
-            'detail_alamat' => 'required|string'
-        ]);
-
-        //default alamat
-        $alamatId = 0;
-
-        $alamat = Alamat::create([
-            'kecamatan_id' => $request->kecamatan_id,
-            'kabupaten_kota_id' => $request->kabupaten_kota_id,
-            'provinsi_id' => $request->provinsi_id,
-            'desa' => $request->desa,
-            'detail_alamat' => $request->detail_alamat,
-        ]);
-
-        if (!$alamat) {
-            return response()->json([
-                'kode' => 500,
-                'status' => false,
-                'message' => 'Terdapat kesalahan pada alamat',
+                // validation for alamat
+                'kecamatan_id' => 'required|numeric',
+                'kabupaten_kota_id' => 'required|numeric',
+                'provinsi_id' => 'required|numeric',
+                'desa' => 'required|string',
+                'detail_alamat' => 'required|string'
             ]);
-        }
+            $alamat = Alamat::create([
+                'kecamatan_id' => $request->kecamatan_id,
+                'kabupaten_kota_id' => $request->kabupaten_kota_id,
+                'provinsi_id' => $request->provinsi_id,
+                'desa' => $request->desa,
+                'detail_alamat' => $request->detail_alamat,
+            ]);
 
-        // get alamat id
-        $alamatId = $alamat->id_alamat;
+            // get alamat id
+            $alamatId = $alamat->id_alamat;
 
-        $pemilu = Pemilu::create([
-            'nama' => $request->nama,
-            'tanggal_pelaksanaan' => $request->tanggal_pelaksanaan,
-            'waktu_pelaksanaan' => $request->waktu_pelaksanaan,
-            'jenis_id' => $request->jenis_id,
-            'alamat_id' => $alamatId,
-        ]);
+            if (!$alamat || !$alamatId) {
+                $kode = 500;
+                throw new Exception('Terdapat Kesalahan Pada Alamat');
+            }
 
-        return response()->json([
-            'kode' => 200,
-            'status' => true,
-            'message' => 'Data pemilu berhasil ditambahkan',
-            'data' => $pemilu
-        ]);
+            $pemilu = Pemilu::create([
+                'nama' => $request->nama,
+                'tanggal_pelaksanaan' => $request->tanggal_pelaksanaan,
+                'waktu_pelaksanaan' => $request->waktu_pelaksanaan,
+                'jenis_id' => $request->jenis_id,
+                'alamat_id' => $alamatId,
+            ]);
+
+            if (!$pemilu) {
+                $kode = 400;
+                throw new Exception('Terdapat Kesalahan pada Data Pemilu');
+            }
+
+            return response()->json([
+                'kode' => 200,
+                'status' => true,
+                'message' => 'Data pemilu berhasil ditambahkan',
+                'data' => $pemilu
+            ]);
+        } catch (Throwable $err) {
+            return response()->json([
+                'kode' => $kode,
+                'status' => false,
+                'message' => 'Gagal: ' . $err->getMessage(),
+            ], $kode);
+        };
     }
 
     public function getAll()
     {
+        $kode = 200;
+        try {
+            $data = Pemilu::query()->search(request(['nama', 'id']))->get();
+            if (is_null($data)) {
+                $kode = 404;
+                throw new Exception('Data Pemilu Tidak Ditemukan');
+            }
 
-        $data = Pemilu::query()->search(request(['nama', 'id']))->get();
-        if (count($data) < 1) {
             return response()->json([
-                'kode' => 404,
+                'kode' => 200,
+                'status' => true,
+                'message' => 'Data Pemilu Berhasil Diambil',
+                'data' => $data
+            ]);
+        } catch (Throwable $err) {
+            return response()->json([
+                'kode' => $kode,
                 'status' => false,
                 'message' => 'Data Pemilu Tidak Ditemukan',
-            ], 404);
-        }
-        // }
-
-        return response()->json([
-            'kode' => 200,
-            'status' => true,
-            'message' => 'Data Pemilu Berhasil Diambil',
-            'data' => $data
-        ]);
+            ], $kode);
+        };
     }
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('only-admin')) {
+        $kode = 200;
+        try {
+            if (!Gate::allows('only-admin')) {
+                $kode = 403;
+                throw new Exception('Akses ditolak. Hanya petugas yang memiliki akses untuk fitur ini');
+            }
+
+            //validation
+            $request->validate([
+                'nama' => 'required|string',
+                'tanggal_pelaksanaan' => 'required|date_format:Y-m-d',
+                'jenis_id' => 'required|numeric',
+
+                // validation for alamat
+                'kecamatan_id' => 'required|numeric',
+                'kabupaten_kota_id' => 'required|numeric',
+                'provinsi_id' => 'required|numeric',
+                'desa' => 'required|string',
+            ]);
+
+            // Mencari data pemilu yang sesuai dengan id
+            $pemilu = Pemilu::find($id);
+
+            if(!$pemilu){
+                $kode = 404;
+                throw new Exception('Data Pemilu Tidak Ditemukan');
+            }
+
+            // update data pemilu
+            $pemilu->nama = $request->nama;
+            $pemilu->tanggal_pelaksanaan = $request->tanggal_pelaksanaan;
+            $pemilu->waktu_pelaksanaan = $request->waktu_pelaksanaan;
+            $pemilu->jenis_id = $request->jenis_id;
+            $pemilu->save();
+
+            $alamat = Alamat::find($pemilu->alamat_id);
+
+            if(!$alamat){
+                $kode = 404;
+                throw new Exception('Data Alamat Tidak Ditemukan');
+            }
+
+            //update data Alamat
+            $alamat->provinsi_id = $request->provinsi_id;
+            $alamat->kabupaten_kota_id = $request->kabupaten_kota_id;
+            $alamat->kecamatan_id = $request->kecamatan_id;
+            $alamat->desa = $request->desa;
+            $alamat->save();
+
             return response()->json([
-                'kode' => 403,
+                'kode' => 200,
+                'status' => true,
+                'message' => 'Data Pemilu Berhasil Diperbaharui',
+                'data' => $pemilu,
+            ]);
+        } catch (Throwable $err) {
+            return response()->json([
+                'kode' => $kode,
                 'status' => false,
-                'message' => 'Akses ditolak. Hanya petugas yang memiliki akses untuk fitur ini'
-            ], 403);
-        }
-
-        //validation
-        $request->validate([
-            'nama' => 'required|string',
-            'tanggal_pelaksanaan' => 'required|date_format:Y-m-d',
-            'jenis_id' => 'required|numeric',
-
-            // validation for alamat
-            'kecamatan_id' => 'required|numeric',
-            'kabupaten_kota_id' => 'required|numeric',
-            'provinsi_id' => 'required|numeric',
-            'desa' => 'required|string',
-        ]);
-
-        // Mencari data pemilu yang sesuai dengan id
-        $pemilu = Pemilu::find($id);
-
-        // update data pemilu
-        $pemilu->nama = $request->nama;
-        $pemilu->tanggal_pelaksanaan = $request->tanggal_pelaksanaan;
-        $pemilu->waktu_pelaksanaan = $request->waktu_pelaksanaan;
-        $pemilu->jenis_id = $request->jenis_id;
-        $pemilu->save();
-
-        $alamat = Alamat::find($pemilu->alamat_id);
-
-        //update data provinsi
-        $alamat->provinsi_id = $request->provinsi_id;
-        $alamat->kabupaten_kota_id = $request->kabupaten_kota_id;
-        $alamat->kecamatan_id = $request->kecamatan_id;
-        $alamat->desa = $request->desa;
-        $alamat->save();
-
-        return response()->json([
-            'kode' => 200,
-            'status' => true,
-            'message' => 'Data Pemilu Berhasil Diperbaharui',
-            'data' => $pemilu,
-        ]);
+                'message' => 'Gagal: ' . $err->getMessage(),
+            ], $kode);
+        };
     }
 
     public function details($id)
     {
+        $kode = 200;
+        try {
+            $pemilu = Pemilu::find($id)->first();
+            if (!$pemilu) {
+                $kode = 404;
+                throw new Exception('Data Tidak ditemukan');
+            }
+            return response()->json([
+                'kode' => 200,
+                'status' => true,
+                'message' => 'Data Pemilu Berhasil Diambil',
+                'data' => $pemilu
+            ]);
+        } catch (Throwable $err) {
+            return response()->json([
+                'kode' => $kode,
+                'status' => false,
+                'message' => 'Gagal: ' . $err->getMessage(),
+            ], $kode);
+        };
         // if (!Gate::allows('only-admin')) {
         //     return response()->json([
         //         'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
         //     ], 403);
         // }
-
-        $pemilu = Pemilu::find($id)->first();
-
-        return response()->json([
-            'kode' => 200,
-            'status' => true,
-            'message' => 'Data Pemilu Berhasil Diambil',
-            'data' => $pemilu
-        ]);
     }
 
     public function delete($id)
     {
-        if (!Gate::allows('only-admin')) {
+        $kode = 200;
+        try {
+            if (!Gate::allows('only-admin')) {
+                $kode = 403;
+                throw new Exception('Akses ditolak. Hanya petugas yang memiliki akses untuk fitur ini');
+            }
+
+            $pemilu = Pemilu::find($id)->first();
+            if (!$pemilu) {
+                $kode = 404;
+                throw new Exception('Data Tidak ditemukan');
+            }
+            $pemilu->delete();
+
             return response()->json([
-                'kode' => 403,
+                'kode' => 200,
+                'status' => true,
+                'message' => 'Data Pemilu Berhasil Dihapus',
+            ], 200);
+        } catch (Throwable $err) {
+            return response()->json([
+                'kode' => $kode,
                 'status' => false,
-                'message' => 'Akses ditolak. Hanya petugas yang memiliki akses untuk fitur ini'
-            ], 403);
-        }
-
-        $pemilu = Pemilu::find($id)->first();
-        $pemilu->delete();
-
-        return response()->json([
-            'kode' => 200,
-            'status' => true,
-            'message' => 'Data Pemilu Berhasil Dihapus',
-        ], 200);
+                'message' => 'Gagal: ' . $err->getMessage(),
+            ], $kode);
+        };
     }
 }

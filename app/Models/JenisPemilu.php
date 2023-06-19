@@ -16,7 +16,6 @@ class JenisPemilu extends Model
         'nama',
     ];
 
-
     public function pemilu()
     {
         return $this->hasMany(Pemilu::class, 'jenis_id', 'id_jenis');

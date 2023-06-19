@@ -21,7 +21,6 @@ class Alamat extends Model
         'detail_alamat'
     ];
 
-
     public function pemilu()
     {
         return $this->hasOne(Pemilu::class, 'alamat_id', 'id_alamat');

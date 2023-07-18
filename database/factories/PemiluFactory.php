@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Admin;
+use App\Models\Administrator;
 use App\Models\Alamat;
 use App\Models\JenisPemilu;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -21,8 +23,10 @@ class PemiluFactory extends Factory
         return [
             'nama' => 'Test Nama Pemilu ' . $this->faker->numberBetween(1, 500),
             'tanggal_pelaksanaan' => $this->faker->dateTimeBetween('now', '+2 months'),
+            'waktu_pelaksanaan' => $this->faker->time('H:i'),
             'jenis_id' => JenisPemilu::factory(),
             'alamat_id' => Alamat::factory()->generateGarutJawaBarat()->create(),
+            'admin_id' => Administrator::factory()
         ];
     }
 }

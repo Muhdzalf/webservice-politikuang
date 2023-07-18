@@ -10,20 +10,25 @@ class Alamat extends Model
 {
     use HasFactory;
 
-    protected $table = 'alamat_pemilu';
+    protected $table = 'alamat';
+    protected $primaryKey = 'id_alamat';
 
     protected $fillable = [
         'kecamatan_id',
         'kabupaten_kota_id',
         'provinsi_id',
-        'desa'
+        'desa',
+        'detail_alamat'
     ];
-
-    protected $primaryKey = 'id_alamat';
 
     public function pemilu()
     {
-        return $this->hasOne(User::class, 'alamat_id', 'id_alamat');
+        return $this->hasOne(Pemilu::class, 'alamat_id', 'id_alamat');
+    }
+
+    public function masyarakat()
+    {
+        return $this->hasOne(Masyarakat::class, 'alamat_id', 'id_alamat');
     }
 
     public function provinsi()
@@ -32,7 +37,7 @@ class Alamat extends Model
     }
     public function kabupaten()
     {
-        return $this->belongsTo(Kabupaten::class, 'kabupaten_kota_id', 'id_kabupaten)kota');
+        return $this->belongsTo(KabupatenKota::class, 'kabupaten_kota_id', 'id_kabupaten_kota');
     }
     public function kecamatan()
     {

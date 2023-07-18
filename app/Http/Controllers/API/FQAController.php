@@ -4,102 +4,151 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Fqa;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class FQAController extends Controller
 {
 
     public function getAll()
     {
-        $fqa = Fqa::query()->filter(request(['cari']))->get();
-        if (count($fqa) < 1) {
-            return response()->json([
-                'kode' => 404,
-                'status' => 'Not Found',
-                'message' => 'Data FQA yang anda cari tidak ditemukan',
-            ], 404);
-        }
+        $kode = 200;
+        try {
+            $fqa = Fqa::query()->filter(request(['cari']))->get();
+            if (is_null($fqa)) {
+                $kode = 404;
+                throw new Exception('Data FQA Tidak Ditemukan');
+            }
 
-        return response()->json([
-            'kode' => 200,
-            'status' => 'OK',
-            'message' => 'Data FQA berhasil diambil',
-            'data' => $fqa
-        ], 200);
+            return response()->json([
+                'kode' => 200,
+                'status' => true,
+                'message' => 'Data FQA berhasil diambil',
+                'data' => $fqa
+            ], 200);
+        } catch (Throwable $err) {
+            return response()->json([
+                'kode' => $kode,
+                'status' => false,
+                'message' => 'Gagal: ' . $err->getMessage(),
+            ], $kode);
+        }
     }
 
     public function create(Request $request)
     {
-        if (!Gate::allows('only-petugas')) {
-            return response()->json([
-                'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya petugas yang memiliki akses untuk fitur ini'
-            ], 403);
-        }
-        $request->validate([
+        $kode = 200;
+        $rules = [
             'pertanyaan' => 'required|string',
             'jawaban' => 'required|string'
-        ]);
+        ];
+        try {
+            if (!Gate::allows('only-admin')) {
+                $kode = 403;
+                throw new Exception('Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini');
+            }
+            $validator = Validator::make($request->all(), $rules);
 
-        $fqa = Fqa::create([
-            'pertanyaan' => $request->pertanyaan,
-            'jawaban' => $request->jawaban
-        ]);
+            if($validator->fails()){
+                $kode = 400;
+                throw new Exception($validator->messages()->first());
+            }
 
-        return response()->json([
-            'kode' => 200,
-            'status' => 'OK',
-            'message' => 'Data FQA Berhasil Ditambahkan',
-            'data' => $fqa
-        ]);
+
+            $fqa = Fqa::create([
+                'pertanyaan' => $request->pertanyaan,
+                'jawaban' => $request->jawaban,
+                'admin_id' => Auth::user()->administrator->id_admin
+            ]);
+
+            return response()->json([
+                'kode' => 200,
+                'status' => true,
+                'message' => 'Data FQA Berhasil Ditambahkan',
+                'data' => $fqa
+            ]);
+        } catch (Throwable $err) {
+            return response()->json([
+                'kode' => $kode,
+                'status' => false,
+                'message' => 'Gagal: ' . $err->getMessage(),
+            ], $kode);
+        }
     }
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('only-petugas')) {
+        $kode = 200;
+        try {
+            if (!Gate::allows('only-admin')) {
+                $kode = 403;
+                throw new Exception('Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini');
+            }
+            $fqa = Fqa::find($id);
+
+            $request->validate([
+                'pertanyaan' => 'required|string',
+                'jawaban' => 'required|string'
+            ]);
+
+            if(!$fqa){
+                $kode = 404;
+                throw new Exception('Data Tidak Ditemukan');
+            }
+
+            $fqa->pertanyaan = $request->pertanyaan;
+            $fqa->jawaban = $request->jawaban;
+            $fqa->admin_id = $fqa->admin_id;
+            $fqa->save();
+
             return response()->json([
-                'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya petugas yang memiliki akses untuk fitur ini'
-            ], 403);
+                'kode' => 200,
+                'status' => true,
+                'message' => 'Data FQA Berhasil Diperbaharui',
+                'data' => $fqa
+            ], 200);
+        } catch (Throwable $err) {
+            return response()->json([
+                'kode' => $kode,
+                'status' => false,
+                'message' => 'Gagal: ' . $err->getMessage(),
+            ], $kode);
         }
-        $fqa = Fqa::find($id);
-
-        $request->validate([
-            'pertanyaan' => 'required|string',
-            'jawaban' => 'required|string'
-        ]);
-
-        $fqa->pertanyaan = $request->pertanyaan;
-        $fqa->jawaban = $request->jawaban;
-        $fqa->save();
-
-        return response()->json([
-            'kode' => 200,
-            'status' => 'OK',
-            'message' => 'Data FQA Berhasil Diperbaharui',
-            'data' => $fqa
-        ], 200);
     }
 
     public function delete($id)
     {
-        if (!Gate::allows('only-petugas')) {
-            return response()->json([
-                'kode' => 403,
-                'status' => 'Forbidden',
-                'message' => 'Anda tidak memiliki akses untuk fitur ini, Hanya petugas yang memiliki akses untuk fitur ini'
-            ], 403);
-        }
-        $fqa = Fqa::find($id);
-        $fqa->delete();
+        $kode = 200;
+        try {
+            if (!Gate::allows('only-admin')) {
+                $kode = 403;
+                throw new Exception('Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini');
+            }
 
-        return response()->json([
-            'kode' => 200,
-            'status' => 'OK',
-            'message' => 'Data FQA berhasil Dihapus',
-        ], 200);
+            $fqa = Fqa::find($id);
+
+            if (!$fqa) {
+                $kode = 404;
+                throw new Exception('Data Tidak Ditemukan');
+            }
+
+            $fqa->delete();
+
+            return response()->json([
+                'kode' => 200,
+                'status' => true,
+                'message' => 'Data FQA berhasil Dihapus',
+            ], 200);
+        } catch (Throwable $err) {
+            return response()->json([
+                'kode' => $kode,
+                'status' => false,
+                'message' => 'Gagal: ' . $err->getMessage(),
+            ], $kode);
+        }
     }
 }

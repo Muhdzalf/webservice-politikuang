@@ -17,6 +17,11 @@ return new class extends Migration
             $table->id('id_fqa');
             $table->string('pertanyaan', 150);
             $table->text('jawaban');
+
+            // foreign key to admin_id
+            $table->unsignedBigInteger('admin_id')->nullable();
+            $table->foreign('admin_id')->references('id_admin')->on('administrator')->cascadeOnUpdate()->nullOnDelete();
+
             $table->timestamps();
         });
     }

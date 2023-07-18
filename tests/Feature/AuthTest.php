@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\Alamat;
+use App\Models\Masyarakat;
 use App\Models\User;
 use Tests\TestCase;
 use Faker\Factory as Faker;
-
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
 
 class AuthTest extends TestCase
 {
@@ -14,170 +17,196 @@ class AuthTest extends TestCase
      *
      * @return void
      */
-    public function test_user_success_register()
+
+    public function test_masyarakat_success_register()
     {
         $faker = Faker::create('id_ID');
+        $nik = $faker->numerify('320506######0002');
+        $email = $faker->safeEmail();
 
-        $masyarakatData = [
-            'nik' => $faker->numerify('320506##########'),
-            'nama' => $faker->name(),
-            'email' => $faker->safeEmail(),
+        $payload = [
+            'nik' => $nik,
+            'nama' => 'Muhammad Dzalfiqri Sabani',
+            'email' => $email,
             'password' => '12345678',
             'tanggal_lahir' => '2000-12-12',
-            'jenis_kelamin' => $faker->randomElement(['L', 'P']),
-            'no_hp' => $faker->numerify('08232013####'),
-            'alamat' => $faker->address(),
-            'pekerjaan' => $faker->jobTitle(),
+            'jenis_kelamin' => 'L',
+            'no_hp' => '085156184235',
+
+            // Data Alamat
+            'provinsi_id' => 32,
+            'kabupaten_kota_id' => 3205,
+            'kecamatan_id' => 3205230,
+            'desa' => 'Desa Sukaratu',
+            'detail_alamat' => 'Kampung Sompok',
+
+            'pekerjaan' => 'Mahasiswa',
             'kewarganegaraan' => 'Indonesia',
-            'role' => 'masyarakat',
         ];
 
-        $response = $this->postJson('api/register', $masyarakatData);
+        $response = $this->postJson('api/user/register', $payload);
 
         $response->assertOk()->assertJsonStructure([
             'kode',
             'status',
             'message',
-            'access_token',
-            'type',
             'data' => [
-                'nik',
+                'id_user',
                 'nama',
                 'email',
-                'tanggal_lahir',
-                'jenis_kelamin',
-                'no_hp',
-                'alamat',
-                'pekerjaan',
-                'kewarganegaraan',
                 'role',
+                'access_token',
+                'type',
             ],
         ]);
     }
 
-    // user registrasi tanpa mencantumkan email (data tidak lengkap)
-    public function test_user_get_a_validation_error_when_register_without_email()
+    // user registrasi tanpa mencantumkan data
+    public function test_masyarakat_get_a_validation_error_when_try_to_register_without_nik_data()
     {
         $faker = Faker::create('id_ID');
-        $masyarakatData = [
-            'nik' => $faker->numerify('320506##########'),
-            'nama' => $faker->name(),
+        $email = $faker->safeEmail();
+
+        $payload = [
+            'nik' => '',
+            'nama' => 'Muhammad Dzalfiqri Sabani',
+            'email' => $email,
             'password' => '12345678',
             'tanggal_lahir' => '2000-12-12',
-            'jenis_kelamin' => $faker->randomElement(['L', 'P']),
-            'no_hp' => $faker->numerify('08232013####'),
-            'alamat' => $faker->address(),
-            'pekerjaan' => $faker->jobTitle(),
+            'jenis_kelamin' => 'L',
+            'no_hp' => '085156184235',
+
+            // Data Alamat
+            'provinsi_id' => 32,
+            'kabupaten_kota_id' => 3205,
+            'kecamatan_id' => 3205230,
+            'desa' => 'Desa Sukaratu',
+            'detail_alamat' => 'Kampung Sompok',
+
+            'pekerjaan' => 'Mahasiswa',
             'kewarganegaraan' => 'Indonesia',
-            'role' => 'masyarakat',
         ];
 
-        $response = $this->postJson('api/register', $masyarakatData, ['Accept' => 'application/json']);
+        $response = $this->postJson('api/user/register', $payload, ['Accept' => 'application/json']);
 
-        $response->assertUnprocessable()->assertJson([
-            'message' => 'The email field is required.',
-            'errors' => [
-                'email' => ['The email field is required.']
-            ]
+
+        $response->assertStatus(400)->assertJson([
+            'kode' => 400,
+            'status' => false,
+            'message' => 'Gagal: The nik field is required.',
         ]); //422
     }
 
-    public function test_user_get_a_validation_error_when_register_with_registered_email()
+    // Test registrasi dengan email yang sudah digunakan
+    public function test_masyarakat_get_a_validation_error_when_try_to_register_with_registered_email()
     {
         $faker = Faker::create('id_ID');
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
 
-        // membuat user dengan email example@gmail.com
-        User::factory()->create(['email' => 'example@gmail.com']);
-
-        $newData = [
-            'nik' => $faker->numerify('320506##########'),
-            'nama' => $faker->name(),
-            'email' => 'example@gmail.com',
+        $payload = [
+            'nik' => $faker->numerify('320506######0002'),
+            'nama' => 'Muhammad Dzalfiqri Sabani',
+            'email' => $masyarakat->email,
             'password' => '12345678',
             'tanggal_lahir' => '2000-12-12',
-            'jenis_kelamin' => $faker->randomElement(['L', 'P']),
-            'no_hp' => $faker->numerify('08232013####'),
-            'alamat' => $faker->address(),
-            'pekerjaan' => $faker->jobTitle(),
+            'jenis_kelamin' => 'L',
+            'no_hp' => '085156184235',
+            'provinsi_id' => 32,
+            'kabupaten_kota_id' => 3205,
+            'kecamatan_id' => 3205230,
+            'desa' => 'Desa Sukaratu',
+            'detail_alamat' => 'Aula Desa',
+            'pekerjaan' => 'Mahasiswa',
             'kewarganegaraan' => 'Indonesia',
-            'role' => 'masyarakat',
         ];
 
         // $this->withoutExceptionHandling();
-        $response = $this->postJson('api/register', $newData);
+        $response = $this->postJson('api/user/register', $payload, ['Accept' => 'application/json']);
 
 
-        $response->assertUnprocessable()->assertJson([
-            'message' => 'The email has already been taken.',
-            'errors' => [
-                'email' => ['The email has already been taken.']
-            ]
-        ]); //422
+        $response->assertStatus(400)->assertJson([
+            'kode' => 400,
+            'status' => false,
+            'message' => 'Gagal: The email has already been taken.',
+        ]); //400
     }
 
+    // test dengan tanpa mengisi kolom email dan password
     public function test_required_field_for_login()
     {
-        $response = $this->postJson('api/login', []);
+        $response = $this->postJson('api/user/login', []);
 
-        $response->assertUnprocessable()->assertJson([
-            'message' => 'The email field is required. (and 1 more error)',
-            'errors' => [
-                'email' => ['The email field is required.'],
-                'password' => ['The password field is required.'],
-            ]
+        $response->assertStatus(400)->assertJson([
+            'kode' => 400,
+            'status' => false,
+            'message' => 'Gagal: The email field is required.',
         ]);
     }
 
+    // test login berhasil
     public function test_user_success_login()
     {
-        $response = $this->postJson('api/login', [
-            'email' => 'example@gmail.com',
+        $payload = User::factory()->has(Masyarakat::factory())->create();
+
+        $response = $this->postJson('api/user/login', [
+            'email' => $payload->email,
             'password' => '12345678'
         ]);
 
         $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
             'message',
             'data' => [
+                'id_user',
                 'nama',
-                'nik',
                 'email',
-                'tanggal_lahir',
-                'jenis_kelamin',
-                'no_hp',
-                'alamat',
-                'pekerjaan',
-                'kewarganegaraan',
                 'role',
-            ]
+                'access_token',
+                'type',
+            ],
         ]);
     }
 
-    public function test_user_get_a_unauthorized_error_when_login_with_wrong_email_or_password()
+    public function test_user_get_a_bad_request_error_when_login_with_wrong_email()
     {
-        $response = $this->postJson('api/login', [
-            'email' => 'example01@gmail.com', //registered email is 'example@gmail.com
-            'password' => '123456789'
+        $response = $this->postJson('api/user/login', [
+            'email' => 'testemail@gmail.com', //registered email is 'muhdzalfikri@gmail.com
+            'password' => '12345678'
         ]);
-        $response->assertUnauthorized()->assertJson([
-            'kode' => 401,
-            'status' => 'Unauthorized',
-            'message' => 'Proses login gagal, siahkan cek kembali email dan password Anda'
+        $response->assertStatus(400)->assertJson([
+            'kode' => 400,
+            'status' => false,
+            'message' => 'Gagal: Cek kembali email dan password Anda',
         ]);
     }
 
-    // public function test_user_success_logout()
-    // {
-    //     $user = User::factory()->create();
-    //     Sanctum::actingAs($user['logout']);
+    public function test_user_get_a_bad_request_error_when_login_with_wrong_password()
+    {
+        $response = $this->postJson('api/user/login', [
+            'email' => 'muhdzalfikri@gmail.com',
+            'password' => '87654321' // wrong password
+        ]);
+        $response->assertStatus(400)->assertJson([
+            'kode' => 400,
+            'status' => false,
+            'message' => 'Gagal: Cek kembali email dan password Anda',
+        ]);
+    }
 
-    //     $token = $user->tokens();
+    public function test_user_success_logout()
+    {
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
+        $token = $masyarakat->createToken('usertoken')->plainTextToken;
 
-    //     $response = $this->postJson('api/logout', [], ['Authorization' => $token]); //token ada pada header
+        Sanctum::actingAs($masyarakat);
 
-    //     $response->assertOk()->assertJson([
-    //         'kode' => 200,
-    //         'status' => 'OK',
-    //         'message' => 'Logout Berhasil',
-    //     ]);
-    // }
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->postJson('api/logout',); //token ada pada header
+
+        $response->assertOk()->assertJson([
+            'kode' => 200,
+            'status' => 'OK',
+            'message' => 'Logout Berhasil',
+        ]);
+    }
 }

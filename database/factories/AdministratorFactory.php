@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\JenisPemilu>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
  */
-class JenisPemiluFactory extends Factory
+class AdministratorFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,7 +18,7 @@ class JenisPemiluFactory extends Factory
     public function definition()
     {
         return [
-            'nama' => 'Contoh jenis pemilu ' . $this->faker->randomNumber(),
+            'user_id' => User::factory(),
         ];
     }
 }

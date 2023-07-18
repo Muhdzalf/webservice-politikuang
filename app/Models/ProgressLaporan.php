@@ -10,24 +10,22 @@ class ProgressLaporan extends Model
     use HasFactory;
 
     protected $table = 'progress_laporan';
-
+    protected $primaryKey = 'id_progress';
 
     protected $fillable = [
         'nomor_laporan',
-        'nik',
+        'pengawas_id',
         'status',
         'keterangan'
     ];
-
-    protected $primaryKey = 'id_progress';
 
     public function laporan()
     {
         return $this->belongsTo(Laporan::class, 'nomor_laporan', 'nomor_laporan');
     }
 
-    public function user()
+    public function pengawas()
     {
-        return $this->belongsTo(User::class, 'nik', 'nik');
+        return $this->belongsTo(Pengawas::class, 'pengawas_id', 'id_pengawas');
     }
 }

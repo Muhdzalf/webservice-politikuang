@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Admin;
+use App\Models\Administrator;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +20,8 @@ class FqaFactory extends Factory
     {
         return [
             'pertanyaan' => $this->faker->sentence(),
-            'Jawaban' => $this->faker->paragraph()
+            'Jawaban' => $this->faker->paragraph(),
+            'admin_id' => Administrator::factory()
         ];
     }
 }

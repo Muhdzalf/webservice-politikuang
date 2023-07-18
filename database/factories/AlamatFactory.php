@@ -20,6 +20,9 @@ class AlamatFactory extends Factory
             'kecamatan_id' => 3205230, // Banyuresmi
             'kabupaten_kota_id' => 3205, // Kabupaten Garut
             'provinsi_id' => 32,
+            'desa' => 'Desa ' . $this->faker->numberBetween(0, 100),
+            'detail_alamat' => 'Kampung ' . $this->faker->randomLetter()
+
         ];
     }
 
@@ -30,7 +33,8 @@ class AlamatFactory extends Factory
                 'kecamatan_id' => 3205230, // Banyuresmi
                 'kabupaten_kota_id' => 3205, // Kabupaten Garut
                 'provinsi_id' => 32,
-                'desa' => 'Desa ' . $this->faker->numberBetween(0, 100)
+                'desa' => 'Desa ' . $this->faker->numberBetween(0, 100),
+                'detail_alamat' => 'Kampung ' . $this->faker->randomLetter()
             ];
         });
     }

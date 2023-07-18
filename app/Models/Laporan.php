@@ -11,6 +11,9 @@ class Laporan extends Model
     use HasFactory;
 
     protected $table = 'laporan';
+    protected $primaryKey = 'nomor_laporan';
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
         'nomor_laporan',
@@ -19,17 +22,12 @@ class Laporan extends Model
         'pemberi',
         'penerima',
         'tanggal_kejadian',
-        'alamat_kejadian',
+        'tempat_kejadian',
         'kronologi_kejadian',
         'bukti',
         'pemilu_id',
-        'pelapor',
+        'nik',
     ];
-
-    protected $primaryKey = 'nomor_laporan';
-    protected $keyType = 'string';
-    public $incrementing = false;
-
 
     public function scopeFilter($query, array $filters)
     {
@@ -40,11 +38,11 @@ class Laporan extends Model
     }
 
     //Relasi
-
-    public function user()
+    public function masyarakat()
     {
-        return $this->belongsTo(User::class, 'pelapor', 'nik');
+        return $this->belongsTo(Masyarakat::class, 'nik', 'nik');
     }
+
     public function pemilu()
     {
         return $this->belongsTo(Pemilu::class, 'pemilu_id', 'id_pemilu');

@@ -1,6 +1,5 @@
 <?php
 
-use Database\Seeders\KabupatenSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;
@@ -15,16 +14,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('kabupaten_kota', function (Blueprint $table) {
-            $table->char('id_kabupaten_kota', 4)->primary();
-            $table->string('nama', 40);
-            $table->char('provinsi_id', 2);
-            $table->foreign('provinsi_id')->references('id_provinsi')->on('provinsi')->onDelete('cascade')->onUpdate('cascade');
+        Schema::create('provinsi', function (Blueprint $table) {
+            $table->char('id_provinsi', 2)->primary();
+            $table->string('nama', 35);
             $table->timestamps();
         });
 
         Artisan::call('db:seed', [
-            '--class' => KabupatenSeeder::class
+            '--class' => ProvinsiSeeder::class
         ]);
     }
 
@@ -35,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('kabupaten_kota');
+        Schema::dropIfExists('provinsi');
     }
 };

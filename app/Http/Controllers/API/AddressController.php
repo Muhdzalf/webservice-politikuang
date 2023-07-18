@@ -15,35 +15,22 @@ class AddressController extends Controller
     {
         try {
             $provinsi = Provinsi::all();
+
+            if(is_null($provinsi)){
+                throw new Exception('Data Provinsi Tidak Ditemukan');
+            }
+
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'Data provinsi berhasil diambil',
                 'data' => $provinsi
             ]);
         } catch (Exception $error) {
             return response()->json([
-                'message' => 'Data provinsi gagal diambil',
-                'error' => $error
-            ]);
-        }
-    }
-
-    // Kabupaten
-    public function getAllKabupaten()
-    {
-        try {
-            $kabupaten = KabupatenKota::all();
-            return response()->json([
-                'kode' => 200,
-                'status' => 'OK',
-                'message' => 'Data kabupaten berhasil diambil',
-                'data' => $kabupaten
-            ]);
-        } catch (Exception $error) {
-            return response()->json([
-                'message' => 'Data kabupaten gagal diambil',
-                'error' => $error
+                'kode' => 404,
+                'status' => false,
+                'message' => 'Gagal: '. $error->getMessage(),
             ]);
         }
     }
@@ -52,35 +39,21 @@ class AddressController extends Controller
     {
         try {
             $kabupaten = KabupatenKota::query()->where('provinsi_id', $id)->get();
+            if(is_null($kabupaten)){
+                throw new Exception('Data Provinsi Tidak Ditemukan');
+            }
+
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'List kabupaten berhasil diambil',
                 'data' => $kabupaten
             ]);
         } catch (Exception $error) {
             return response()->json([
-                'message' => 'Data kabupaten gagal diambil',
-                'error' => $error
-            ]);
-        }
-    }
-
-    // Kecamatan
-    public function getAllKecamatan()
-    {
-        try {
-            $kecamatan = Kecamatan::all();
-            return response()->json([
-                'kode' => 200,
-                'status' => 'OK',
-                'message' => 'Data kecamatan berhasil diambil',
-                'data' => $kecamatan
-            ]);
-        } catch (Exception $error) {
-            return response()->json([
-                'message' => 'Data kecamatan gagal diambil',
-                'error' => $error
+                'kode' => 404,
+                'status' => false,
+                'message' => 'Gagal: '. $error->getMessage(),
             ]);
         }
     }
@@ -89,16 +62,20 @@ class AddressController extends Controller
     {
         try {
             $kecamatan = kecamatan::query()->where('kabupaten_kota_id', $id)->get();
+            if(is_null($kecamatan)){
+                throw new Exception('Data Provinsi Tidak Ditemukan');
+            }
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'List kecamatan berhasil diambil',
                 'data' => $kecamatan
             ]);
         } catch (Exception $error) {
             return response()->json([
-                'message' => 'Data kecamatan gagal diambil',
-                'error' => $error
+                'kode' => 404,
+                'status' => false,
+                'message' => 'Gagal: '. $error->getMessage(),
             ]);
         }
     }

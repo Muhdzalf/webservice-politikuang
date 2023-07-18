@@ -10,14 +10,12 @@ class KabupatenKota extends Model
     use HasFactory;
 
     protected $table = 'kabupaten_kota';
+    protected $primaryKey = 'id_kabupaten_kota';
 
     protected $fillable = [
         'nama',
         'provinsi_id'
     ];
-
-    protected $primaryKey = 'id_kabupaten_kota';
-
 
     public function provinsi()
     {

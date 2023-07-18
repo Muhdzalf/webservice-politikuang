@@ -24,13 +24,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => Hash::make('12345678'), // password
             'remember_token' => Str::random(10),
-            'nik' => $this->faker->numerify('320506##########'),
-            'tanggal_lahir' => '2000-12-12', // Valid Format Y-m-d
-            'jenis_kelamin' => $this->faker->randomElement(['L', 'P']),
             'no_hp' => $this->faker->numerify('08232013####'),
-            'alamat' => $this->faker->address(),
-            'pekerjaan' => $this->faker->jobTitle(),
-            'kewarganegaraan' => 'Indonesia',
             'role' => 'masyarakat',
         ];
     }
@@ -58,7 +52,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function admin()
+    public function administrator()
     {
         return $this->state(function (array $attributes) {
             return [

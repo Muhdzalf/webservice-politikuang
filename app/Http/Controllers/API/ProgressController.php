@@ -10,6 +10,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class ProgressController extends Controller
@@ -59,6 +60,11 @@ class ProgressController extends Controller
     // mengupdate hanya statusnya saja eh bukan update deng tapi nambahin status progress laporan
     public function responLaporan(Request $request, $nomor_laporan)
     {
+        $rules = [
+            'status' => 'required|string|in:diproses, ditolak, dikembalikan, selesai',
+            'keterangan' => 'required|string',
+        ];
+
         try{
             $kode = 200;
             if (!Gate::allows('only-petugas')) {
@@ -66,20 +72,22 @@ class ProgressController extends Controller
                 throw new Exception('Hanya petugas yang memiliki akses untuk fitur ini');
             }
 
-            $request->validate([
-                'status' => 'required|string|in:diproses, ditolak, dikembalikan, selesai',
-                'keterangan' => 'required|string',
-            ]);
+            $validator = Validator::make($request->all(), $rules);
+
+            if($validator->fails()){
+                $kode= 400;
+                throw new Exception($validator->messages()->first());
+            }
 
             $userId = Auth::user()->id_user;
             $pengawas = Pengawas::where('user_id', $userId)->first();
 
-            if(!$userId || $pengawas){
+            if(!$userId || !$pengawas){
                 $kode= 500;
                 throw new Exception('Terjadi Kesalahan pada sistem');
             }
 
-            ProgressLaporan::create([
+           $progress = ProgressLaporan::create([
                 'nomor_laporan' => $nomor_laporan,
                 'pengawas_id' => $pengawas->id_pengawas,
                 'status' => $request->status,
@@ -89,7 +97,8 @@ class ProgressController extends Controller
             return response()->json([
                 'kode' => 200,
                 'status' => true,
-                'message' => 'progress laporan dengan nomor '.'"'.$nomor_laporan.'"'. ' berhasil ditambahkan',
+                'message' => 'progress untuk laporan dengan nomor '.'"'.$nomor_laporan.'"'. ' berhasil ditambahkan',
+                'data' => $progress
             ]);
         }catch(Throwable $err){
             return response()->json([

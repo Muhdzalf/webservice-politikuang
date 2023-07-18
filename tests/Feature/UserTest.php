@@ -18,6 +18,71 @@ class UserTest extends TestCase
      * @return void
      */
 
+    public function test_admin_can_create_pengawas()
+    {
+        $faker = Faker::create('id_ID');
+
+        $admin = User::factory()->administrator()->create();
+
+        Sanctum::actingAs($admin);
+
+        $pengawasData = [
+            'nama' => $faker->name(),
+            'email' => $faker->safeEmail(),
+            'password' => '12345678',
+            'no_hp' => $faker->numerify('08232013####'),
+            'no_spt' => '01/SK/' . $faker->city() . '/V/2023',
+            'jabatan' => $faker->randomElement(['Ketua', 'Anggota']),
+            'mulai_tugas' => '2023-01-01',
+            'selesai_tugas' => '2023-06-01',
+            'role' => 'pengawas',
+        ];
+
+        $response = $this->postJson('api/user/pengawas', $pengawasData);
+
+        $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
+            'message',
+            'data' => [
+                'id_user',
+                'nama',
+                'email',
+                'role',
+            ]
+        ]);
+    }
+
+    public function test_admin_can_create_other_admin()
+    {
+        $faker = Faker::create('id_ID');
+
+        $admin = User::factory()->administrator()->create();
+
+        Sanctum::actingAs($admin);
+
+        $AdminData = [
+            'nama' => $faker->name(),
+            'email' => $faker->safeEmail(),
+            'password' => '12345678',
+            'no_hp' => $faker->numerify('08232013####'),
+        ];
+
+        $response = $this->postJson('api/user/admin', $AdminData);
+
+        $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
+            'message',
+            'data' => [
+                'id_user',
+                'nama',
+                'email',
+                'role',
+            ]
+        ]);
+    }
+
     public function test_authenticated_user_can_get_their_user_data()
     {
         // test with masyarakat
@@ -30,7 +95,23 @@ class UserTest extends TestCase
 
         $response = $this->getJson('api/user');
 
-        $response->assertOk()->dump();
+        $response->assertOk()->assertJsonStructure(
+            [
+                'kode',
+                'status',
+                'message',
+                'data' => [
+                    'id_user',
+                    'nama',
+                    'email',
+                    'no_hp',
+                    'role',
+                    'email_verified_at',
+                    'created_at',
+                    'updated_at',
+                ]
+            ]
+        );
     }
 
     public function test_user_can_update_profile_data()
@@ -41,22 +122,22 @@ class UserTest extends TestCase
 
         Sanctum::actingAs($masyarakat);
 
-        dump($masyarakat);
-
         // Terdapat Perubahaan pada nama dan alamat
         $dataBaru = [
-            'nama' => 'Nama Telah Diedit',
-            'email' => 'edditedemail@mail.com',
+            'nama' => $faker->name() . ' (edited)', // Edited Name
+            'email' => $masyarakat->email,
             'no_hp' => $masyarakat->no_hp,
         ];
 
-        $response = $this->postJson(
-            'api/user/update',
+        $response = $this->putJson(
+            'api/user',
             $dataBaru,
             ['Accept' => 'application/json']
         );
 
         $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
             'message',
             'data',
         ])->dump();
@@ -71,6 +152,17 @@ class UserTest extends TestCase
 
         $response = $this->getJson('api/user/all');
 
-        $response->assertOk()->dump();
+        $response->assertOk()->assertJsonStructure([
+                'kode',
+                'status',
+                'message',
+                'data' =>[
+                '*' => [
+                    'id_user',
+                    'nama',
+                    'email',
+                    'role',
+                ]]
+            ]);
     }
 }

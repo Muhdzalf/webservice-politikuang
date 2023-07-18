@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class FQAController extends Controller
@@ -25,7 +26,7 @@ class FQAController extends Controller
 
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'Data FQA berhasil diambil',
                 'data' => $fqa
             ], 200);
@@ -41,15 +42,22 @@ class FQAController extends Controller
     public function create(Request $request)
     {
         $kode = 200;
+        $rules = [
+            'pertanyaan' => 'required|string',
+            'jawaban' => 'required|string'
+        ];
         try {
             if (!Gate::allows('only-admin')) {
                 $kode = 403;
                 throw new Exception('Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini');
             }
-            $request->validate([
-                'pertanyaan' => 'required|string',
-                'jawaban' => 'required|string'
-            ]);
+            $validator = Validator::make($request->all(), $rules);
+
+            if($validator->fails()){
+                $kode = 400;
+                throw new Exception($validator->messages()->first());
+            }
+
 
             $fqa = Fqa::create([
                 'pertanyaan' => $request->pertanyaan,
@@ -59,7 +67,7 @@ class FQAController extends Controller
 
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'Data FQA Berhasil Ditambahkan',
                 'data' => $fqa
             ]);
@@ -99,7 +107,7 @@ class FQAController extends Controller
 
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'Data FQA Berhasil Diperbaharui',
                 'data' => $fqa
             ], 200);
@@ -132,7 +140,7 @@ class FQAController extends Controller
 
             return response()->json([
                 'kode' => 200,
-                'status' => 'OK',
+                'status' => true,
                 'message' => 'Data FQA berhasil Dihapus',
             ], 200);
         } catch (Throwable $err) {

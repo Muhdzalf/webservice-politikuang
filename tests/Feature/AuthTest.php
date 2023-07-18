@@ -21,20 +21,25 @@ class AuthTest extends TestCase
     public function test_masyarakat_success_register()
     {
         $faker = Faker::create('id_ID');
+        $nik = $faker->numerify('320506######0002');
+        $email = $faker->safeEmail();
 
         $payload = [
-            'nik' => $faker->numerify('320506######0002'),
+            'nik' => $nik,
             'nama' => 'Muhammad Dzalfiqri Sabani',
-            'email' => $faker->safeEmail(),
+            'email' => $email,
             'password' => '12345678',
             'tanggal_lahir' => '2000-12-12',
             'jenis_kelamin' => 'L',
             'no_hp' => '085156184235',
+
+            // Data Alamat
             'provinsi_id' => 32,
             'kabupaten_kota_id' => 3205,
             'kecamatan_id' => 3205230,
             'desa' => 'Desa Sukaratu',
-            'detail_alamat' => 'Aula Desa',
+            'detail_alamat' => 'Kampung Sompok',
+
             'pekerjaan' => 'Mahasiswa',
             'kewarganegaraan' => 'Indonesia',
         ];
@@ -45,62 +50,51 @@ class AuthTest extends TestCase
             'kode',
             'status',
             'message',
-            'access_token',
-            'type',
             'data' => [
+                'id_user',
                 'nama',
                 'email',
-                'no_hp',
                 'role',
+                'access_token',
+                'type',
             ],
         ]);
     }
 
     // user registrasi tanpa mencantumkan data
-    public function test_masyarakat_get_a_validation_error_when_try_to_register_without_data()
+    public function test_masyarakat_get_a_validation_error_when_try_to_register_without_nik_data()
     {
+        $faker = Faker::create('id_ID');
+        $email = $faker->safeEmail();
 
         $payload = [
             'nik' => '',
-            'nama' => '',
-            'email' => '',
-            'password' => '',
-            'tanggal_lahir' => '',
-            'jenis_kelamin' => '',
-            'no_hp' => '',
-            'provinsi_id' => '',
-            'kabupaten_kota_id' => '',
-            'kecamatan_id' => '',
-            'desa' => '',
-            'detail_alamat' => '',
-            'pekerjaan' => '',
-            'kewarganegaraan' => '',
+            'nama' => 'Muhammad Dzalfiqri Sabani',
+            'email' => $email,
+            'password' => '12345678',
+            'tanggal_lahir' => '2000-12-12',
+            'jenis_kelamin' => 'L',
+            'no_hp' => '085156184235',
+
+            // Data Alamat
+            'provinsi_id' => 32,
+            'kabupaten_kota_id' => 3205,
+            'kecamatan_id' => 3205230,
+            'desa' => 'Desa Sukaratu',
+            'detail_alamat' => 'Kampung Sompok',
+
+            'pekerjaan' => 'Mahasiswa',
+            'kewarganegaraan' => 'Indonesia',
         ];
 
         $response = $this->postJson('api/user/register', $payload, ['Accept' => 'application/json']);
 
-        $response->assertUnprocessable()->assertJsonStructure(
-            [
-                'message',
-                'errors' => [
-                    'nik',
-                    'nama',
-                    'email',
-                    'password',
-                    'tanggal_lahir',
-                    'jenis_kelamin',
-                    'no_hp',
-                    'provinsi_id',
-                    'kabupaten_kota_id',
-                    'kecamatan_id',
-                    'desa',
-                    'detail_alamat',
-                    'pekerjaan',
-                    'kewarganegaraan',
 
-                ]
-            ]
-        );
+        $response->assertStatus(400)->assertJson([
+            'kode' => 400,
+            'status' => false,
+            'message' => 'Gagal: The nik field is required.',
+        ]); //422
     }
 
     // Test registrasi dengan email yang sudah digunakan
@@ -130,12 +124,11 @@ class AuthTest extends TestCase
         $response = $this->postJson('api/user/register', $payload, ['Accept' => 'application/json']);
 
 
-        $response->assertUnprocessable()->assertJson([
-            'message' => 'The email has already been taken.',
-            'errors' => [
-                'email' => ['The email has already been taken.']
-            ]
-        ]); //422
+        $response->assertStatus(400)->assertJson([
+            'kode' => 400,
+            'status' => false,
+            'message' => 'Gagal: The email has already been taken.',
+        ]); //400
     }
 
     // test dengan tanpa mengisi kolom email dan password
@@ -143,12 +136,10 @@ class AuthTest extends TestCase
     {
         $response = $this->postJson('api/user/login', []);
 
-        $response->assertUnprocessable()->assertJson([
-            'message' => 'The email field is required. (and 1 more error)',
-            'errors' => [
-                'email' => ['The email field is required.'],
-                'password' => ['The password field is required.'],
-            ]
+        $response->assertStatus(400)->assertJson([
+            'kode' => 400,
+            'status' => false,
+            'message' => 'Gagal: The email field is required.',
         ]);
     }
 
@@ -166,41 +157,40 @@ class AuthTest extends TestCase
             'kode',
             'status',
             'message',
-            'access_token',
-            'type',
             'data' => [
                 'id_user',
                 'nama',
                 'email',
-                'no_hp',
                 'role',
+                'access_token',
+                'type',
             ],
-        ])->dump();
+        ]);
     }
 
-    public function test_user_get_a_unauthorized_error_when_login_with_wrong_email()
+    public function test_user_get_a_bad_request_error_when_login_with_wrong_email()
     {
         $response = $this->postJson('api/user/login', [
-            'email' => 'dzalfiqrisabani@gmail.com', //registered email is 'example@gmail.com
+            'email' => 'testemail@gmail.com', //registered email is 'muhdzalfikri@gmail.com
             'password' => '12345678'
         ]);
-        $response->assertUnauthorized()->assertJson([
-            'kode' => 401,
+        $response->assertStatus(400)->assertJson([
+            'kode' => 400,
             'status' => false,
-            'message' => 'Proses login gagal, siahkan cek kembali email dan password Anda'
+            'message' => 'Gagal: Cek kembali email dan password Anda',
         ]);
     }
 
-    public function test_user_get_a_unauthorized_error_when_login_with_wrong_password()
+    public function test_user_get_a_bad_request_error_when_login_with_wrong_password()
     {
         $response = $this->postJson('api/user/login', [
-            'email' => 'muhdzalfikri@gmail.com', //registered email is 'example@gmail.com
-            'password' => '87654321'
+            'email' => 'muhdzalfikri@gmail.com',
+            'password' => '87654321' // wrong password
         ]);
-        $response->assertUnauthorized()->assertJson([
-            'kode' => 401,
+        $response->assertStatus(400)->assertJson([
+            'kode' => 400,
             'status' => false,
-            'message' => 'Proses login gagal, siahkan cek kembali email dan password Anda'
+            'message' => 'Gagal: Cek kembali email dan password Anda',
         ]);
     }
 

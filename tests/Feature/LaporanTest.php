@@ -27,10 +27,10 @@ class LaporanTest extends TestCase
     public function test_masyarakat_success_create_laporan()
     {
         /// PERSIAPAN
+        $faker = Faker::create('id_ID');
         $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         Sanctum::actingAs($masyarakat, ['createLaporan']);
 
-        $faker = Faker::create('id_ID');
 
         // membuat jenis pemilu baru
         $jenisPemilu = JenisPemilu::factory()->create([
@@ -71,13 +71,25 @@ class LaporanTest extends TestCase
                 'kode',
                 'status',
                 'message',
-                'data'
+                'data' => [
+                    'nomor_laporan',
+                    'judul',
+                    'tanggal_kejadian',
+                    'pemberi',
+                    'penerima',
+                    'nominal',
+                    'tempat_kejadian',
+                    'kronologi_kejadian',
+                    'bukti',
+                    'nik',
+                    'pemilu_id'
+                ]
             ]
         );
     }
 
     // Masyarakat membuat laporan dengan data tidak lengkap
-    public function test_masyarakat_get_a_validation_error_when_try_to_create_laporan_with_pemberi_and_penerima_field_on_null()
+    public function test_masyarakat_get_a_validation_error_when_try_to_create_laporan_with_pemberi_or_penerima_field_on_null()
     {
 
         $faker = Faker::create('id_ID');
@@ -117,13 +129,11 @@ class LaporanTest extends TestCase
 
         $response = $this->postJson('api/laporan', $payload, ['Accept' => 'Application/json']);
 
-        $response->assertUnprocessable()->assertJson(
+        $response->assertStatus(400)->assertJson(
             [
-                "message" => "The pemberi field is required. (and 1 more error)",
-                "errors" => [
-                    "pemberi" => ["The pemberi field is required."],
-                    "penerima" => ["The penerima field is required."],
-                ]
+                'kode' => 400,
+                'status' => false,
+                'message' => 'Gagal: The pemberi field is required.',
             ]
         );
     }
@@ -171,12 +181,30 @@ class LaporanTest extends TestCase
         );
     }
     // masyarakat melihat detail laporan berdasarkan nomor laporan
-    public function test_masyarakat_can_get_laporan_by_nomor_laporan()
+    public function test_masyarakat_can_read_laporan_by_nomor_laporan()
     {
-
-        $this->withoutExceptionHandling();
         $faker = Faker::create('id_ID');
-        $pemiluID = DB::table('pemilu')->pluck('id_pemilu');
+        $pemiluID = $faker->randomElement(DB::table('pemilu')->pluck('id_pemilu'));
+
+        if(!$pemiluID){
+            $jenisPemilu = JenisPemilu::factory()->create([
+                'nama' => 'Pemilihan Kepala Desa'
+            ]);
+
+            // Alamat
+            $alamat = Alamat::factory()->generateGarutJawaBarat()->create();
+
+            // membuat pemilu baru
+            $pemilu = Pemilu::factory()->create([
+                'nama' => 'Pemilihan Kepala Desa Sukaratu',
+                'tanggal_pelaksanaan' => '2023-03-20',
+                'waktu_pelaksanaan' => $faker->time('H:i'),
+                'jenis_id' => $jenisPemilu->id_jenis,
+                'alamat_id' => $alamat->id_alamat
+            ]);
+
+            $pemiluID = $pemilu->id_pemilu;
+        }
 
         $masyarakat = User::factory()->has(Masyarakat::factory())->create();
         Sanctum::actingAs($masyarakat);
@@ -192,7 +220,7 @@ class LaporanTest extends TestCase
             'tempat_kejadian' => 'Kp Sukamentri, Garut',
             'kronologi_kejadian' => 'hari senin pagi Bapak Samsudin berkunjung ke Kampung sukamentri dengan sambal membagikan uang kepada setiap warga',
             'bukti' => 'https://www.drive.google.com',
-            'pemilu_id' => $faker->randomElement($pemiluID),
+            'pemilu_id' => $pemiluID,
             'nik' => $masyarakat->masyarakat->nik
         ];
 
@@ -238,12 +266,12 @@ class LaporanTest extends TestCase
             [
                 "kode" => 403,
                 "status" => false,
-                "message" => "Anda Tidak Memiliki Akses Untuk Melihat Laporan Ini"
+                "message" => "Gagal: Anda Tidak Memiliki Akses Untuk Melihat Laporan Ini"
             ]
         );
     }
 
-    public function test_masyarakat_can_update_their_laporan()
+    public function test_masyarakat_can_update_title_laporan()
     {
         $faker = Faker::create('id_ID');
         $masyarakat = User::factory()->has(Masyarakat::factory())->create();
@@ -389,7 +417,7 @@ class LaporanTest extends TestCase
             [
                 'kode' => 403,
                 'status' => false,
-                'message' => 'Akses Ditolak. Laporan sedang diproses, Tidak dapat diubah'
+                'message' => 'Gagal: Akses Ditolak!. Laporan sedang diproses, tidak dapat diubah'
             ]
         );
     }
@@ -443,7 +471,7 @@ class LaporanTest extends TestCase
             [
                 'kode' => 403,
                 'status' => false,
-                'message' => 'Akses Ditolak!. Hanya pemilik Laporan yang dapat menggunakan fitur ini'
+                'message' => 'Gagal: Akses Ditolak!. Hanya pemilik Laporan yang dapat menggunakan fitur ini'
             ]
         );
     }
@@ -484,7 +512,7 @@ class LaporanTest extends TestCase
             [
                 'kode' => 200,
                 'status' => true,
-                'message' => 'Data Laporan ' . $laporan->judul . ' berhasil dihapus'
+                'message' => 'Laporan dengan judul ' .'"'. $laporan->judul .'"'. ' berhasil dihapus'
             ]
         );
     }
@@ -521,11 +549,11 @@ class LaporanTest extends TestCase
 
         $response = $this->deleteJson('api/laporan/' . $laporan->nomor_laporan);
 
-        $response->assertOk()->assertJson(
+        $response->assertForbidden(403)->assertJson(
             [
                 'kode' => 403,
                 'status' => false,
-                'message' => 'Permintaan Ditolak. Laporan sedang diproses, tidak dapat dihapus'
+                'message' => 'Gagal: Permintaan Ditolak. Laporan sedang diproses, tidak dapat dihapus'
             ]
         );
     }
@@ -583,21 +611,14 @@ class LaporanTest extends TestCase
                 '*' => [
                     'nomor_laporan',
                     'judul',
-                    'pemberi',
-                    'penerima',
                     'nominal',
-                    'tempat_kejadian',
-                    'kronologi_kejadian',
-                    'tanggal_kejadian',
-                    'bukti',
-                    'pemilu_id',
-                    'nik'
+                    'created_at',
                 ]
             ]
         ]);
     }
 
-    public function test_petugas_can_get_all_laporan_masyarakat()
+    public function test_pengawas_can_get_all_laporan_masyarakat()
     {
         $petugas = User::factory()->petugas()->has(Pengawas::factory())->create();
         Sanctum::actingAs($petugas, ['getAll']);
@@ -612,15 +633,8 @@ class LaporanTest extends TestCase
                 '*' => [
                     'nomor_laporan',
                     'judul',
-                    'pemberi',
-                    'penerima',
                     'nominal',
-                    'tempat_kejadian',
-                    'kronologi_kejadian',
-                    'tanggal_kejadian',
-                    'bukti',
-                    'pemilu_id',
-                    'nik'
+                    'created_at',
                 ]
             ]
         ]);

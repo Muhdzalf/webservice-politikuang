@@ -8,6 +8,7 @@ use App\Models\Pemilu;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class PemiluController extends Controller
@@ -15,13 +16,8 @@ class PemiluController extends Controller
     public function create(Request $request)
     {
         $kode = 200;
-        try {
-            if (!Gate::allows('only-admin')) {
-                $kode = 403;
-                throw new Exception('Akses ditolak. Hanya petugas yang memiliki akses untuk fitur ini');
-            }
-            $request->validate([
-                'nama' => 'required|string',
+        $rules = [
+            'nama' => 'required|string',
                 'tanggal_pelaksanaan' => 'required|date_format:Y-m-d',
                 'waktu_pelaksanaan' => 'required|date_format:H:i',
                 'jenis_id' => 'required|numeric',
@@ -32,7 +28,19 @@ class PemiluController extends Controller
                 'provinsi_id' => 'required|numeric',
                 'desa' => 'required|string',
                 'detail_alamat' => 'required|string'
-            ]);
+        ];
+        try {
+            if (!Gate::allows('only-admin')) {
+                $kode = 403;
+                throw new Exception('Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini.');
+            }
+            $validator = Validator::make($request->all(), $rules);
+
+            if($validator->fails()){
+                $kode = 400;
+                throw new Exception($validator->messages()->first());
+            }
+
             $alamat = Alamat::create([
                 'kecamatan_id' => $request->kecamatan_id,
                 'kabupaten_kota_id' => $request->kabupaten_kota_id,
@@ -68,6 +76,7 @@ class PemiluController extends Controller
                 'message' => 'Data pemilu berhasil ditambahkan',
                 'data' => $pemilu
             ]);
+
         } catch (Throwable $err) {
             return response()->json([
                 'kode' => $kode,
@@ -82,22 +91,32 @@ class PemiluController extends Controller
         $kode = 200;
         try {
             $data = Pemilu::query()->search(request(['nama', 'id']))->get();
+
             if (is_null($data)) {
                 $kode = 404;
                 throw new Exception('Data Pemilu Tidak Ditemukan');
             }
 
+            $filteredData = $data->map(function ($item) {
+                return [
+                    'id_pemilu'=> $item->id_pemilu,
+                    'nama'=> $item->nama,
+                    'tanggal_pelaksanaan'=> $item->tanggal_pelaksanaan,
+                    'waktu_pelaksanaan'=> $item->waktu_pelaksanaan,
+                ];
+            });
+
             return response()->json([
                 'kode' => 200,
                 'status' => true,
                 'message' => 'Data Pemilu Berhasil Diambil',
-                'data' => $data
+                'data' => $filteredData
             ]);
         } catch (Throwable $err) {
             return response()->json([
                 'kode' => $kode,
                 'status' => false,
-                'message' => 'Data Pemilu Tidak Ditemukan',
+                'message' => 'Gagal: ' .$err->getMessage(),
             ], $kode);
         };
     }
@@ -108,7 +127,7 @@ class PemiluController extends Controller
         try {
             if (!Gate::allows('only-admin')) {
                 $kode = 403;
-                throw new Exception('Akses ditolak. Hanya petugas yang memiliki akses untuk fitur ini');
+                throw new Exception('Akses ditolak. Hanya petugas yang memiliki akses untuk fitur ini.');
             }
 
             //validation
@@ -172,7 +191,7 @@ class PemiluController extends Controller
     {
         $kode = 200;
         try {
-            $pemilu = Pemilu::find($id)->first();
+            $pemilu = Pemilu::with('alamat','jenis')->find($id);
             if (!$pemilu) {
                 $kode = 404;
                 throw new Exception('Data Tidak ditemukan');
@@ -190,11 +209,6 @@ class PemiluController extends Controller
                 'message' => 'Gagal: ' . $err->getMessage(),
             ], $kode);
         };
-        // if (!Gate::allows('only-admin')) {
-        //     return response()->json([
-        //         'message' => 'Hanya petugas yang memiliki akses untuk fitur ini'
-        //     ], 403);
-        // }
     }
 
     public function delete($id)

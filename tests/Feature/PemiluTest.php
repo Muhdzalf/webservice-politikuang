@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Admin;
 use App\Models\Administrator;
 use App\Models\Alamat;
 use App\Models\JenisPemilu;
@@ -21,6 +20,78 @@ class PemiluTest extends TestCase
      *
      * @return void
      */
+
+    public function test_masyarakat_can_get_all_pemilu_data()
+    {
+        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
+        Sanctum::actingAs($masyarakat);
+
+        $response = $this->getJson('api/pemilu');
+
+        $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
+            'message',
+            'data' => [
+                '*' => [
+                    'id_pemilu',
+                    'nama',
+                    'tanggal_pelaksanaan',
+                    'waktu_pelaksanaan',
+                ]
+            ]
+        ]);
+    }
+
+    public function test_admin_can_get_detail_pemilu_by_Id()
+    {
+        $faker = Faker::create();
+
+        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
+
+        Sanctum::actingAs($admin, ['details']);
+
+        $jenisPemilu = DB::table('jenis_pemilu')->pluck('id_jenis');
+        $jenisPemiluId = $faker->randomElement($jenisPemilu);
+
+        $alamat = Alamat::factory()->create([
+            'provinsi_id' => 32,
+            'kabupaten_kota_id' => 3205,
+            'kecamatan_id' => 3205230,
+            'desa' => 'Desa Sukaratu',
+            'detail_alamat' => 'Aula Desa',
+        ]);
+
+        $alamatId = $alamat->id_alamat;
+
+        $dataPemilu = [
+            'nama' => 'Pemilihan Desa Sukaratu',
+            'tanggal_pelaksanaan' => $faker->date(),
+            'waktu_pelaksanaan' => $faker->time('H:i'),
+            'jenis_id' => $jenisPemiluId,
+            'alamat_id' => $alamatId,
+            'admin_id' => $admin->id_admin
+        ];
+
+        $pemilu = Pemilu::factory()->create($dataPemilu);
+
+        $response = $this->getJson('api/pemilu/' . $pemilu->id_pemilu);
+
+        $response->assertOk()->assertJsonStructure([
+            'kode',
+            'status',
+            'message',
+            'data' => [
+                'id_pemilu',
+                'nama',
+                'tanggal_pelaksanaan',
+                'waktu_pelaksanaan',
+                'jenis_id',
+                'alamat_id',
+            ]
+        ]);
+    }
+
     public function test_admin_success_create_pemilu()
     {
         $faker = Faker::create('id_ID');
@@ -89,12 +160,12 @@ class PemiluTest extends TestCase
             [
                 'kode' => 403,
                 'status' => false,
-                'message' => 'Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini.'
+                'message' => 'Gagal: Akses ditolak. Hanya admin yang memiliki akses untuk fitur ini.'
             ]
         );
     }
 
-    public function test_admin_get_a_validation_error_when_create_pemilu_with_tanggal_pelaksanaan_field__on_null()
+    public function test_admin_get_a_validation_error_when_create_pemilu_with_tanggal_pelaksanaan_field_on_null()
     {
         $faker = Faker::create('id_ID');
         $admin = User::factory()->administrator()->has(Administrator::factory())->create();
@@ -118,12 +189,11 @@ class PemiluTest extends TestCase
 
         $response = $this->postJson('api/pemilu', $dataPemilu);
 
-        $response->assertUnprocessable()->assertJson(
+        $response->assertStatus(400)->assertJson(
             [
-                "message" => "The tanggal pelaksanaan field is required.",
-                "errors" => [
-                    "tanggal_pelaksanaan" => ["The tanggal pelaksanaan field is required."],
-                ]
+                'kode' => 400,
+                'status' => false,
+                'message' => 'Gagal: The tanggal pelaksanaan field is required.',
             ]
         );
     }
@@ -183,55 +253,6 @@ class PemiluTest extends TestCase
         ]);
     }
 
-    public function test_admin_can_get_detail_pemilu()
-    {
-        $faker = Faker::create();
-
-        $admin = User::factory()->administrator()->has(Administrator::factory())->create();
-
-        Sanctum::actingAs($admin, ['details']);
-
-        $jenisPemilu = DB::table('jenis_pemilu')->pluck('id_jenis');
-        $jenisPemiluId = $faker->randomElement($jenisPemilu);
-
-        $alamat = Alamat::factory()->create([
-            'provinsi_id' => 32,
-            'kabupaten_kota_id' => 3205,
-            'kecamatan_id' => 3205230,
-            'desa' => 'Desa Sukaratu',
-            'detail_alamat' => 'Aula Desa',
-        ]);
-
-        $alamatId = $alamat->id_alamat;
-
-        $dataPemilu = [
-            'nama' => 'Pemilihan Desa Sukaratu',
-            'tanggal_pelaksanaan' => $faker->date(),
-            'waktu_pelaksanaan' => $faker->time('H:i'),
-            'jenis_id' => $jenisPemiluId,
-            'alamat_id' => $alamatId,
-            'admin_id' => $admin->id_admin
-        ];
-
-        $pemilu = Pemilu::factory()->create($dataPemilu);
-
-        $response = $this->getJson('api/pemilu/' . $pemilu->id_pemilu);
-
-        $response->assertOk()->assertJsonStructure([
-            'kode',
-            'status',
-            'message',
-            'data' => [
-                'id_pemilu',
-                'nama',
-                'tanggal_pelaksanaan',
-                'waktu_pelaksanaan',
-                'jenis_id',
-                'alamat_id',
-            ]
-        ]);
-    }
-
     public function test_admin_can_delete_pemilu()
     {
         // $this->withExceptionHandling();
@@ -252,29 +273,5 @@ class PemiluTest extends TestCase
                 'message' => 'Data Pemilu Berhasil Dihapus',
             ]
         );
-    }
-
-    public function test_masyarakat_can_get_all_pemilu_data()
-    {
-        $masyarakat = User::factory()->has(Masyarakat::factory())->create();
-        Sanctum::actingAs($masyarakat);
-
-        $response = $this->getJson('api/pemilu');
-
-        $response->assertOk()->assertJsonStructure([
-            'kode',
-            'status',
-            'message',
-            'data' => [
-                '*' => [
-                    'id_pemilu',
-                    'nama',
-                    'tanggal_pelaksanaan',
-                    'waktu_pelaksanaan',
-                    'jenis_id',
-                    'alamat_id'
-                ]
-            ]
-        ]);
     }
 }

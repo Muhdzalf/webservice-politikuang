@@ -11,6 +11,7 @@ use App\Http\Controllers\API\PemiluController;
 use App\Http\Controllers\API\PengawasController;
 use App\Http\Controllers\API\ProgressController;
 use App\Http\Controllers\API\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,7 +37,7 @@ Route::middleware('auth:sanctum')->group(
 
         // User
         Route::get('/user', [UserController::class, 'fetchUser']);
-        Route::post('/user/update', [UserController::class, 'updateProfile']);
+        Route::put('/user', [UserController::class, 'updateProfile']);
         Route::post('/user/pengawas', [PengawasController::class, 'create']);
         Route::post('/user/admin', [AdministratorController::class, 'create']);
 
@@ -91,4 +92,4 @@ Route::middleware('auth:sanctum')->group(
 Route::Post('/user/login', [AuthController::class, 'login']);
 
 // REGISTRASI MASYARAKAT
-Route::Post('/user/register', [MasyarakatController::class, 'register']);
+Route::Post('/user/register', [AuthController::class, 'register']);

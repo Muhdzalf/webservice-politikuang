@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 use function PHPSTORM_META\map;
@@ -21,8 +22,8 @@ class LaporanController extends Controller
     //
     public function create(Request $request)
     {
-        try {
-            $request->validate([
+        $kode = 200; // default
+        $rules = [
                 'nomor_laporan' => 'unique:laporan',
                 'judul' => 'required|string',
                 'tanggal_kejadian' => 'required|date_format:Y-m-d',
@@ -33,21 +34,26 @@ class LaporanController extends Controller
                 'kronologi_kejadian' => 'required|string',
                 'bukti' => 'required|url',
                 'pemilu_id' => 'required|numeric'
-            ]);
+        ];
+
+        try {
+            $validator = Validator::make($request->all(), $rules);
+
+            if($validator->fails()){
+                $kode = 400;
+                throw new Exception($validator->messages()->first());
+            }
 
             // mendapatkan nik user yang sedang login
             $userId = Auth::user()->id_user;
             $pengirimId = Masyarakat::where('user_id', $userId)->first();
 
-            $kode = 200; // default
-            $status = true;
 
             // membuat nomor laporan
             $nomorLaporan = $this->generateNomorLaporan($request->pemilu_id);
 
             if (!$userId || !$pengirimId || !$nomorLaporan) {
-                $kode = 400;
-                $status = false;
+                $kode = 500;
                 throw new Exception('Tidak dapat membuat Laporan. Terdapat Kesalahan pada sistem');
             }
 
@@ -78,11 +84,12 @@ class LaporanController extends Controller
                 'kode' => 200,
                 'status' => true,
                 'message' => 'Laporan Berhasil dibuat dengan nomor ' . $laporan->nomor_laporan,
+                'data' => $laporan,
             ]);
         } catch (Throwable $err) {
             return response()->json([
                 'kode' => $kode,
-                'status' => $status,
+                'status' => false,
                 'message' => 'Gagal: ' . $err->getMessage(),
             ], $kode);
         }
@@ -114,7 +121,7 @@ class LaporanController extends Controller
             if ($ProgressLaporan->status === 'diproses' || $ProgressLaporan->status === 'ditolak' || $ProgressLaporan->status === 'selesai') {
                 $kode = 403;
                 $status = false;
-                throw new Exception('Akses Ditolak! Laporan sedang diproses');
+                throw new Exception('Akses Ditolak!. Laporan sedang diproses, tidak dapat diubah');
             }
 
             $laporan->judul = $request->judul;
@@ -164,9 +171,9 @@ class LaporanController extends Controller
                 throw new Exception('Hanya Petugas Yang dapat Mengakses Fitur Ini');
             }
 
-            $laporan = Laporan::query()->filter(request(['cari']))->get(['nomor_laporan', 'judul']);
+            $laporan = Laporan::query()->filter(request(['cari']))->get(['nomor_laporan', 'judul', 'nominal', 'created_at']); //hanya menampilkan nomor dan judul
 
-            if (count($laporan) < 1) {
+            if (is_null($laporan)) {
                 $kode = 404;
                 $status = false;
                 throw new Exception('Laporan Tidak Ditemukan');
@@ -287,7 +294,7 @@ class LaporanController extends Controller
             return response()->json([
                 'kode' => 200,
                 'status' => true,
-                'message' => 'Laporan dengan judul'.'"'. $laporan->judul .'"'. ' berhasil dihapus'
+                'message' => 'Laporan dengan judul '.'"'. $laporan->judul .'"'. ' berhasil dihapus'
             ]);
         } catch (Throwable $err) {
             return response()->json([

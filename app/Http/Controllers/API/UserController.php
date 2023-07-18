@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class UserController extends Controller
@@ -41,36 +42,47 @@ class UserController extends Controller
             ]);}catch(Throwable $err){
             return response()->json([
                 'kode' => $kode,
-                'status' => 'false',
+                'status' => false,
                 'message' => 'Gagal: '. $err->getMessage(),
             ], $kode);
         };
     }
 
-    public function updateProfile(Request $request, User $user)
+    public function updateProfile(Request $request)
     {
         $kode = 200;
-        try{}catch(Throwable $err){}
-        $request->validate([
+        $Msyrules = [
             'nama' => 'required|string|max:50',
             'email' => 'required|email',
             'no_hp' => 'required|regex:/(0)[0-9]{11}/',
-        ]);
+        ];
+        try{
+            $user = $request->user();
+            $validator = Validator::make($request->all(), $Msyrules);
 
-        $user = $request->user();
+            if($validator->fails()){
+                $kode = 400;
+                throw new Exception($validator->messages()->first());
+            }
 
-        $user->nama = $request->nama;
-        $user->email = $request->email;
-        $user->no_hp = $request->no_hp;
 
-        $user->save();
+            $user->nama = $request->nama;
+            $user->email = $request->email;
+            $user->no_hp = $request->no_hp;
 
-        return response()->json([
-            'kode' => 200,
-            'status' => true,
-            'message' => "data berhasil diperbaharui",
-            'data' => $user
-        ]);
+            $user->save();
+
+            return response()->json([
+                'kode' => 200,
+                'status' => true,
+                'message' => "data berhasil diperbaharui",
+                'data' => $user
+            ]);
+        }catch(Throwable $err){  return response()->json([
+            'kode' => $kode,
+            'status' => false,
+            'message' => 'Gagal: '.$err->getMessage(),
+        ], $kode);}
     }
 
     public function getAllUser()
@@ -82,16 +94,26 @@ class UserController extends Controller
                 throw new Exception('Hanya Petugas Yang dapat Mengakses Fitur Ini');
             }
             $user = User::all();
+
+            $filteredUser = $user->map(function ($item) {
+                return [
+                    'id_user' => $item->id_user,
+                    'nama' => $item->nama,
+                    'email' => $item->email,
+                    'role' => $item->role,
+                ];
+            });
+
             return response()->json([
                 'kode' => 200,
                 'status' => true,
                 'message' => 'Data User Berhasil Diambil',
-                'data' => $user
+                'data' => $filteredUser,
             ]);
         }catch(Throwable $err){
             return response()->json([
             'kode' => $kode,
-            'status' => 'false',
+            'status' => false,
             'message' => 'Gagal: '.$err->getMessage(),
         ], $kode);}
     }

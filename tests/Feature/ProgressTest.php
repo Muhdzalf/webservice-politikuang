@@ -27,24 +27,21 @@ class ProgressTest extends TestCase
     // untuk menguji bahwa pengawas dapat merespon laporan yang telah dibuat masyarakat
     public function test_pengawas_success_respon_laporan()
     {
-        $this->withExceptionHandling();
         $faker = Faker::create('id_ID');
 
         $petugas = User::factory()->petugas()->has(Pengawas::factory())->create();
         Sanctum::actingAs($petugas);
 
         // mengambil nomor laporan secara acak dari database
-        $laporan = DB::table('laporan')->pluck('nomor_laporan');
-        $nomor = $faker->randomElement($laporan);
+        $laporanId = $faker->randomElement(DB::table('laporan')->pluck('nomor_laporan'));
 
         //payload
         $payload = [
-            'nomor_laporan' => $nomor,
             'status' => 'diproses',
             'keterangan' => 'Laporan Sedang Diproses Oleh Petugas.'
         ];
 
-        $response = $this->postJson('api/laporan/respon/' . $nomor, $payload);
+        $response = $this->postJson('api/laporan/respon/' . $laporanId, $payload);
 
         $response->assertOk()->assertJsonStructure(
             [
@@ -75,13 +72,14 @@ class ProgressTest extends TestCase
         $response = $this->postJson('api/laporan/respon/' . $id, [
             'nomor_laporan' => $id,
             'status' => 'Tidak Diterima',
-            'keterangan' => 'Laporan Tidak Bisa Diterima karena tidak adanya data pendukung'
+            'keterangan' => 'Laporan Tidak Bisa Diterima karena tidak adanya bukti data pendukung'
         ]);
 
-        $response->assertUnprocessable()->assertJsonStructure(
+        $response->assertStatus(400)->assertJsonStructure(
             [
+                'kode',
+                'status',
                 'message',
-                'errors'
             ]
         );
     }
